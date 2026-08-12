@@ -1,4 +1,4 @@
-import TaskManager from './components/TaskManager';
+
 
 function App() {
   return (
@@ -7,7 +7,7 @@ function App() {
         Fullstack CRUD App
       </h1>
       <div className="w-full">
-        <TaskManager />
+   
       </div>
     </div>
   );
