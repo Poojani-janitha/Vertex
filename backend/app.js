@@ -14,6 +14,7 @@ app.use('/api', apiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 
+
 app.get('/', (_req, res) => {
 	res.json({ message: 'Vertex API is running' });
 });

@@ -58,3 +58,15 @@ exports.delete = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.updateMyProfile = async (req, res) => {
+  try {
+    const [updated] = await Profile.update(req.body, {
+      where: { userId: req.user.id }
+    });
+    const profile = await Profile.findOne({ where: { userId: req.user.id } });
+    res.status(200).json(profile);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

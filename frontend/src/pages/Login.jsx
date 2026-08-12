@@ -21,8 +21,12 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data));
       
-      // Redirect to jobs page after successful login
-      navigate('/jobs');
+      // Redirect based on role
+      if (response.data.role === 'student') {
+        navigate('/dashboard');
+      } else {
+        navigate('/jobs');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
     } finally {
