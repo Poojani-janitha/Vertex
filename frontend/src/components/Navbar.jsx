@@ -4,53 +4,33 @@ import { useState, useEffect } from 'react';
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-<<<<<<< HEAD
-  const [currentUser, setCurrentUser] = useState(null);
+  const [user, setUser] = useState(null);
 
   // Sync login status on navigation
   useEffect(() => {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       try {
-        setCurrentUser(JSON.parse(userStr));
+        setUser(JSON.parse(userStr));
       } catch (err) {
         console.error(err);
       }
     } else {
-      setCurrentUser(null);
-    }
-  }, [location]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setCurrentUser(null);
-    navigate('/');
-  };
-=======
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      setUser(JSON.parse(userString));
-    } else {
       setUser(null);
     }
   }, [location]);
->>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
-
-  const getLinkClass = (path) => {
-    return location.pathname === path
-      ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
-      : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     navigate('/');
+  };
+
+  const getLinkClass = (path) => {
+    return location.pathname === path
+      ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
+      : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
   };
 
   return (
@@ -68,31 +48,17 @@ const Navbar = () => {
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
                 <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
-<<<<<<< HEAD
-                {currentUser && currentUser.role === 'employer' && (
-                  <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
-=======
                 {user && user.role === 'student' && (
                   <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
->>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
+                )}
+                {user && user.role === 'employer' && (
+                  <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
                 )}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
-<<<<<<< HEAD
-              {currentUser ? (
-                <>
-                  <span className="text-gray-400 text-sm">Hello, <span className="font-semibold text-gray-200">{currentUser.name}</span></span>
-                  <button 
-                    onClick={handleLogout}
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    Log out
-                  </button>
-                </>
-=======
               {user ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-300 text-sm">
@@ -100,12 +66,11 @@ const Navbar = () => {
                   </span>
                   <button 
                     onClick={handleLogout}
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-750 hover:border-red-600 transition"
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-900/50 hover:border-red-500 transition cursor-pointer"
                   >
                     Log out
                   </button>
                 </div>
->>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
               ) : (
                 <>
                   <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
