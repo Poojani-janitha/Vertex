@@ -31,6 +31,9 @@ router.use('/badges', badgeRoutes);
 const messageRoutes = require('./messageRoutes');
 router.use('/messages', messageRoutes);
 
+const skillRoutes = require('./skillRoutes');
+router.use('/skills', skillRoutes);
+
 const adminRoutes = require('./adminRoutes');
 router.use('/admin', adminRoutes);
 

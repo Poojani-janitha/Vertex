@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
-const { Job, Application, User, EmployerVerification, sequelize } = require('../models');
+const { Job, Application, User, EmployerVerification, Message, sequelize } = require('../models');
 
 // @desc    Create a new job post
 // @route   POST /api/jobs
@@ -16,7 +16,8 @@ const createJob = async (req, res) => {
       latitude,
       longitude,
       startTime,
-      endTime
+      endTime,
+      requiredEmployees
     } = req.body;
 
     // Validate fields
@@ -46,6 +47,7 @@ const createJob = async (req, res) => {
       longitude,
       startTime,
       endTime,
+      requiredEmployees: requiredEmployees ? parseInt(requiredEmployees) : 1,
       status: 'open'
     });
 
@@ -134,7 +136,8 @@ const updateApplicationStatus = async (req, res) => {
     }
 
     // Find application and include job to check ownership
-    const application = await Application.findByPk(applicationId, {
+    const application = await Application.findOne({
+      where: { id: applicationId },
       include: [{ model: Job, as: 'job' }]
     });
 
@@ -150,6 +153,31 @@ const updateApplicationStatus = async (req, res) => {
     // Update status
     application.status = status;
     await application.save();
+
+    // If accepted, decrement requiredEmployees and check if filled
+    if (status === 'accepted') {
+      const job = application.job;
+      if (job.requiredEmployees > 0) {
+        job.requiredEmployees = Math.max(0, job.requiredEmployees - 1);
+        if (job.requiredEmployees === 0) {
+          job.status = 'filled';
+        }
+        await job.save();
+      }
+    }
+
+    // Automatically send direct message from employer to the student
+    const messageText = status === 'accepted'
+      ? `Congratulations! Your application for the job "${application.job.title}" has been approved. Looking forward to working with you!`
+      : `Thank you for applying for the job "${application.job.title}". Unfortunately, we have decided to proceed with other candidates at this time.`;
+
+    await Message.create({
+      jobId: application.jobId,
+      senderId: req.user.id,
+      receiverId: application.studentId,
+      message: messageText,
+      sentAt: new Date()
+    });
 
     // Remove nested job object before returning for clean response
     const responseData = application.toJSON();

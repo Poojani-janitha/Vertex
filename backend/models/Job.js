@@ -58,6 +58,12 @@ class Job extends Model {
         allowNull: true,
         field: 'end_time',
       },
+      requiredEmployees: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+        field: 'required_employees',
+      },
       status: {
         type: DataTypes.ENUM('open', 'closed', 'filled'),
         defaultValue: 'open',
