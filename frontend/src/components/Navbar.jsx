@@ -6,26 +6,31 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  // Sync login status on navigation
   useEffect(() => {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      setUser(JSON.parse(userString));
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch (err) {
+        console.error(err);
+      }
     } else {
       setUser(null);
     }
   }, [location]);
-
-  const getLinkClass = (path) => {
-    return location.pathname === path
-      ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
-      : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     navigate('/');
+  };
+
+  const getLinkClass = (path) => {
+    return location.pathname === path
+      ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
+      : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
   };
 
   return (
@@ -46,6 +51,9 @@ const Navbar = () => {
                 {user && user.role === 'student' && (
                   <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
                 )}
+                {user && user.role === 'employer' && (
+                  <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
+                )}
               </div>
             </div>
           </div>
@@ -58,7 +66,7 @@ const Navbar = () => {
                   </span>
                   <button 
                     onClick={handleLogout}
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-750 hover:border-red-600 transition"
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-900/50 hover:border-red-500 transition cursor-pointer"
                   >
                     Log out
                   </button>
