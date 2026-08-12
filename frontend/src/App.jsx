@@ -1,15 +1,18 @@
-
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Jobs from './pages/Jobs';
+import Users from './pages/Users';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-bold text-white mb-8 text-center">
-        Fullstack CRUD App
-      </h1>
-      <div className="w-full">
-   
-      </div>
-    </div>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/users" element={<Users />} />
+      </Routes>
+    </Layout>
   );
 }
 
