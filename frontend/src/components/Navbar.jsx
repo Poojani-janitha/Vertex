@@ -40,7 +40,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
               <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
-                Vertex
+                WorkOra
               </span>
             </Link>
             <div className="hidden md:block ml-10">
@@ -48,6 +48,7 @@ const Navbar = () => {
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
                 <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
+                <Link to="/contact" className={getLinkClass('/contact')}>Contact Us</Link>
                 {user && user.role === 'student' && (
                   <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
                 )}

@@ -189,8 +189,8 @@ const CommunityDashboard = () => {
         
         {/* Brand Logo header */}
         <div className="h-16 px-6 border-b border-gray-800 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">V</div>
-          <span className="text-lg font-bold text-white tracking-wider">Vertex Comm</span>
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">W</div>
+          <span className="text-lg font-bold text-white tracking-wider">WorkOra Comm</span>
         </div>
 
         {/* Sidebar Nav content */}
