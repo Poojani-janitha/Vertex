@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
 
 // Import subviews
@@ -7,6 +7,7 @@ import Overview from './views/Overview';
 import ProfileSettings from './views/ProfileSettings';
 import AppliedJobs from './views/AppliedJobs';
 import Messages from './views/Messages';
+import RelatedJobs from './views/RelatedJobs';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -156,10 +157,10 @@ const StudentDashboard = () => {
       <aside className="w-64 bg-[#111726] border-r border-gray-800 flex flex-col h-full shrink-0 select-none">
         
         {/* Brand Logo header */}
-        <div className="h-16 px-6 border-b border-gray-800 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">W</div>
-          <span className="text-lg font-bold text-white tracking-wider">WorkOra Student</span>
-        </div>
+        <Link to="/" className="h-16 px-6 border-b border-gray-800 flex items-center gap-3 hover:bg-gray-850 transition-colors cursor-pointer select-none">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg shrink-0">W</div>
+          <span className="text-lg font-bold text-white tracking-wider truncate">WorkOra Student</span>
+        </Link>
 
         {/* Sidebar Nav content */}
         <div className="flex-grow overflow-y-auto px-4 py-6 space-y-6">
@@ -180,7 +181,14 @@ const StudentDashboard = () => {
                 className={sidebarButtonClass('jobs')}
               >
                 <span className="text-base">💼</span>
-                Registered Jobs
+                My Jobs
+              </button>
+              <button
+                onClick={() => setActiveTab('related-jobs')}
+                className={sidebarButtonClass('related-jobs')}
+              >
+                <span className="text-base">🔍</span>
+                Related Jobs
               </button>
               <button
                 onClick={() => setActiveTab('messages')}
@@ -291,6 +299,15 @@ const StudentDashboard = () => {
           {activeTab === 'jobs' && (
             <AppliedJobs 
               applications={applications} 
+            />
+          )}
+
+          {activeTab === 'related-jobs' && (
+            <RelatedJobs 
+              user={user}
+              profile={profile}
+              applications={applications}
+              onApplicationSubmitted={fetchDashboardData}
             />
           )}
 
