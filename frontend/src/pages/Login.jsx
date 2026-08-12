@@ -22,7 +22,9 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(response.data));
       
       // Redirect based on role
-      if (response.data.role === 'student') {
+      if (response.data.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (response.data.role === 'student') {
         navigate('/dashboard');
       } else {
         navigate('/jobs');
