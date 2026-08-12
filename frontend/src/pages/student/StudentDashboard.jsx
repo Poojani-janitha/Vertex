@@ -16,6 +16,7 @@ const StudentDashboard = () => {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [applications, setApplications] = useState([]);
+  const [reviewedJobIds, setReviewedJobIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -53,15 +54,21 @@ const StudentDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const [userRes, appsRes, availabilityRes] = await Promise.all([
+      const [userRes, appsRes, availabilityRes, reviewsRes] = await Promise.all([
         api.get('/auth/me'),
         api.get('/applications/my-applications'),
-        api.get('/availabilities/my-availability')
+        api.get('/availabilities/my-availability'),
+        api.get('/reviews')
       ]);
       
       setUser(userRes.data);
       setProfile(userRes.data.profile);
       setApplications(appsRes.data);
+
+      // Filter reviews by this student to know which jobs they already reviewed
+      const myReviews = reviewsRes.data.filter(r => r.fromUser === userRes.data.id);
+      const dbReviewed = myReviews.map(r => r.jobId);
+      setReviewedJobIds(dbReviewed);
 
       // Merge DB availability into state
       const dbAvail = availabilityRes.data;
@@ -299,6 +306,9 @@ const StudentDashboard = () => {
           {activeTab === 'jobs' && (
             <AppliedJobs 
               applications={applications} 
+              reviewedJobIds={reviewedJobIds}
+              user={user}
+              onReviewSubmitted={fetchDashboardData}
             />
           )}
 

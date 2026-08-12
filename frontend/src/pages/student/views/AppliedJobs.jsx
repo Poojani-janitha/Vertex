@@ -1,7 +1,22 @@
 import React, { useState } from 'react';
+import api from '../../../api/axios';
 
-const AppliedJobs = ({ applications }) => {
+const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitted }) => {
   const [filter, setFilter] = useState('all');
+
+  // Review Modal State
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  // Job Details Modal State
+  const [selectedDetailsJob, setSelectedDetailsJob] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsTrustScore, setDetailsTrustScore] = useState(null);
 
   const filteredApplications = applications.filter(app => {
     if (filter === 'all') return true;
@@ -16,8 +31,76 @@ const AppliedJobs = ({ applications }) => {
     }`;
   };
 
+  const handleOpenReview = (job) => {
+    setSelectedJob(job);
+    setRating(5);
+    setComment('');
+    setFeedback(null);
+    setShowReviewModal(true);
+  };
+
+  const handleCloseReview = () => {
+    setShowReviewModal(false);
+    setSelectedJob(null);
+    setFeedback(null);
+  };
+
+  const handleOpenDetails = async (job) => {
+    if (!job) return;
+    // Reset previous states to prevent showing old modal details while loading
+    setSelectedDetailsJob(null);
+    setDetailsTrustScore(null);
+    setDetailsLoading(true);
+    setShowDetailsModal(true);
+    try {
+      const [jobRes, scoreRes] = await Promise.all([
+        api.get(`/jobs/${job.id}`),
+        api.get(`/users/${job.employerId}/trust-score`)
+      ]);
+      setSelectedDetailsJob(jobRes.data);
+      setDetailsTrustScore(scoreRes.data);
+    } catch (err) {
+      console.error('Failed to fetch job details/trust score:', err);
+      // Fallback to simple job properties passed in if backend fails
+      setSelectedDetailsJob(job);
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      await api.post('/reviews', {
+        jobId: selectedJob.id,
+        fromUser: user.id,
+        toUser: selectedJob.employerId,
+        rating,
+        comment
+      });
+      setFeedback({ type: 'success', text: 'Review submitted successfully!' });
+      
+      // Sync dashboard data
+      if (onReviewSubmitted) {
+        onReviewSubmitted();
+      }
+
+      // Close modal shortly
+      setTimeout(() => {
+        handleCloseReview();
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setFeedback({ type: 'error', text: 'Failed to submit review. Please try again.' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="space-y-6">
       
       {/* Header and Filter Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-800 pb-6">
@@ -63,31 +146,251 @@ const AppliedJobs = ({ applications }) => {
                 <th className="px-6 py-4">Pay Amount</th>
                 <th className="px-6 py-4">Date Applied</th>
                 <th className="px-6 py-4 text-center">Status</th>
+                <th className="px-6 py-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
-              {filteredApplications.map((app) => (
-                <tr key={app.id} className="hover:bg-gray-800/40 transition-colors">
-                  <td className="px-6 py-4 font-semibold text-white">{app.job?.title || 'Unknown Job'}</td>
-                  <td className="px-6 py-4 text-green-400 font-semibold">${app.job?.payAmount || 'N/A'}</td>
-                  <td className="px-6 py-4 text-gray-400 text-xs">
-                    {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${
-                      app.status === 'accepted' ? 'bg-green-950/40 text-green-400 border-green-800' :
-                      app.status === 'rejected' ? 'bg-red-950/40 text-red-400 border-red-800' :
-                      'bg-yellow-950/40 text-yellow-450 border-yellow-800'
-                    }`}>
-                      {app.status === 'accepted' ? 'approved' : (app.status || 'pending')}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {filteredApplications.map((app) => {
+                const hasEnded = app.job?.endTime ? new Date(app.job.endTime) < new Date() : false;
+                const isApproved = app.status === 'accepted';
+                const alreadyReviewed = reviewedJobIds.includes(app.jobId);
+
+                return (
+                  <tr key={app.id} className="hover:bg-gray-800/40 transition-colors">
+                    <td className="px-6 py-4 font-semibold text-white">
+                      <button 
+                        type="button"
+                        onClick={() => handleOpenDetails(app.job)} 
+                        className="font-semibold text-white hover:text-blue-400 hover:underline text-left focus:outline-none"
+                      >
+                        {app.job?.title || 'Unknown Job'}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-green-400 font-semibold">Rs {app.job?.payAmount || 'N/A'}</td>
+                    <td className="px-6 py-4 text-gray-400 text-xs">
+                      {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${
+                        app.status === 'accepted' ? 'bg-green-950/40 text-green-400 border-green-800' :
+                        app.status === 'rejected' ? 'bg-red-950/40 text-red-400 border-red-800' :
+                        'bg-yellow-950/40 text-yellow-450 border-yellow-800'
+                      }`}>
+                        {app.status === 'accepted' ? 'approved' : (app.status || 'pending')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      {isApproved && hasEnded ? (
+                        alreadyReviewed ? (
+                          <span className="text-[10px] text-gray-500 font-bold bg-gray-900 border border-gray-800 px-2 py-1 rounded uppercase tracking-wider">Reviewed</span>
+                        ) : (
+                          <button 
+                            onClick={() => handleOpenReview(app.job)}
+                            className="bg-blue-600 hover:bg-blue-500 text-[10px] font-bold text-white px-3 py-1 rounded-lg uppercase tracking-wider transition shadow shadow-blue-500/20"
+                          >
+                            Review
+                          </button>
+                        )
+                      ) : (
+                        <span className="text-gray-600 text-xs">-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       )}
+
+      {/* Review Submission Modal */}
+      {showReviewModal && selectedJob && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#121824] border border-gray-800 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center bg-[#111726]/80">
+              <h3 className="text-base font-bold text-white">
+                ⭐️ Review Employer / Job
+              </h3>
+              <button 
+                onClick={handleCloseReview}
+                className="text-gray-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <form onSubmit={handleReviewSubmit} className="p-6 space-y-4">
+              {feedback && (
+                <div className={`p-3 rounded-lg text-xs text-center border ${
+                  feedback.type === 'success' 
+                    ? 'bg-green-950/40 border-green-800 text-green-300' 
+                    : 'bg-red-950/40 border-red-800 text-red-300'
+                }`}>
+                  {feedback.text}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Reviewing Job</label>
+                <div className="text-sm font-semibold text-white">{selectedJob.title}</div>
+              </div>
+
+              {/* Star Rating Selection */}
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Rating</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`text-2xl transition-transform transform active:scale-95 ${
+                        star <= rating ? 'text-yellow-400' : 'text-gray-600'
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Feedback Description</label>
+                <textarea 
+                  required 
+                  rows="4" 
+                  placeholder="Share your experience working on this gig..." 
+                  className="w-full bg-gray-900 border border-gray-750 text-white rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button 
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                >
+                  {submitting ? 'Submitting...' : 'Submit Review'}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={handleCloseReview}
+                  className="bg-gray-850 hover:bg-gray-800 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Job Details Modal */}
+      {showDetailsModal && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+          <div className="bg-[#121824] border border-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-8 space-y-6">
+              
+              <div className="flex justify-between items-start border-b border-gray-800 pb-4">
+                <h2 className="text-2xl font-bold text-white font-sans">
+                  {detailsLoading ? 'Loading details...' : selectedDetailsJob?.title}
+                </h2>
+                <button 
+                  onClick={() => setShowDetailsModal(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {detailsLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              ) : selectedDetailsJob ? (
+                <div className="space-y-6 text-sm text-gray-300">
+                  <div>
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Description</h4>
+                    <p className="text-gray-200 leading-relaxed bg-gray-900/30 p-4 rounded-xl border border-gray-800">
+                      {selectedDetailsJob.description || 'No description provided.'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                      <div className="text-gray-500 text-xs mb-1">Pay Amount</div>
+                      <div className="text-lg font-semibold text-green-400">Rs {selectedDetailsJob.payAmount || 'N/A'}</div>
+                    </div>
+                    <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
+                      <div className="text-gray-500 text-xs mb-1">Location</div>
+                      <div className="text-md font-medium text-white">{selectedDetailsJob.locationName || 'Remote / Unspecified'}</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-450 bg-gray-900/30 p-4 rounded-xl border border-gray-800">
+                    <div>📅 Start Time: <span className="text-white font-medium">{selectedDetailsJob.startTime ? new Date(selectedDetailsJob.startTime).toLocaleString() : 'N/A'}</span></div>
+                    <div>📅 End Time: <span className="text-white font-medium">{selectedDetailsJob.endTime ? new Date(selectedDetailsJob.endTime).toLocaleString() : 'N/A'}</span></div>
+                  </div>
+
+                  {detailsTrustScore && (
+                    <div className="bg-[#1c2234] p-5 rounded-xl border border-gray-750 space-y-3">
+                      <div className="flex justify-between items-center border-b border-gray-700/60 pb-2">
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Employer Trust Score</h4>
+                        <span className="text-sm font-extrabold text-green-400">{detailsTrustScore.score}/100</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-300">
+                        <div className="flex justify-between p-2 rounded bg-gray-900/45">
+                          <span>⭐ Average Rating:</span>
+                          <strong className="text-white">{detailsTrustScore.metrics?.avgRating}★ ({detailsTrustScore.breakdown?.rating}/40 pts)</strong>
+                        </div>
+                        <div className="flex justify-between p-2 rounded bg-gray-900/45">
+                          <span>⏱️ Worked Hours:</span>
+                          <strong className="text-white">{detailsTrustScore.metrics?.verifiedHours}h ({detailsTrustScore.breakdown?.hours}/30 pts)</strong>
+                        </div>
+                        <div className="flex justify-between p-2 rounded bg-gray-900/45">
+                          <span>💬 Reply Rate:</span>
+                          <strong className="text-white">95% ({detailsTrustScore.breakdown?.reply}/20 pts)</strong>
+                        </div>
+                        <div className="flex justify-between p-2 rounded bg-gray-900/45">
+                          <span>💼 Completed Jobs:</span>
+                          <strong className="text-white">{detailsTrustScore.metrics?.completedJobs} ({detailsTrustScore.breakdown?.completed}/10 pts)</strong>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedDetailsJob.skillsNeeded && (
+                    <div>
+                      <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedDetailsJob.skillsNeeded.split(',').map((skill, index) => (
+                          <span key={index} className="bg-blue-950/40 text-blue-400 border border-blue-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+              <div className="pt-4 border-t border-gray-800 flex justify-end">
+                <button 
+                  type="button"
+                  onClick={() => setShowDetailsModal(false)}
+                  className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+                >
+                  Close
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

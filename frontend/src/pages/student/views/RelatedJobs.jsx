@@ -65,7 +65,8 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
       }
     } catch (err) {
       console.error(err);
-      setFeedback({ type: 'error', text: 'Failed to submit application. Please try again.' });
+      const errMsg = err.response?.data?.error || 'Failed to submit application. Please try again.';
+      setFeedback({ type: 'error', text: errMsg });
     } finally {
       setApplyingJobId(null);
     }
