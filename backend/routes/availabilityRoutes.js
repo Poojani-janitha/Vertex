@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const availabilityController = require('../controllers/availabilityController');
+const { protect } = require('../middleware/authMiddleware');
+
+router.get('/my-availability', protect, availabilityController.getMyAvailability);
+router.put('/my-availability', protect, availabilityController.updateMyAvailability);
 
 router.get('/', availabilityController.getAll);
 router.get('/:id', availabilityController.getById);

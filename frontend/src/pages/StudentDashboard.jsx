@@ -16,20 +16,49 @@ const StudentDashboard = () => {
   const [updating, setUpdating] = useState(false);
   const [updateMessage, setUpdateMessage] = useState(null);
 
+  // Availability Schedule state (Default initialized for Mon-Sun)
+  const defaultDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const [availability, setAvailability] = useState(
+    defaultDays.map(day => ({
+      dayOfWeek: day,
+      startTime: '09:00',
+      endTime: '17:00',
+      isAvailable: false
+    }))
+  );
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, appsRes] = await Promise.all([
+        const [profileRes, appsRes, availabilityRes] = await Promise.all([
           api.get('/auth/me'),
-          api.get('/applications/my-applications')
+          api.get('/applications/my-applications'),
+          api.get('/availabilities/my-availability')
         ]);
         
         setProfile(profileRes.data);
         setApplications(appsRes.data);
         
-        // Pre-fill form
+        // Pre-fill profile form
         setBio(profileRes.data.profile?.bio || '');
         setSkills(profileRes.data.profile?.skills || '');
+
+        // Merge DB availability into state
+        const dbAvail = availabilityRes.data;
+        if (dbAvail && dbAvail.length > 0) {
+          setAvailability(prev => prev.map(defaultDay => {
+            const matched = dbAvail.find(item => item.dayOfWeek === defaultDay.dayOfWeek);
+            if (matched) {
+              return {
+                ...defaultDay,
+                startTime: matched.startTime ? matched.startTime.substring(0, 5) : '09:00',
+                endTime: matched.endTime ? matched.endTime.substring(0, 5) : '17:00',
+                isAvailable: matched.isAvailable
+              };
+            }
+            return defaultDay;
+          }));
+        }
       } catch (err) {
         setError('Failed to load dashboard data. Make sure you are logged in.');
       } finally {
@@ -39,23 +68,61 @@ const StudentDashboard = () => {
     fetchData();
   }, []);
 
-  const handleUpdateProfile = async (e) => {
+  const handleAvailabilityChange = (dayIndex, field, value) => {
+    setAvailability(prev => prev.map((item, idx) => {
+      if (idx === dayIndex) {
+        return { ...item, [field]: value };
+      }
+      return item;
+    }));
+  };
+
+  const handleUpdateProfileAndAvailability = async (e) => {
     e.preventDefault();
     setUpdating(true);
     setUpdateMessage(null);
     try {
-      const response = await api.put('/profiles/my-profile', {
+      // 1. Save profile details (bio & skills)
+      const profilePromise = api.put('/profiles/my-profile', {
         bio,
         skills
       });
-      // Update local state profile reference
+
+      // 2. Save availability list (format times if checked)
+      const formattedAvailability = availability.map(item => ({
+        dayOfWeek: item.dayOfWeek,
+        startTime: item.isAvailable ? item.startTime : null,
+        endTime: item.isAvailable ? item.endTime : null,
+        isAvailable: item.isAvailable
+      }));
+      const availabilityPromise = api.put('/availabilities/my-availability', formattedAvailability);
+
+      const [profileRes, availabilityRes] = await Promise.all([profilePromise, availabilityPromise]);
+
+      // Update local profile state
       setProfile({
         ...profile,
-        profile: response.data
+        profile: profileRes.data
       });
-      setUpdateMessage({ type: 'success', text: 'Profile updated successfully!' });
+
+      // Re-merge saved availability in state
+      const dbAvail = availabilityRes.data;
+      setAvailability(prev => prev.map(defaultDay => {
+        const matched = dbAvail.find(item => item.dayOfWeek === defaultDay.dayOfWeek);
+        if (matched) {
+          return {
+            ...defaultDay,
+            startTime: matched.startTime ? matched.startTime.substring(0, 5) : '09:00',
+            endTime: matched.endTime ? matched.endTime.substring(0, 5) : '17:00',
+            isAvailable: matched.isAvailable
+          };
+        }
+        return defaultDay;
+      }));
+
+      setUpdateMessage({ type: 'success', text: 'Profile and availability updated successfully!' });
     } catch (err) {
-      setUpdateMessage({ type: 'error', text: 'Failed to update profile. Please try again.' });
+      setUpdateMessage({ type: 'error', text: 'Failed to update schedule/profile. Please try again.' });
     } finally {
       setUpdating(false);
     }
@@ -89,7 +156,7 @@ const StudentDashboard = () => {
   return (
     <div className="flex flex-col md:flex-row gap-8 min-h-[70vh]">
       {/* Sidebar Panel */}
-      <div className="w-full md:w-64 bg-gray-800 rounded-2xl border border-gray-700 p-4 space-y-2 h-fit">
+      <div className="w-full md:w-64 bg-gray-800 rounded-2xl border border-gray-700 p-4 space-y-2 h-fit animate-fade-in">
         <div className="px-4 py-3 border-b border-gray-700 mb-4">
           <div className="font-bold text-white text-lg">{profile?.name}</div>
           <div className="text-xs text-gray-500">Student Account</div>
@@ -127,7 +194,7 @@ const StudentDashboard = () => {
             <div className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 p-8 rounded-xl border border-gray-700/50">
               <h1 className="text-3xl font-extrabold text-white mb-2">Welcome back, {profile?.name}!</h1>
               <p className="text-gray-300">
-                You have applied to <strong className="text-blue-400">{applications.length}</strong> jobs. Keep your profile updated to stand out to employers!
+                You have applied to <strong className="text-blue-400">{applications.length}</strong> jobs. Keep your profile and free slots updated to stand out to employers!
               </p>
             </div>
 
@@ -144,9 +211,9 @@ const StudentDashboard = () => {
                 </div>
               </div>
               <div className="bg-gray-900/50 p-6 rounded-xl border border-gray-750">
-                <div className="text-gray-400 text-sm mb-1">Profile Skills</div>
-                <div className="text-xl font-bold text-blue-400 truncate mt-2">
-                  {profile?.profile?.skills ? profile.profile.skills.split(',').length : 0} tags
+                <div className="text-gray-400 text-sm mb-1">Available Days</div>
+                <div className="text-4xl font-extrabold text-blue-400">
+                  {availability.filter(a => a.isAvailable).length} / 7
                 </div>
               </div>
             </div>
@@ -157,7 +224,7 @@ const StudentDashboard = () => {
               <ul className="list-disc list-inside text-gray-400 text-sm space-y-2">
                 <li>Make sure your bio lists your current university course and graduation year.</li>
                 <li>Add comma-separated skills in the Profile tab to match automatically with recruiters.</li>
-                <li>Apply for jobs on the Jobs Board to see status updates here instantly.</li>
+                <li>Set your free time slots accurately in the Profile tab so employers can verify your schedule.</li>
               </ul>
             </div>
           </div>
@@ -166,9 +233,9 @@ const StudentDashboard = () => {
         {activeTab === 'profile' && (
           <div className="max-w-2xl">
             <h2 className="text-3xl font-extrabold text-white mb-2">Edit Your Profile</h2>
-            <p className="text-gray-400 mb-8">Update your professional details to attract recruiters.</p>
+            <p className="text-gray-400 mb-8">Update your professional details and weekly availability schedule.</p>
             
-            <form onSubmit={handleUpdateProfile} className="space-y-6">
+            <form onSubmit={handleUpdateProfileAndAvailability} className="space-y-6">
               {updateMessage && (
                 <div className={`p-4 rounded-lg text-sm border ${
                   updateMessage.type === 'success' ? 'bg-green-900/30 text-green-300 border-green-800' : 'bg-red-900/30 text-red-300 border-red-800'
@@ -210,7 +277,7 @@ const StudentDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Your Skills</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2 font-semibold">Your Skills</label>
                 <input 
                   type="text" 
                   placeholder="React, Tailwind CSS, Python, SQL (comma-separated)"
@@ -221,12 +288,52 @@ const StudentDashboard = () => {
                 <span className="text-xs text-gray-500 mt-2 block">Employers use these keywords to search for applicants.</span>
               </div>
 
+              {/* Availability Schedule Section */}
+              <div className="pt-6 border-t border-gray-700">
+                <h3 className="text-xl font-bold text-white mb-2">Weekly Availability Schedule</h3>
+                <p className="text-sm text-gray-400 mb-6">Select the days and specific times you are available for work.</p>
+                
+                <div className="space-y-3">
+                  {availability.map((item, idx) => (
+                    <div key={item.dayOfWeek} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-900/30 p-4 rounded-xl border border-gray-700/50 gap-4 transition-all duration-200">
+                      <label className="flex items-center space-x-3 cursor-pointer sm:w-28">
+                        <input 
+                          type="checkbox"
+                          checked={item.isAvailable}
+                          onChange={(e) => handleAvailabilityChange(idx, 'isAvailable', e.target.checked)}
+                          className="form-checkbox text-blue-500 rounded focus:ring-blue-500 bg-gray-800 border-gray-700 h-5 w-5 cursor-pointer"
+                        />
+                        <span className={`font-semibold ${item.isAvailable ? 'text-white' : 'text-gray-500'}`}>{item.dayOfWeek}</span>
+                      </label>
+
+                      <div className="flex items-center gap-2 flex-grow sm:justify-end">
+                        <input 
+                          type="time"
+                          disabled={!item.isAvailable}
+                          value={item.startTime}
+                          onChange={(e) => handleAvailabilityChange(idx, 'startTime', e.target.value)}
+                          className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-20 disabled:cursor-not-allowed"
+                        />
+                        <span className="text-gray-500 text-sm">to</span>
+                        <input 
+                          type="time"
+                          disabled={!item.isAvailable}
+                          value={item.endTime}
+                          onChange={(e) => handleAvailabilityChange(idx, 'endTime', e.target.value)}
+                          className="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-20 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-6 rounded-lg transition transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/20"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg transition transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/20"
               >
-                {updating ? 'Saving Changes...' : 'Save Profile'}
+                {updating ? 'Saving Changes...' : 'Save Profile & Schedule'}
               </button>
             </form>
           </div>
