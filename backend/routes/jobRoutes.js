@@ -15,16 +15,19 @@ const router = express.Router();
 // Require authentication for all job routes
 router.use(protect);
 
-// Student & Employer accessible routes (must be BEFORE restrictTo middleware!)
-router.get('/', getAllJobs);
-router.get('/:id', getJobById);
+// Static employer-only routes first (to prevent conflict with :id)
+router.get('/my-jobs', restrictTo('employer'), getMyJobs);
+router.get('/my-jobs/:id/applicants', restrictTo('employer'), getJobApplicants);
+router.patch('/applications/:applicationId', restrictTo('employer'), updateApplicationStatus);
 
-// Employer-only routes
-router.use(restrictTo('employer'));
-router.post('/', createJob);
-router.get('/my-jobs', getMyJobs);
-router.get('/my-jobs/:id/applicants', getJobApplicants);
-router.patch('/applications/:applicationId', updateApplicationStatus);
-router.post('/:id/generate-qr', generateJobQR);
+// General static routes
+router.get('/', getAllJobs);
+
+// Employer creation & QR generation
+router.post('/', restrictTo('employer'), createJob);
+router.post('/:id/generate-qr', restrictTo('employer'), generateJobQR);
+
+// Dynamic routes last!
+router.get('/:id', getJobById);
 
 module.exports = router;
