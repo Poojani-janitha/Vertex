@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
+const apiRoutes = require('./routes');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 
@@ -9,6 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api', apiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 
