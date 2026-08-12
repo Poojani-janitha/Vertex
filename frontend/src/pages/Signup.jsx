@@ -55,6 +55,8 @@ const Signup = () => {
       // Redirect based on role
       if (response.data.role === 'admin') {
         navigate('/admin/dashboard');
+      } else if (response.data.role === 'employer') {
+        navigate('/community');
       } else if (response.data.role === 'student') {
         navigate('/dashboard');
       } else {

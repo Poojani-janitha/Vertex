@@ -1,6 +1,18 @@
+import { useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 
 const Layout = ({ children }) => {
+  const location = useLocation();
+  const isCommunity = location.pathname.startsWith('/community');
+
+  if (isCommunity) {
+    return (
+      <div className="min-h-screen bg-[#0e131f] text-gray-100 flex flex-col font-sans">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col font-sans">
       <Navbar />
