@@ -29,12 +29,12 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
-              <button className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
+              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
                 Log in
-              </button>
-              <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
+              </Link>
+              <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
                 Sign up
-              </button>
+              </Link>
             </div>
           </div>
         </div>
