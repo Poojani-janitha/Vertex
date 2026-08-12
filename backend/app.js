@@ -3,6 +3,7 @@ const cors = require('cors');
 const sequelize = require('./config/database');
 const apiRoutes = require('./routes');
 const authRoutes = require('./routes/authRoutes');
+const jobRoutes = require('./routes/jobRoutes');
 
 const app = express();
 
@@ -11,8 +12,9 @@ app.use(express.json());
 
 app.use('/api', apiRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
 
-app.get('/', (_req, res) => {
+app.get('/', (_req, res) =>>,StartLine:11,TargetContent: {
 	res.json({ message: 'Vertex API is running' });
 });
 
