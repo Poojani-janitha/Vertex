@@ -27,7 +27,7 @@ const MapPan = ({ pos }) => {
   const map = useMap();
   useEffect(() => {
     if (pos) {
-      map.setView(pos, 15);
+      map.setView(pos, 16);
     }
   }, [pos, map]);
   return null;
@@ -36,14 +36,18 @@ const MapPan = ({ pos }) => {
 const PostJob = ({ onJobCreated }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [skillsNeeded, setSkillsNeeded] = useState('');
   const [payAmount, setPayAmount] = useState('');
+  const [requiredEmployees, setRequiredEmployees] = useState('1');
   const [locationName, setLocationName] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   
-  // Default map position: Matara, Sri Lanka (5.9496, 80.5353)
-  const [position, setPosition] = useState([5.9496, 80.5353]); 
+  // Database skills list & selection states
+  const [dbSkills, setDbSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  
+  // Default map position: Faculty of Technology, University of Ruhuna (6.0617, 80.5694)
+  const [position, setPosition] = useState([6.0617, 80.5694]); 
   
   // Geocoding search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +57,19 @@ const PostJob = ({ onJobCreated }) => {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch skills from database
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await api.get('/skills');
+        setDbSkills(response.data);
+      } catch (err) {
+        console.error('Failed to fetch skills:', err);
+      }
+    };
+    fetchSkills();
+  }, []);
+
   // Search OpenStreetMap Nominatim API - Restricted strictly to Sri Lanka (countrycodes=lk)
   const handleMapSearch = async (e) => {
     e.preventDefault();
@@ -61,7 +78,6 @@ const PostJob = ({ onJobCreated }) => {
     setIsSearchingMap(true);
     setSearchFeedback(null);
     try {
-      // Appending countrycodes=lk to restrict results to Sri Lanka
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&countrycodes=lk&q=${encodeURIComponent(searchQuery)}`
       );
@@ -83,6 +99,14 @@ const PostJob = ({ onJobCreated }) => {
     }
   };
 
+  const toggleSkill = (skillName) => {
+    if (selectedSkills.includes(skillName)) {
+      setSelectedSkills(selectedSkills.filter(s => s !== skillName));
+    } else {
+      setSelectedSkills([...selectedSkills, skillName]);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -92,8 +116,9 @@ const PostJob = ({ onJobCreated }) => {
       await api.post('/jobs', {
         title,
         description,
-        skillsNeeded,
+        skillsNeeded: selectedSkills.join(', '), // Send joined skills string
         payAmount: parseFloat(payAmount),
+        requiredEmployees: parseInt(requiredEmployees),
         locationName,
         latitude: position[0],
         longitude: position[1],
@@ -105,6 +130,15 @@ const PostJob = ({ onJobCreated }) => {
       setError(err.response?.data?.message || 'Failed to post job. Please check verification status and inputs.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Triggers native browser datepicker popup
+  const handleShowCalendar = (e) => {
+    try {
+      e.target.showPicker();
+    } catch (err) {
+      console.warn('Native datepicker not supported or blocked:', err);
     }
   };
 
@@ -122,7 +156,7 @@ const PostJob = ({ onJobCreated }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-300 mb-1">Job Title</label>
             <input 
@@ -146,6 +180,18 @@ const PostJob = ({ onJobCreated }) => {
               onChange={(e) => setPayAmount(e.target.value)}
             />
           </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 mb-1">Required Candidates (Vacancies)</label>
+            <input 
+              type="number" 
+              required 
+              min="1"
+              placeholder="1" 
+              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              value={requiredEmployees}
+              onChange={(e) => setRequiredEmployees(e.target.value)}
+            />
+          </div>
         </div>
 
         <div>
@@ -159,58 +205,82 @@ const PostJob = ({ onJobCreated }) => {
           />
         </div>
 
-        {/* Date and Calendar Time Inputs - Styled with absolute icons inside fields */}
+        {/* Date and Calendar Time Inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">📅 Start Date & Time</label>
+            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
+              📅 Start Date & Time
+            </label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
               <input 
                 type="datetime-local" 
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
+                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator cursor-pointer"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
+                onClick={handleShowCalendar}
+                onFocus={handleShowCalendar}
               />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">📅 End Date & Time</label>
+            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
+              📅 End Date & Time
+            </label>
             <div className="relative">
               <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
               <input 
                 type="datetime-local" 
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
+                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator cursor-pointer"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
+                onClick={handleShowCalendar}
+                onFocus={handleShowCalendar}
               />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Required Skills (Comma separated)</label>
-            <input 
-              type="text" 
-              placeholder="Communication, Teamwork" 
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-              value={skillsNeeded}
-              onChange={(e) => setSkillsNeeded(e.target.value)}
-            />
+        {/* REQUIRED SKILLS SELECTABLE BADGES (New) */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-300 mb-2">Required Skills (Select multiple)</label>
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-900/40 border border-gray-800 rounded-lg">
+            {dbSkills.length === 0 ? (
+              <span className="text-xs text-gray-500 animate-pulse">Loading skills list...</span>
+            ) : (
+              dbSkills.map((skill) => {
+                const isSelected = selectedSkills.includes(skill.name);
+                return (
+                  <button
+                    key={skill.id}
+                    type="button"
+                    onClick={() => toggleSkill(skill.name)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer select-none ${
+                      isSelected
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-500/20'
+                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-650'
+                    }`}
+                  >
+                    {skill.name}
+                  </button>
+                );
+              })
+            )}
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Location Name / Venue description</label>
-            <input 
-              type="text" 
-              required
-              placeholder="e.g. University Hall A" 
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-              value={locationName}
-              onChange={(e) => setLocationName(e.target.value)}
-            />
-          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-300 mb-1">Location Name / Venue description</label>
+          <input 
+            type="text" 
+            required
+            placeholder="e.g. Faculty Lecture Hall A" 
+            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+            value={locationName}
+            onChange={(e) => setLocationName(e.target.value)}
+          />
         </div>
 
         {/* MAP LOCATION SEARCH INPUT */}
@@ -219,7 +289,7 @@ const PostJob = ({ onJobCreated }) => {
           <div className="flex gap-2 mb-2">
             <input 
               type="text"
-              placeholder="Type town, university, or venue (e.g. Matara, University of Ruhuna)..." 
+              placeholder="Type town, university, or venue (e.g. Faculty of Technology, Ruhuna)..." 
               className="flex-grow bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -242,9 +312,9 @@ const PostJob = ({ onJobCreated }) => {
             </div>
           )}
 
-          {/* Leaflet map selector */}
-          <div className="h-64 rounded-lg overflow-hidden border border-gray-700 relative z-0">
-            <MapContainer center={position} zoom={13} style={{ height: '100%', width: '100%' }}>
+          {/* Leaflet map selector - Height increased to h-[450px] */}
+          <div className="h-[450px] rounded-lg overflow-hidden border border-gray-700 relative z-0">
+            <MapContainer center={position} zoom={16} style={{ height: '100%', width: '100%' }}>
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
