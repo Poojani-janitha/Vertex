@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const applicationController = require('../controllers/applicationController');
+const { protect } = require('../middleware/authMiddleware');
+
+router.get('/my-applications', protect, applicationController.getMyApplications);
 
 router.get('/', applicationController.getAll);
 router.get('/:id', applicationController.getById);

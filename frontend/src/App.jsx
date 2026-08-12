@@ -5,6 +5,7 @@ import Jobs from './pages/Jobs';
 import Users from './pages/Users';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import StudentDashboard from './pages/StudentDashboard';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<StudentDashboard />} />
       </Routes>
     </Layout>
   );

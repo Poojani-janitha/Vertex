@@ -1,12 +1,31 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      setUser(JSON.parse(userString));
+    } else {
+      setUser(null);
+    }
+  }, [location]);
 
   const getLinkClass = (path) => {
     return location.pathname === path
       ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
       : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -24,17 +43,36 @@ const Navbar = () => {
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
                 <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
+                {user && user.role === 'student' && (
+                  <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
+                )}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
-              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
-                Log in
-              </Link>
-              <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
-                Sign up
-              </Link>
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-300 text-sm">
+                    Logged in as <strong className="text-white">{user.name}</strong>
+                  </span>
+                  <button 
+                    onClick={handleLogout}
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-750 hover:border-red-600 transition"
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
+                    Log in
+                  </Link>
+                  <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
