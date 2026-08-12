@@ -12,12 +12,12 @@ const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Require authentication for all job routes
-router.use(protect);
-
-// Student & Employer accessible routes (must be BEFORE restrictTo middleware!)
+// Student & Employer accessible routes (Public, no login required to view)
 router.get('/', getAllJobs);
 router.get('/:id', getJobById);
+
+// Require authentication for all other actions (post, manage applications, QR)
+router.use(protect);
 
 // Employer-only routes
 router.use(restrictTo('employer'));
