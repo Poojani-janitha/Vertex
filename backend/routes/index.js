@@ -31,4 +31,7 @@ router.use('/badges', badgeRoutes);
 const messageRoutes = require('./messageRoutes');
 router.use('/messages', messageRoutes);
 
+const adminRoutes = require('./adminRoutes');
+router.use('/admin', adminRoutes);
+
 module.exports = router;
