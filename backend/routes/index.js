@@ -8,7 +8,7 @@ const profileRoutes = require('./profileRoutes');
 router.use('/profiles', profileRoutes);
 
 const availabilityRoutes = require('./availabilityRoutes');
-router.use('/availabilitys', availabilityRoutes);
+router.use('/availabilities', availabilityRoutes);
 
 const jobRoutes = require('./jobRoutes');
 router.use('/jobs', jobRoutes);

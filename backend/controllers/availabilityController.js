@@ -1,4 +1,4 @@
-const { Availability } = require('../models');
+const { Availability, Profile } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
@@ -56,5 +56,49 @@ exports.delete = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getMyAvailability = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ where: { userId: req.user.id } });
+    if (!profile) return res.status(404).json({ error: 'Profile not found' });
+    
+    const items = await Availability.findAll({ where: { profileId: profile.id } });
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateMyAvailability = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ where: { userId: req.user.id } });
+    if (!profile) return res.status(404).json({ error: 'Profile not found' });
+
+    const availabilityData = req.body; // Array of { dayOfWeek, startTime, endTime, isAvailable }
+
+    if (!Array.isArray(availabilityData)) {
+      return res.status(400).json({ error: 'Body must be an array of availability slots' });
+    }
+
+    // Process each slot
+    for (const slot of availabilityData) {
+      const { dayOfWeek, startTime, endTime, isAvailable } = slot;
+      
+      // Upsert: search by profileId and dayOfWeek, update or create
+      await Availability.upsert({
+        profileId: profile.id,
+        dayOfWeek,
+        startTime: startTime || null,
+        endTime: endTime || null,
+        isAvailable: isAvailable !== undefined ? isAvailable : true
+      });
+    }
+
+    const updatedItems = await Availability.findAll({ where: { profileId: profile.id } });
+    res.status(200).json(updatedItems);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };

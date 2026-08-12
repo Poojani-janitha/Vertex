@@ -21,8 +21,10 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data));
       
-      // Redirect dynamically based on user role
-      if (response.data.role === 'employer') {
+      // Redirect based on role
+      if (response.data.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (response.data.role === 'employer') {
         navigate('/community');
       } else if (response.data.role === 'student') {
         navigate('/dashboard');

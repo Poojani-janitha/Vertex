@@ -12,22 +12,17 @@ const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Require authentication for all job routes
-router.use(protect);
-
-// Static employer-only routes first (to prevent conflict with :id)
-router.get('/my-jobs', restrictTo('employer'), getMyJobs);
-router.get('/my-jobs/:id/applicants', restrictTo('employer'), getJobApplicants);
-router.patch('/applications/:applicationId', restrictTo('employer'), updateApplicationStatus);
-
-// General static routes
+// 1. Public static routes (No login required)
 router.get('/', getAllJobs);
 
-// Employer creation & QR generation
-router.post('/', restrictTo('employer'), createJob);
-router.post('/:id/generate-qr', restrictTo('employer'), generateJobQR);
+// 2. Protected Employer-only routes (static routes must be BEFORE dynamic parameter routes!)
+router.get('/my-jobs', protect, restrictTo('employer'), getMyJobs);
+router.get('/my-jobs/:id/applicants', protect, restrictTo('employer'), getJobApplicants);
+router.patch('/applications/:applicationId', protect, restrictTo('employer'), updateApplicationStatus);
+router.post('/:id/generate-qr', protect, restrictTo('employer'), generateJobQR);
+router.post('/', protect, restrictTo('employer'), createJob);
 
-// Dynamic routes last!
+// 3. Public dynamic routes (Must be at the very bottom so it doesn't hijack /my-jobs)
 router.get('/:id', getJobById);
 
 module.exports = router;
