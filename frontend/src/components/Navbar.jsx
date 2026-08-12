@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+<<<<<<< HEAD
   const [currentUser, setCurrentUser] = useState(null);
 
   // Sync login status on navigation
@@ -26,11 +27,30 @@ const Navbar = () => {
     setCurrentUser(null);
     navigate('/');
   };
+=======
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      setUser(JSON.parse(userString));
+    } else {
+      setUser(null);
+    }
+  }, [location]);
+>>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
 
   const getLinkClass = (path) => {
     return location.pathname === path
       ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
       : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -48,14 +68,20 @@ const Navbar = () => {
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
                 <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
+<<<<<<< HEAD
                 {currentUser && currentUser.role === 'employer' && (
                   <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
+=======
+                {user && user.role === 'student' && (
+                  <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
+>>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
                 )}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
+<<<<<<< HEAD
               {currentUser ? (
                 <>
                   <span className="text-gray-400 text-sm">Hello, <span className="font-semibold text-gray-200">{currentUser.name}</span></span>
@@ -66,6 +92,20 @@ const Navbar = () => {
                     Log out
                   </button>
                 </>
+=======
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-300 text-sm">
+                    Logged in as <strong className="text-white">{user.name}</strong>
+                  </span>
+                  <button 
+                    onClick={handleLogout}
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-750 hover:border-red-600 transition"
+                  >
+                    Log out
+                  </button>
+                </div>
+>>>>>>> 21924de444c8bf03ce7c0e6c225f30d23596cb62
               ) : (
                 <>
                   <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
