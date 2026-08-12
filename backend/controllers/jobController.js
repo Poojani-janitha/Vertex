@@ -205,10 +205,46 @@ const generateJobQR = async (req, res) => {
   }
 };
 
+// @desc    Get all open jobs (for students)
+// @route   GET /api/jobs
+// @access  Private (Student/Employer)
+const getAllJobs = async (req, res) => {
+  try {
+    const jobs = await Job.findAll({
+      where: { status: 'open' },
+      order: [['createdAt', 'DESC']]
+    });
+    return res.json(jobs);
+  } catch (error) {
+    console.error('Get all jobs error:', error);
+    return res.status(500).json({ message: 'Server error retrieving jobs.', error: error.message });
+  }
+};
+
+// @desc    Get a single job details by ID
+// @route   GET /api/jobs/:id
+// @access  Private (Student/Employer)
+const getJobById = async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.id, {
+      include: [{ model: User, as: 'employer', attributes: ['id', 'name', 'email'] }]
+    });
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found.' });
+    }
+    return res.json(job);
+  } catch (error) {
+    console.error('Get job by ID error:', error);
+    return res.status(500).json({ message: 'Server error retrieving job details.', error: error.message });
+  }
+};
+
 module.exports = {
   createJob,
   getMyJobs,
   getJobApplicants,
   updateApplicationStatus,
-  generateJobQR
+  generateJobQR,
+  getAllJobs,
+  getJobById
 };

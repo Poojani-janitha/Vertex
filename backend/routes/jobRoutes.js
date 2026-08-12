@@ -4,16 +4,23 @@ const {
   getMyJobs,
   getJobApplicants,
   updateApplicationStatus,
-  generateJobQR
+  generateJobQR,
+  getAllJobs,
+  getJobById
 } = require('../controllers/jobController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// All routes here require being authenticated and having the 'employer' role
+// Require authentication for all job routes
 router.use(protect);
-router.use(restrictTo('employer'));
 
+// Student & Employer accessible routes (must be BEFORE restrictTo middleware!)
+router.get('/', getAllJobs);
+router.get('/:id', getJobById);
+
+// Employer-only routes
+router.use(restrictTo('employer'));
 router.post('/', createJob);
 router.get('/my-jobs', getMyJobs);
 router.get('/my-jobs/:id/applicants', getJobApplicants);
