@@ -41,7 +41,9 @@ const PostJob = ({ onJobCreated }) => {
   const [locationName, setLocationName] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [position, setPosition] = useState([6.9271, 79.8612]); // default Colombo
+  
+  // Default map position: Matara, Sri Lanka (5.9496, 80.5353)
+  const [position, setPosition] = useState([5.9496, 80.5353]); 
   
   // Geocoding search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,7 +53,7 @@ const PostJob = ({ onJobCreated }) => {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Search OpenStreetMap Nominatim API (Free, no keys needed)
+  // Search OpenStreetMap Nominatim API - Restricted strictly to Sri Lanka (countrycodes=lk)
   const handleMapSearch = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -59,8 +61,9 @@ const PostJob = ({ onJobCreated }) => {
     setIsSearchingMap(true);
     setSearchFeedback(null);
     try {
+      // Appending countrycodes=lk to restrict results to Sri Lanka
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
+        `https://nominatim.openstreetmap.org/search?format=json&countrycodes=lk&q=${encodeURIComponent(searchQuery)}`
       );
       const data = await response.json();
       
@@ -68,10 +71,10 @@ const PostJob = ({ onJobCreated }) => {
         const { lat, lon, display_name } = data[0];
         const newCoords = [parseFloat(lat), parseFloat(lon)];
         setPosition(newCoords);
-        setLocationName(display_name); // Autofill location name input
+        setLocationName(display_name); // Autofill location description
         setSearchFeedback({ type: 'success', text: `Found: ${display_name.split(',')[0]}` });
       } else {
-        setSearchFeedback({ type: 'error', text: 'Location not found on map. Try checking the name.' });
+        setSearchFeedback({ type: 'error', text: 'Location not found in Sri Lanka. Try checking the name.' });
       }
     } catch (err) {
       setSearchFeedback({ type: 'error', text: 'Failed to connect to map search API.' });
@@ -156,31 +159,33 @@ const PostJob = ({ onJobCreated }) => {
           />
         </div>
 
-        {/* Date and Calendar Time Inputs */}
+        {/* Date and Calendar Time Inputs - Styled with absolute icons inside fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
-              📅 Start Date & Time <span className="text-[10px] text-blue-400 font-normal">(Click calendar icon)</span>
-            </label>
-            <input 
-              type="datetime-local" 
-              required
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
+            <label className="block text-xs font-semibold text-gray-300 mb-1">📅 Start Date & Time</label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
+              <input 
+                type="datetime-local" 
+                required
+                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
-              📅 End Date & Time <span className="text-[10px] text-blue-400 font-normal">(Click calendar icon)</span>
-            </label>
-            <input 
-              type="datetime-local" 
-              required
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
+            <label className="block text-xs font-semibold text-gray-300 mb-1">📅 End Date & Time</label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
+              <input 
+                type="datetime-local" 
+                required
+                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
@@ -210,11 +215,11 @@ const PostJob = ({ onJobCreated }) => {
 
         {/* MAP LOCATION SEARCH INPUT */}
         <div className="pt-2">
-          <label className="block text-xs font-semibold text-gray-300 mb-1 uppercase tracking-wider">Search Map Location</label>
+          <label className="block text-xs font-semibold text-gray-300 mb-1 uppercase tracking-wider">Search Map Location (Sri Lanka)</label>
           <div className="flex gap-2 mb-2">
             <input 
               type="text"
-              placeholder="Type town, university, or building (e.g. Kelaniya University)..." 
+              placeholder="Type town, university, or venue (e.g. Matara, University of Ruhuna)..." 
               className="flex-grow bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
