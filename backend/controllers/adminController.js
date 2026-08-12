@@ -1,4 +1,5 @@
 const { User, Job, Review, Report, EmployerVerification } = require('../models');
+const { sendVerificationEmail } = require('../services/mailService');
 
 // @desc    Get all pending employer verifications
 // @route   GET /api/admin/employers/pending
@@ -44,6 +45,9 @@ exports.verifyEmployer = async (req, res) => {
     if (user) {
       user.isVerified = (status === 'approved');
       await user.save();
+
+      // Send verification email to employer (non-blocking)
+      sendVerificationEmail(user.email, user.name, status);
     }
 
     return res.json({
