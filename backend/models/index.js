@@ -9,6 +9,7 @@ const Review = require('./Review');
 const Report = require('./Report');
 const Badge = require('./Badge');
 const Message = require('./Message');
+const EmployerVerification = require('./EmployerVerification');
 
 const models = {
   User,
@@ -21,6 +22,7 @@ const models = {
   Report,
   Badge,
   Message,
+  EmployerVerification,
 };
 
 // Initialize all models using the shared Sequelize connection instance
