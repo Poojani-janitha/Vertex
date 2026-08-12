@@ -1,4 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
+const bcrypt = require('bcryptjs');
 
 class User extends Model {
   static init(sequelize) {
@@ -47,7 +48,23 @@ class User extends Model {
       sequelize,
       tableName: 'users',
       timestamps: false,
+      hooks: {
+        beforeCreate: async (user) => {
+          if (user.password) {
+            user.password = await bcrypt.hash(user.password, 10);
+          }
+        },
+        beforeUpdate: async (user) => {
+          if (user.changed('password')) {
+            user.password = await bcrypt.hash(user.password, 10);
+          }
+        },
+      },
     });
+  }
+
+  async comparePassword(candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
   }
 
   static associate(models) {
@@ -61,6 +78,8 @@ class User extends Model {
     this.hasMany(models.Badge, { foreignKey: 'userId', as: 'badges', onDelete: 'CASCADE' });
     this.hasMany(models.Message, { foreignKey: 'senderId', as: 'sentMessages', onDelete: 'CASCADE' });
     this.hasMany(models.Message, { foreignKey: 'receiverId', as: 'receivedMessages', onDelete: 'CASCADE' });
+    this.hasOne(models.EmployerVerification, { foreignKey: 'userId', as: 'employerVerification', onDelete: 'CASCADE' });
+    this.hasMany(models.EmployerVerification, { foreignKey: 'verifiedBy', as: 'verifiedVerifications', onDelete: 'SET NULL' });
   }
 }
 
