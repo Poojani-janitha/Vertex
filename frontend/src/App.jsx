@@ -5,6 +5,7 @@ import Jobs from './pages/Jobs';
 import Users from './pages/Users';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import CommunityDashboard from './pages/community/com';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/users" element={<Users />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/community" element={<CommunityDashboard />} />
       </Routes>
     </Layout>
   );

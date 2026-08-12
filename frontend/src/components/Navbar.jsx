@@ -1,7 +1,31 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Sync login status on navigation
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setCurrentUser(JSON.parse(userStr));
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      setCurrentUser(null);
+    }
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    navigate('/');
+  };
 
   const getLinkClass = (path) => {
     return location.pathname === path
@@ -24,17 +48,34 @@ const Navbar = () => {
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
                 <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
+                {currentUser && currentUser.role === 'employer' && (
+                  <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
+                )}
               </div>
             </div>
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
-              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
-                Log in
-              </Link>
-              <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
-                Sign up
-              </Link>
+              {currentUser ? (
+                <>
+                  <span className="text-gray-400 text-sm">Hello, <span className="font-semibold text-gray-200">{currentUser.name}</span></span>
+                  <button 
+                    onClick={handleLogout}
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition cursor-pointer"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
+                    Log in
+                  </Link>
+                  <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
+                    Sign up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
