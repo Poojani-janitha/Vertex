@@ -10,6 +10,7 @@ import Messages from './views/Messages';
 import ProfileSettings from './views/ProfileSettings';
 import Reviews from './views/Reviews';
 import ScanQR from './views/ScanQR';
+import JobApplicants from './views/JobApplicants';
 
 const CommunityDashboard = () => {
   const navigate = useNavigate();
