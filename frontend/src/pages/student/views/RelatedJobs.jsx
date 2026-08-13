@@ -75,7 +75,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
   if (loading) {
     return (
       <div className="flex justify-center items-center h-48">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#06402B]"></div>
       </div>
     );
   }
@@ -83,8 +83,8 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
   return (
     <div className="animate-fade-in space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Related Jobs</h2>
-        <p className="text-gray-400 text-sm">
+        <h2 className="text-2xl font-bold text-[#06402B] mb-2">Related Jobs</h2>
+        <p className="text-gray-500 text-sm">
           Recommended jobs based on your profile skills:{' '}
           {studentSkills.length > 0 ? (
             <span className="text-blue-450 font-semibold">{profile.skills}</span>
@@ -103,17 +103,17 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
       )}
 
       {studentSkills.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900/30 rounded-2xl border border-gray-800 border-dashed">
+        <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
           <div className="text-gray-600 text-5xl mb-4">💡</div>
-          <h3 className="text-lg font-medium text-gray-300">Set your skills first</h3>
+          <h3 className="text-lg font-medium text-gray-600">Set your skills first</h3>
           <p className="text-gray-550 text-xs mt-2">
             Add tags to your profile settings to get matching job recommendations.
           </p>
         </div>
       ) : matchedJobs.length === 0 ? (
-        <div className="text-center py-16 bg-gray-900/30 rounded-2xl border border-gray-800 border-dashed">
+        <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
           <div className="text-gray-600 text-5xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-300">No matching jobs</h3>
+          <h3 className="text-lg font-medium text-gray-600">No matching jobs</h3>
           <p className="text-gray-550 text-xs mt-2">
             No open jobs matched your specific skills today. Check back later or update your skills!
           </p>
@@ -121,16 +121,16 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {matchedJobs.map(job => (
-            <div key={job.id} className="bg-[#111726] border border-gray-800 rounded-xl p-6 flex flex-col justify-between space-y-4 hover:border-blue-900/50 transition-colors">
+            <div key={job.id} className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col justify-between space-y-4 hover:border-blue-900/50 transition-colors">
               <div className="space-y-2">
                 <div className="flex justify-between items-start gap-4">
-                  <h3 className="font-bold text-white text-base">{job.title}</h3>
+                  <h3 className="font-bold text-[#06402B] text-base">{job.title}</h3>
                   <span className="text-green-400 font-bold text-xs bg-green-950/40 border border-green-900 px-2 py-0.5 rounded">
-                    Rs {job.payAmount || 'N/A'}
+                    LKR {job.payAmount || 'N/A'}
                   </span>
                 </div>
                 
-                <p className="text-xs text-gray-400 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">
                   {job.description || 'No description provided.'}
                 </p>
 
@@ -149,8 +149,8 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                           key={sIdx} 
                           className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
                             isMatching 
-                              ? 'bg-blue-950/40 text-blue-400 border-blue-900' 
-                              : 'bg-gray-900 text-gray-550 border-gray-800'
+                              ? 'bg-blue-950/40 text-blue-600 border-blue-900' 
+                              : 'bg-gray-100 text-gray-550 border-gray-200'
                           }`}
                         >
                           {trimmed}
@@ -163,7 +163,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                 <button
                   onClick={() => handleApply(job.id)}
                   disabled={applyingJobId === job.id}
-                  className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   {applyingJobId === job.id ? 'Applying...' : 'Apply in One-Click'}
                 </button>

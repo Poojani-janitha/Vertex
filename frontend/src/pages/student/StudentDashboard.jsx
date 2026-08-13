@@ -202,7 +202,7 @@ const StudentDashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-[#0e131f]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06402B]"></div>
       </div>
     );
   }
@@ -265,20 +265,20 @@ const StudentDashboard = () => {
 
   const sidebarButtonClass = (tabName) => {
     return `w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tabName
-        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+        ? 'bg-[#06402B] text-white shadow-md shadow-blue-500/20'
+        : 'text-gray-500 hover:bg-gray-100 hover:text-[#06402B]'
       }`;
   };
 
   return (
-    <div className="flex h-screen bg-[#0b0e17] text-gray-200 overflow-hidden font-sans relative">
+    <div className="flex h-screen bg-gray-50 text-gray-700 overflow-hidden font-sans relative">
 
       {/* LEFT SIDEBAR */}
-      <aside className="w-64 bg-[#111726] border-r border-gray-800 flex flex-col h-full shrink-0 select-none">
+      <aside className="w-64 bg-[#06402B] border-r border-[#053020] flex flex-col h-full shrink-0 select-none">
 
         {/* Brand Logo header */}
-        <Link to="/" className="h-16 px-6 border-b border-gray-800 flex items-center gap-3 hover:bg-gray-850 transition-colors cursor-pointer select-none">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg shrink-0">W</div>
+        <Link to="/" className="h-16 px-6 border-b border-[#053020] flex items-center gap-3 hover:bg-[#0a5c3f] transition-colors cursor-pointer select-none">
+          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center font-bold text-[#06402B] text-lg shrink-0">W</div>
           <span className="text-lg font-bold text-white tracking-wider truncate">WorkOra Student</span>
         </Link>
 
@@ -287,7 +287,7 @@ const StudentDashboard = () => {
 
           {/* MAIN MENU */}
           <div>
-            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Main</div>
+            <div className="text-[10px] font-bold text-green-200 uppercase tracking-widest px-3 mb-2">Main</div>
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveTab('dashboard')}
@@ -329,7 +329,7 @@ const StudentDashboard = () => {
 
           {/* TOOLS */}
           <div>
-            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Tools</div>
+            <div className="text-[10px] font-bold text-green-200 uppercase tracking-widest px-3 mb-2">Tools</div>
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveTab('profile')}
@@ -353,20 +353,20 @@ const StudentDashboard = () => {
         </div>
 
         {/* BOTTOM USER PROFILE CARD */}
-        <div className="p-4 border-t border-gray-800 bg-[#0d121e] flex items-center justify-between">
+        <div className="p-4 border-t border-[#053020] bg-[#042A1D] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+            <div className="w-10 h-10 rounded-full bg-[#0a5c3f] text-white flex items-center justify-center font-bold text-sm shadow-inner">
               {getInitials(user?.name)}
             </div>
             <div>
-              <div className="text-xs font-bold text-white truncate max-w-[120px]">{user?.name}</div>
+              <div className="text-xs font-bold text-[#06402B] truncate max-w-[120px]">{user?.name}</div>
               <div className="text-[10px] text-gray-500 capitalize">Student</div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-red-400 transition"
+            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-red-400 transition"
           >
             ❌
           </button>
@@ -378,9 +378,9 @@ const StudentDashboard = () => {
       <main className="flex-grow flex flex-col h-full overflow-hidden">
 
         {/* TOP STATUS BAR */}
-        <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#111726]/40 shrink-0">
+        <header className="h-16 border-b border-[#053020] flex items-center justify-between px-8 bg-white shrink-0">
 
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-sm font-bold text-[#06402B] flex items-center gap-2">
             Good night, {user?.name.split(' ')[0]} 👋
           </h2>
 
@@ -390,29 +390,29 @@ const StudentDashboard = () => {
             <input
               type="text"
               placeholder="Search active applications, stats..."
-              className="w-full bg-gray-900 border border-gray-800 text-white rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
+              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
               disabled
             />
           </div>
 
           {/* Top Right Wallet Widget */}
           <div className="flex items-center space-x-6">
-            <div className="bg-[#121824] border border-gray-800 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
-              <span className="text-gray-400 font-medium">LKR Wallet:</span>
-              <strong className="text-green-400">Rs 0.00</strong>
+            <div className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
+              <span className="text-gray-500 font-medium">LKR Wallet:</span>
+              <strong className="text-green-400">LKR 0.00</strong>
               <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-950/40 text-green-300">Active</span>
             </div>
 
-            <div className="flex items-center space-x-3 text-gray-400 text-sm">
-              <button title="Notifications" className="hover:text-white">🔔</button>
-              <button title="Messages" className="hover:text-white">✉</button>
+            <div className="flex items-center space-x-3 text-gray-500 text-sm">
+              <button title="Notifications" className="hover:text-[#06402B]">🔔</button>
+              <button title="Messages" className="hover:text-[#06402B]">✉</button>
             </div>
           </div>
 
         </header>
 
         {/* MAIN BODY CONTAINER */}
-        <div className="flex-grow overflow-y-auto p-8 bg-[#0b0e17]">
+        <div className="flex-grow overflow-y-auto p-8 bg-gray-50">
 
           {activeTab === 'dashboard' && (
             <Overview
@@ -467,11 +467,11 @@ const StudentDashboard = () => {
       {user && (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
           {isChatOpen && (
-            <div className="bg-[#121824] border border-gray-800 w-80 sm:w-96 h-[480px] rounded-2xl shadow-2xl flex flex-col mb-4 overflow-hidden animate-fade-in text-xs">
+            <div className="bg-white border border-gray-200 w-80 sm:w-96 h-[480px] rounded-2xl shadow-2xl flex flex-col mb-4 overflow-hidden animate-fade-in text-xs">
               {/* Modal Header */}
-              <div className="p-4 border-b border-gray-800 bg-[#111726] flex justify-between items-center">
+              <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
                 <div>
-                  <h4 className="font-bold text-white">Student Message Box</h4>
+                  <h4 className="font-bold text-[#06402B]">Student Message Box</h4>
                   <p className="text-[9px] text-gray-500">Chats with employer representatives</p>
                 </div>
                 <button
@@ -479,7 +479,7 @@ const StudentDashboard = () => {
                     setIsChatOpen(false);
                     setActiveThreadKey(null);
                   }}
-                  className="text-gray-400 hover:text-white font-bold cursor-pointer"
+                  className="text-gray-500 hover:text-[#06402B] font-bold cursor-pointer"
                 >
                   ✕
                 </button>
@@ -497,13 +497,13 @@ const StudentDashboard = () => {
                         <button
                           type="button"
                           onClick={() => setActiveThreadKey(null)}
-                          className="text-blue-400 hover:text-blue-300 font-bold mb-3 flex items-center gap-1 text-[10px] cursor-pointer"
+                          className="text-blue-600 hover:text-blue-300 font-bold mb-3 flex items-center gap-1 text-[10px] cursor-pointer"
                         >
                           ← Back to inbox
                         </button>
-                        <div className="bg-gray-900 border border-gray-850 p-2.5 rounded-lg mb-3 shrink-0">
-                          <div className="font-bold text-white text-xs">{thread.otherUserName}</div>
-                          <div className="text-[10px] text-blue-400 font-semibold">{thread.jobTitle}</div>
+                        <div className="bg-gray-100 border border-gray-850 p-2.5 rounded-lg mb-3 shrink-0">
+                          <div className="font-bold text-[#06402B] text-xs">{thread.otherUserName}</div>
+                          <div className="text-[10px] text-blue-600 font-semibold">{thread.jobTitle}</div>
                         </div>
 
                         {/* Chat Bubbles */}
@@ -514,8 +514,8 @@ const StudentDashboard = () => {
                               <div
                                 key={msg.id}
                                 className={`max-w-[75%] rounded-xl px-3 py-2 text-[11px] leading-relaxed shadow-sm ${isMe
-                                    ? 'bg-blue-600 text-white self-end rounded-tr-none'
-                                    : 'bg-gray-800 text-gray-200 self-start rounded-tl-none border border-gray-700/50'
+                                    ? 'bg-[#06402B] text-white self-end rounded-tr-none'
+                                    : 'bg-gray-100 text-gray-700 self-start rounded-tl-none border border-gray-200/50'
                                   }`}
                               >
                                 <p className="break-words">{msg.message}</p>
@@ -528,19 +528,19 @@ const StudentDashboard = () => {
                         </div>
 
                         {/* Send reply form */}
-                        <form onSubmit={(e) => handleSendChatReply(e, thread)} className="flex gap-2 border-t border-gray-800 pt-3 shrink-0">
+                        <form onSubmit={(e) => handleSendChatReply(e, thread)} className="flex gap-2 border-t border-gray-200 pt-3 shrink-0">
                           <input
                             type="text"
                             required
                             placeholder="Type reply to employer..."
-                            className="flex-grow bg-gray-900 border border-gray-800 text-white rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-blue-500"
+                            className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B]"
                             value={chatReplyText}
                             onChange={(e) => setChatReplyText(e.target.value)}
                           />
                           <button
                             type="submit"
                             disabled={sendingChat || !chatReplyText.trim()}
-                            className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-bold px-3 py-1.5 rounded-lg transition text-[10px]"
+                            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-white font-bold px-3 py-1.5 rounded-lg transition text-[10px]"
                           >
                             {sendingChat ? '...' : 'Send'}
                           </button>
@@ -560,16 +560,16 @@ const StudentDashboard = () => {
                         <button
                           key={thread.key}
                           onClick={() => setActiveThreadKey(thread.key)}
-                          className="w-full text-left p-3 rounded-lg bg-gray-900 border border-gray-850 hover:bg-gray-800/50 transition flex flex-col gap-1 cursor-pointer"
+                          className="w-full text-left p-3 rounded-lg bg-gray-100 border border-gray-850 hover:bg-gray-100/50 transition flex flex-col gap-1 cursor-pointer"
                         >
                           <div className="flex justify-between items-baseline w-full">
-                            <span className="font-bold text-white truncate max-w-[150px]">{thread.otherUserName}</span>
+                            <span className="font-bold text-[#06402B] truncate max-w-[150px]">{thread.otherUserName}</span>
                             <span className="text-[8px] text-gray-500">
                               {thread.latestTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          <div className="text-[10px] text-blue-400 font-semibold truncate max-w-[200px]">{thread.jobTitle}</div>
-                          <p className="text-[10px] text-gray-400 truncate w-full italic mt-1">{thread.latestText}</p>
+                          <div className="text-[10px] text-blue-600 font-semibold truncate max-w-[200px]">{thread.jobTitle}</div>
+                          <p className="text-[10px] text-gray-500 truncate w-full italic mt-1">{thread.latestText}</p>
                         </button>
                       ))
                     )}
@@ -583,11 +583,11 @@ const StudentDashboard = () => {
           <button
             type="button"
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className="bg-blue-600 hover:bg-blue-500 text-white rounded-full p-4 shadow-2xl relative flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-50 focus:outline-none"
+            className="bg-[#06402B] hover:bg-[#0a5c3f] text-white rounded-full p-4 shadow-2xl relative flex items-center justify-center transition-transform hover:scale-105 cursor-pointer z-50 focus:outline-none"
           >
             <span className="text-xl">💬</span>
             {receivedMessagesCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-800">
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-200">
                 {receivedMessagesCount}
               </span>
             )}
@@ -603,8 +603,8 @@ const StudentDashboard = () => {
               <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-800">
                 <span className="text-3xl">🚨</span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Trigger Emergency?</h3>
-              <p className="text-gray-400 text-sm mb-6">
+              <h3 className="text-xl font-bold text-[#06402B] mb-2">Trigger Emergency?</h3>
+              <p className="text-gray-500 text-sm mb-6">
                 This will immediately alert the administration with your details and location. Only use in true emergencies.
               </p>
 
@@ -618,7 +618,7 @@ const StudentDashboard = () => {
                 <button
                   onClick={() => setShowEmergencyModal(false)}
                   disabled={triggeringEmergency}
-                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-semibold transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-700 text-[#06402B] rounded-lg font-semibold transition disabled:opacity-50"
                 >
                   Cancel
                 </button>

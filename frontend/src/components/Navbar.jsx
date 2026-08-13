@@ -29,17 +29,18 @@ const Navbar = () => {
 
   const getLinkClass = (path) => {
     return location.pathname === path
-      ? 'text-white border-b-2 border-blue-500 pb-1 font-semibold'
-      : 'text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
+      ? 'text-[#06402B] border-b-2 border-[#06402B] pb-1 font-bold'
+      : 'text-gray-600 hover:text-[#06402B] hover:border-b-2 hover:border-gray-500 pb-1 transition-colors duration-200';
   };
 
   return (
-    <nav className="bg-gray-800 border-b border-gray-700 shadow-lg">
+    <nav className="bg-white border-b border-gray-200 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0">
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#06402B] flex items-center justify-center font-bold text-white text-lg shrink-0">W</div>
+              <span className="text-2xl font-bold text-[#06402B]">
                 WorkOra
               </span>
             </Link>
@@ -65,22 +66,22 @@ const Navbar = () => {
             <div className="ml-4 flex items-center md:ml-6 space-x-4">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-300 text-sm">
-                    Logged in as <strong className="text-white">{user.name}</strong>
+                  <span className="text-gray-600 text-sm">
+                    Logged in as <strong className="text-[#06402B]">{user.name}</strong>
                   </span>
                   <button 
                     onClick={handleLogout}
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-900/50 hover:border-red-500 transition cursor-pointer"
+                    className="text-gray-600 hover:text-[#06402B] px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-900/50 hover:border-red-500 transition cursor-pointer"
                   >
                     Log out
                   </button>
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
+                  <Link to="/login" className="text-gray-600 hover:text-[#06402B] px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
                     Log in
                   </Link>
-                  <Link to="/signup" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
+                  <Link to="/signup" className="bg-[#06402B] hover:bg-[#0a5c3f] text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
                     Sign up
                   </Link>
                 </>

@@ -17,6 +17,31 @@ exports.getPendingEmployers = async (req, res) => {
   }
 };
 
+// @desc    Get all approved employers and their reviews
+// @route   GET /api/admin/employers/approved
+// @access  Private (Admin)
+exports.getApprovedEmployers = async (req, res) => {
+  try {
+    const approved = await EmployerVerification.findAll({
+      where: { verificationStatus: 'approved' },
+      include: [{ 
+        model: User, 
+        as: 'user', 
+        attributes: ['id', 'name', 'email', 'phone'],
+        include: [{
+          model: Review,
+          as: 'receivedReviews',
+          attributes: ['id', 'rating', 'comment', 'createdAt']
+        }]
+      }]
+    });
+    return res.json(approved);
+  } catch (error) {
+    console.error('Get approved employers error:', error);
+    return res.status(500).json({ message: 'Server error retrieving approved employers.', error: error.message });
+  }
+};
+
 // @desc    Verify an employer (approve or reject)
 // @route   PATCH /api/admin/employers/:userId/verify
 // @access  Private (Admin)

@@ -91,17 +91,17 @@ const ScanQR = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-[#121824] border border-gray-800 rounded-xl p-6 space-y-6 shadow-lg animate-fade-in max-w-3xl mx-auto">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6 shadow-lg animate-fade-in max-w-3xl mx-auto">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-lg font-bold text-white">Scan Student Attendance QR</h3>
-          <p className="text-xs text-gray-400">Scan the unique check-in/check-out QR code shown by the student to record their shift attendance.</p>
+          <h3 className="text-lg font-bold text-[#06402B]">Scan Student Attendance QR</h3>
+          <p className="text-xs text-gray-500">Scan the unique check-in/check-out QR code shown by the student to record their shift attendance.</p>
         </div>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            className="text-xs bg-gray-850 hover:bg-gray-800 text-gray-300 font-semibold px-3 py-1.5 rounded-lg border border-gray-700 transition cursor-pointer"
+            className="text-xs bg-gray-850 hover:bg-gray-100 text-gray-600 font-semibold px-3 py-1.5 rounded-lg border border-gray-200 transition cursor-pointer"
           >
             ✕ Close
           </button>
@@ -114,18 +114,18 @@ const ScanQR = ({ onClose }) => {
         }`}>
           <div className="font-bold text-sm mb-1">{feedback.message}</div>
           {feedback.details && (
-            <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-850 font-mono text-[10px] text-gray-300">
+            <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-850 font-mono text-[10px] text-gray-600">
               {feedback.details.student && (
                 <>
-                  <div className="font-bold text-white mb-1">🎓 Student Details:</div>
+                  <div className="font-bold text-[#06402B] mb-1">🎓 Student Details:</div>
                   <div className="pl-2">Name: {feedback.details.student.name}</div>
-                  <div className="pl-2 pb-2 text-[9px] text-gray-400">Email: {feedback.details.student.email}</div>
+                  <div className="pl-2 pb-2 text-[9px] text-gray-500">Email: {feedback.details.student.email}</div>
                 </>
               )}
               {feedback.details.job && (
-                <div className="pl-2 pb-2 text-blue-400">Shift: {feedback.details.job.title}</div>
+                <div className="pl-2 pb-2 text-blue-600">Shift: {feedback.details.job.title}</div>
               )}
-              <div className="font-bold text-white mb-1 border-t border-gray-800 pt-1.5 mt-1.5">⏱ Attendance Log:</div>
+              <div className="font-bold text-[#06402B] mb-1 border-t border-gray-200 pt-1.5 mt-1.5">⏱ Attendance Log:</div>
               {feedback.details.checkInTime && (
                 <div className="pl-2">Checked In At: {new Date(feedback.details.checkInTime).toLocaleString()}</div>
               )}
@@ -139,27 +139,27 @@ const ScanQR = ({ onClose }) => {
 
       {/* WEBCAM READER CONTAINER */}
       <div className="space-y-3">
-        <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider">Webcam Scanner View</label>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden p-4 relative z-0 flex justify-center">
+        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">Webcam Scanner View</label>
+        <div className="bg-gray-100 border border-gray-200 rounded-xl overflow-hidden p-4 relative z-0 flex justify-center">
           <div id="reader" className="w-full max-w-md bg-[#0e131f] rounded-lg min-h-[250px]"></div>
         </div>
       </div>
 
       {/* MANUAL OVERRIDE FALLBACK */}
-      <div className="border-t border-gray-800 pt-6">
-        <label className="block text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wider">Manual Code Override (Demo / Testing)</label>
+      <div className="border-t border-gray-200 pt-6">
+        <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Manual Code Override (Demo / Testing)</label>
         <form onSubmit={handleManualSubmit} className="flex gap-2">
           <input
             type="text"
             placeholder="Paste check-in token text (JWT)..."
-            className="flex-grow bg-gray-900 border border-gray-800 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500"
+            className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
             value={manualToken}
             onChange={(e) => setManualToken(e.target.value)}
           />
           <button
             type="submit"
             disabled={loading || !manualToken.trim()}
-            className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white text-xs font-semibold px-5 py-2 rounded-lg transition"
+            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-[#06402B] text-xs font-semibold px-5 py-2 rounded-lg transition"
           >
             {loading ? 'Verifying...' : 'Verify Token'}
           </button>

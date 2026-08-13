@@ -143,10 +143,10 @@ const PostJob = ({ onJobCreated }) => {
   };
 
   return (
-    <div className="bg-[#121824] border border-gray-800 rounded-xl p-6 space-y-6 shadow-lg animate-fade-in">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6 shadow-lg animate-fade-in">
       <div>
-        <h3 className="text-lg font-bold text-white">Create a New Job Post</h3>
-        <p className="text-xs text-gray-400">Fill in details and pin location coordinates on the map.</p>
+        <h3 className="text-lg font-bold text-[#06402B]">Create a New Job Post</h3>
+        <p className="text-xs text-gray-500">Fill in details and pin location coordinates on the map.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -158,36 +158,36 @@ const PostJob = ({ onJobCreated }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Job Title</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Job Title</label>
             <input 
               type="text" 
               required 
               placeholder="e.g. Event Coordinator Assistant" 
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Pay Amount ($/Hour)</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Pay Amount (LKR/Hour)</label>
             <input 
               type="number" 
               required 
               step="0.01"
               placeholder="15.00" 
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
               value={payAmount}
               onChange={(e) => setPayAmount(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1">Required Candidates (Vacancies)</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Required Candidates (Vacancies)</label>
             <input 
               type="number" 
               required 
               min="1"
               placeholder="1" 
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
               value={requiredEmployees}
               onChange={(e) => setRequiredEmployees(e.target.value)}
             />
@@ -195,11 +195,11 @@ const PostJob = ({ onJobCreated }) => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-1">Description</label>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
           <textarea 
             rows="3" 
             placeholder="Write details about the shift tasks, requirements, dress code..." 
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -208,15 +208,15 @@ const PostJob = ({ onJobCreated }) => {
         {/* Date and Calendar Time Inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
+            <label className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
               📅 Start Date & Time
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
+              <span className="absolute left-3 top-2.5 text-gray-500 text-sm pointer-events-none">📅</span>
               <input 
                 type="datetime-local" 
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator cursor-pointer"
+                className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-[#06402B] calendar-picker-indicator cursor-pointer"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 onClick={handleShowCalendar}
@@ -225,15 +225,15 @@ const PostJob = ({ onJobCreated }) => {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1">
+            <label className="block text-xs font-semibold text-gray-600 mb-1 flex items-center gap-1">
               📅 End Date & Time
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-400 text-sm pointer-events-none">📅</span>
+              <span className="absolute left-3 top-2.5 text-gray-500 text-sm pointer-events-none">📅</span>
               <input 
                 type="datetime-local" 
                 required
-                className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-blue-500 calendar-picker-indicator cursor-pointer"
+                className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-[#06402B] calendar-picker-indicator cursor-pointer"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
                 onClick={handleShowCalendar}
@@ -245,8 +245,8 @@ const PostJob = ({ onJobCreated }) => {
 
         {/* REQUIRED SKILLS SELECTABLE BADGES (New) */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-2">Required Skills (Select multiple)</label>
-          <div className="flex flex-wrap gap-2 p-3 bg-gray-900/40 border border-gray-800 rounded-lg">
+          <label className="block text-xs font-semibold text-gray-600 mb-2">Required Skills (Select multiple)</label>
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-100/40 border border-gray-200 rounded-lg">
             {dbSkills.length === 0 ? (
               <span className="text-xs text-gray-500 animate-pulse">Loading skills list...</span>
             ) : (
@@ -259,8 +259,8 @@ const PostJob = ({ onJobCreated }) => {
                     onClick={() => toggleSkill(skill.name)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer select-none ${
                       isSelected
-                        ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-500/20'
-                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-650'
+                        ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
+                        : 'bg-gray-100 border-gray-200 text-gray-500 hover:border-gray-650'
                     }`}
                   >
                     {skill.name}
@@ -272,12 +272,12 @@ const PostJob = ({ onJobCreated }) => {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-1">Location Name / Venue description</label>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Location Name / Venue description</label>
           <input 
             type="text" 
             required
             placeholder="e.g. Faculty Lecture Hall A" 
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+            className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
             value={locationName}
             onChange={(e) => setLocationName(e.target.value)}
           />
@@ -285,12 +285,12 @@ const PostJob = ({ onJobCreated }) => {
 
         {/* MAP LOCATION SEARCH INPUT */}
         <div className="pt-2">
-          <label className="block text-xs font-semibold text-gray-300 mb-1 uppercase tracking-wider">Search Map Location (Sri Lanka)</label>
+          <label className="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wider">Search Map Location (Sri Lanka)</label>
           <div className="flex gap-2 mb-2">
             <input 
               type="text"
               placeholder="Type town, university, or venue (e.g. Faculty of Technology, Ruhuna)..." 
-              className="flex-grow bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#06402B]"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -298,7 +298,7 @@ const PostJob = ({ onJobCreated }) => {
               type="button"
               onClick={handleMapSearch}
               disabled={isSearchingMap}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
+              className="bg-[#06402B] hover:bg-[#0a5c3f] text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
             >
               {isSearchingMap ? 'Searching...' : '🔍 Find on Map'}
             </button>
@@ -313,7 +313,7 @@ const PostJob = ({ onJobCreated }) => {
           )}
 
           {/* Leaflet map selector - Height increased to h-[450px] */}
-          <div className="h-[450px] rounded-lg overflow-hidden border border-gray-700 relative z-0">
+          <div className="h-[450px] rounded-lg overflow-hidden border border-gray-200 relative z-0">
             <MapContainer center={position} zoom={16} style={{ height: '100%', width: '100%' }}>
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -329,7 +329,7 @@ const PostJob = ({ onJobCreated }) => {
         <button 
           type="submit" 
           disabled={submitting}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg transition"
+          className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-2.5 rounded-lg transition"
         >
           {submitting ? 'Creating job...' : 'Post Job opportunity'}
         </button>

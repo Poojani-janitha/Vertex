@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getPendingEmployers,
+  getApprovedEmployers,
   verifyEmployer,
   deleteReview,
   deleteJob,
@@ -22,6 +23,7 @@ router.use(restrictTo('admin'));
 
 // Employer Verification
 router.get('/employers/pending', getPendingEmployers);
+router.get('/employers/approved', getApprovedEmployers);
 router.patch('/employers/:userId/verify', verifyEmployer);
 
 // Moderation
