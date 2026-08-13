@@ -93,7 +93,7 @@ const CommunityDashboard = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-[#0e131f]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06402B]"></div>
       </div>
     );
   }
@@ -106,7 +106,7 @@ const CommunityDashboard = () => {
           <p>{error || 'This dashboard is reserved for verified Community (Employer) members only.'}</p>
           <button
             onClick={() => navigate('/login')}
-            className="mt-4 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-6 rounded-lg transition"
+            className="mt-4 bg-red-600 hover:bg-red-500 text-[#06402B] font-semibold py-2 px-6 rounded-lg transition"
           >
             Go to Login
           </button>
@@ -119,39 +119,39 @@ const CommunityDashboard = () => {
   if (!verification || verification.verificationStatus !== 'approved') {
     return (
       <div className="max-w-3xl mx-auto py-12 px-4">
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl p-8 text-center space-y-6">
+        <div className="bg-gray-100 rounded-2xl border border-gray-200 shadow-2xl p-8 text-center space-y-6">
           <div className="text-yellow-400 text-5xl animate-pulse">⏳</div>
-          <h2 className="text-3xl font-extrabold text-white">Pending Admin Approval</h2>
-          <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
+          <h2 className="text-3xl font-extrabold text-[#06402B]">Pending Admin Approval</h2>
+          <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
             Your verification status is currently <span className="text-yellow-400 font-bold uppercase">{verification?.verificationStatus || 'pending'}</span>.
             An administrator needs to approve your credentials before you can post jobs, manage applicants, or view student details.
           </p>
 
-          <div className="bg-gray-900/50 p-6 rounded-xl border border-gray-700 max-w-md mx-auto text-left space-y-2">
-            <h3 className="font-bold text-gray-300 border-b border-gray-700 pb-2 mb-2">Registration Overview</h3>
-            <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Name:</span> {user.name}</div>
-            <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Email:</span> {user.email}</div>
-            <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Account Type:</span> {verification?.accountType}</div>
+          <div className="bg-gray-100/50 p-6 rounded-xl border border-gray-200 max-w-md mx-auto text-left space-y-2">
+            <h3 className="font-bold text-gray-600 border-b border-gray-200 pb-2 mb-2">Registration Overview</h3>
+            <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Name:</span> {user.name}</div>
+            <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Email:</span> {user.email}</div>
+            <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Account Type:</span> {verification?.accountType}</div>
             {verification?.accountType === 'company' ? (
               <>
-                <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Company:</span> {verification.companyName}</div>
-                <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">Reg No:</span> {verification.companyRegNo}</div>
+                <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Company:</span> {verification.companyName}</div>
+                <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">Reg No:</span> {verification.companyRegNo}</div>
               </>
             ) : (
-              <div className="text-sm text-gray-400"><span className="font-semibold text-gray-300">ID/NIC:</span> {verification?.individualIdNo}</div>
+              <div className="text-sm text-gray-500"><span className="font-semibold text-gray-600">ID/NIC:</span> {verification?.individualIdNo}</div>
             )}
           </div>
 
           <div className="pt-4 flex gap-4 justify-center">
             <button
               onClick={fetchData}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg transition"
+              className="bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-2 px-6 rounded-lg transition"
             >
               Refresh Status
             </button>
             <button
               onClick={handleLogout}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+              className="bg-gray-700 hover:bg-gray-600 text-[#06402B] font-semibold py-2 px-6 rounded-lg transition"
             >
               Log out
             </button>
@@ -167,14 +167,14 @@ const CommunityDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0b0e17] text-gray-200 overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 text-gray-700 overflow-hidden font-sans">
 
       {/* LEFT SIDEBAR (Matching Developers Stack exactly) */}
-      <aside className="w-64 bg-[#111726] border-r border-gray-800 flex flex-col h-full shrink-0 select-none">
+      <aside className="w-64 bg-[#06402B] border-r border-[#053020] flex flex-col h-full shrink-0 select-none">
 
         {/* Brand Logo header */}
-        <div className="h-16 px-6 border-b border-gray-800 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">W</div>
+        <div className="h-16 px-6 border-b border-[#053020] flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#06402B] flex items-center justify-center font-bold text-[#06402B] text-lg">W</div>
           <span className="text-lg font-bold text-white tracking-wider">WorkOra Comm</span>
         </div>
 
@@ -183,7 +183,7 @@ const CommunityDashboard = () => {
 
           {/* MAIN MENU */}
           <div>
-            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Main</div>
+            <div className="text-[10px] font-bold text-green-200 uppercase tracking-widest px-3 mb-2">Main</div>
             <nav className="space-y-1">
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -199,10 +199,7 @@ const CommunityDashboard = () => {
                     setActiveTab(tab.id);
                     setSelectedJob(null);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tab.id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                    }`}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tab.id ? 'bg-white text-[#06402B] shadow-md' : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'}`}
                 >
                   <span className="text-base">{tab.icon}</span>
                   {tab.label}
@@ -215,14 +212,11 @@ const CommunityDashboard = () => {
 
           {/* TOOLS */}
           <div>
-            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Tools</div>
+            <div className="text-[10px] font-bold text-green-200 uppercase tracking-widest px-3 mb-2">Tools</div>
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'settings'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'settings' ? 'bg-white text-[#06402B] shadow-md' : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'}`}
               >
                 <span className="text-base">⚙</span> Profile Settings
               </button>
@@ -238,20 +232,20 @@ const CommunityDashboard = () => {
         </div>
 
         {/* BOTTOM USER PROFILE CARD */}
-        <div className="p-4 border-t border-gray-800 bg-[#0d121e] flex items-center justify-between">
+        <div className="p-4 border-t border-[#053020] bg-[#042A1D] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow-inner">
+            <div className="w-10 h-10 rounded-full bg-[#0a5c3f] text-[#06402B] flex items-center justify-center font-bold text-sm shadow-inner">
               {getInitials(user.name)}
             </div>
             <div>
-              <div className="text-xs font-bold text-white truncate max-w-[120px]">{user.name}</div>
+              <div className="text-xs font-bold text-[#06402B] truncate max-w-[120px]">{user.name}</div>
               <div className="text-[10px] text-gray-500 capitalize">{verification.accountType}</div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-red-400 transition"
+            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-red-400 transition"
           >
             ❌
           </button>
@@ -263,10 +257,10 @@ const CommunityDashboard = () => {
       <main className="flex-grow flex flex-col h-full overflow-hidden">
 
         {/* TOP STATUS BAR (Matching Developers Stack) */}
-        <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#111726]/40 shrink-0">
+        <header className="h-16 border-b border-[#053020] flex items-center justify-between px-8 bg-white shrink-0">
 
           {/* Top Welcome Title */}
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-sm font-bold text-[#06402B] flex items-center gap-2">
             Good night, {user.name.split(' ')[0]} 👋
           </h2>
 
@@ -276,7 +270,7 @@ const CommunityDashboard = () => {
             <input
               type="text"
               placeholder="Search active applicants, jobs, transcripts..."
-              className="w-full bg-gray-900 border border-gray-800 text-white rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
+              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
               disabled
             />
           </div>
@@ -285,16 +279,16 @@ const CommunityDashboard = () => {
           <div className="flex items-center space-x-6">
 
             {/* Mock Nav controls */}
-            <div className="flex items-center space-x-3 text-gray-400 text-sm">
-              <button title="Notifications" className="hover:text-white">🔔</button>
-              <button title="Messages" className="hover:text-white">✉</button>
+            <div className="flex items-center space-x-3 text-gray-500 text-sm">
+              <button title="Notifications" className="hover:text-[#06402B]">🔔</button>
+              <button title="Messages" className="hover:text-[#06402B]">✉</button>
             </div>
           </div>
 
         </header>
 
         {/* MAIN BODY CONTAINER */}
-        <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-[#0b0e17]">
+        <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-gray-50">
 
           {/* DYNAMIC VIEW ROUTER */}
           {activeTab === 'dashboard' && (
@@ -350,9 +344,9 @@ const CommunityDashboard = () => {
       {/* Floating safety / report modal */}
       {showReportModal && (
         <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-[#121824] border border-gray-800 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-gray-800 flex justify-between items-center bg-[#111726]/80">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+          <div className="bg-white border border-gray-200 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white/80">
+              <h3 className="text-lg font-bold text-[#06402B] flex items-center gap-2">
                 <span>🚨</span> File Report Against Student
               </h3>
               <button
@@ -360,7 +354,7 @@ const CommunityDashboard = () => {
                   setShowReportModal(false);
                   setReportSuccess(null);
                 }}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-500 hover:text-[#06402B]"
               >
                 ✕
               </button>
@@ -377,36 +371,36 @@ const CommunityDashboard = () => {
               )}
 
               <div>
-                <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Student Email</label>
+                <label className="block text-[10px] font-semibold text-gray-600 mb-1 uppercase tracking-wider">Student Email</label>
                 <input
                   type="email"
                   required
                   placeholder="student@university.edu"
-                  className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportEmail}
                   onChange={(e) => setReportEmail(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Student Name</label>
+                <label className="block text-[10px] font-semibold text-gray-600 mb-1 uppercase tracking-wider">Student Name</label>
                 <input
                   type="text"
                   required
                   placeholder="John Doe"
-                  className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Inquiry Details</label>
+                <label className="block text-[10px] font-semibold text-gray-600 mb-1 uppercase tracking-wider">Inquiry Details</label>
                 <textarea
                   required
                   rows="3"
                   placeholder="Detail the issue (e.g. no-show, fake check-in attempt)..."
-                  className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
                 />
@@ -415,7 +409,7 @@ const CommunityDashboard = () => {
               <div className="pt-2 flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="flex-1 bg-red-600 hover:bg-red-500 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Submit Inquiry
                 </button>
@@ -425,7 +419,7 @@ const CommunityDashboard = () => {
                     setShowReportModal(false);
                     setReportSuccess(null);
                   }}
-                  className="bg-gray-850 hover:bg-gray-800 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="bg-gray-850 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Cancel
                 </button>

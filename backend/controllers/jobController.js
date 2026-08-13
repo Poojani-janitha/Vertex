@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
-const { Job, Application, User, EmployerVerification, Message, Checkin, sequelize } = require('../models');
+const { Job, Application, User, EmployerVerification, Message, Checkin, Profile, sequelize } = require('../models');
 
 // @desc    Create a new job post
 // @route   POST /api/jobs
@@ -110,7 +110,13 @@ const getJobApplicants = async (req, res) => {
         {
           model: User,
           as: 'student',
-          attributes: ['id', 'name', 'email', 'phone']
+          attributes: ['id', 'name', 'email', 'phone'],
+          include: [
+            {
+              model: Profile,
+              as: 'profile'
+            }
+          ]
         }
       ],
       order: [['appliedAt', 'DESC']]
