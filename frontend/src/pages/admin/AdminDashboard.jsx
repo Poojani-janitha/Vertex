@@ -200,8 +200,8 @@ const AdminDashboard = () => {
   const sidebarButtonClass = (tabName) => {
     return `w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center space-x-3 ${
       activeTab === tabName
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+        ? 'bg-[#06402B] text-white shadow-lg shadow-[#06402B]/25'
+        : 'text-gray-500 hover:bg-gray-50 hover:text-[#06402B]'
     }`;
   };
 
@@ -235,10 +235,10 @@ const AdminDashboard = () => {
 
       <div className="flex flex-col md:flex-row gap-8 min-h-[70vh]">
         {/* Sidebar Panel */}
-        <div className="w-full md:w-64 bg-gray-800 rounded-2xl border border-gray-700 p-4 space-y-2 h-fit">
-        <div className="px-4 py-3 border-b border-gray-700 mb-4">
-          <div className="font-bold text-white text-lg">{user?.name}</div>
-          <div className="text-xs text-red-400 uppercase font-semibold">Administrator</div>
+        <div className="w-full md:w-64 bg-white rounded-2xl border border-gray-100 p-4 space-y-2 h-fit shadow-[0_15px_40px_rgba(6,64,43,0.08)]">
+        <div className="px-4 py-3 border-b border-gray-100 mb-4">
+          <div className="font-bold text-[#06402B] text-lg">{user?.name}</div>
+          <div className="text-xs text-red-500 uppercase font-bold">Administrator</div>
         </div>
 
         <button 
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 bg-gray-800 rounded-2xl border border-gray-700 p-8 shadow-xl">
+      <div className="flex-1 bg-white rounded-2xl border border-gray-100 p-8 shadow-[0_15px_40px_rgba(6,64,43,0.08)]">
         
         {modMessage && (
           <div className={`p-4 rounded-lg text-sm border mb-6 ${
@@ -279,42 +279,42 @@ const AdminDashboard = () => {
 
         {activeTab === 'employers' && (
           <div>
-            <h2 className="text-3xl font-extrabold text-white mb-2">Pending Employer Registrations</h2>
-            <p className="text-gray-400 mb-8">Review details and verify new employers before they can list jobs.</p>
+            <h2 className="text-3xl font-extrabold text-[#06402B] mb-2">Pending Employer Registrations</h2>
+            <p className="text-gray-500 mb-8">Review details and verify new employers before they can list jobs.</p>
 
             {pendingEmployers.length === 0 ? (
-              <div className="text-center py-20 bg-gray-900/30 rounded-2xl border border-gray-700 border-dashed">
+              <div className="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200 border-dashed">
                 <div className="text-gray-650 text-5xl mb-4">🎉</div>
-                <h3 className="text-xl font-medium text-gray-300">All caught up!</h3>
+                <h3 className="text-xl font-medium text-[#06402B]">All caught up!</h3>
                 <p className="text-gray-500 mt-2">No employers currently waiting for verification.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {pendingEmployers.map((emp) => (
-                  <div key={emp.id} className="bg-gray-900/40 p-6 rounded-xl border border-gray-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div key={emp.id} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <h3 className="text-xl font-bold text-white">
+                        <h3 className="text-xl font-bold text-[#06402B]">
                           {emp.accountType === 'company' ? emp.companyName : emp.user?.name}
                         </h3>
-                        <span className="bg-blue-900/50 text-blue-300 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-800 uppercase">
+                        <span className="bg-green-50 text-green-700 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-200 uppercase">
                           {emp.accountType}
                         </span>
                       </div>
                       
-                      <div className="text-gray-400 text-sm">
-                        Registered by: <strong className="text-gray-200">{emp.user?.name}</strong> ({emp.user?.email})
+                      <div className="text-gray-500 text-sm">
+                        Registered by: <strong className="text-gray-800">{emp.user?.name}</strong> ({emp.user?.email})
                       </div>
 
                       {emp.accountType === 'company' && (
-                        <div className="text-gray-400 text-sm">
-                          Company Reg No: <code className="text-gray-200 bg-gray-800 px-1.5 py-0.5 rounded">{emp.companyRegNo}</code>
+                        <div className="text-gray-500 text-sm">
+                          Company Reg No: <code className="text-[#06402B] bg-gray-100 px-1.5 py-0.5 rounded">{emp.companyRegNo}</code>
                         </div>
                       )}
                       
                       {emp.individualIdNo && (
-                        <div className="text-gray-400 text-sm">
-                          ID Number: <code className="text-gray-200 bg-gray-800 px-1.5 py-0.5 rounded">{emp.individualIdNo}</code>
+                        <div className="text-gray-500 text-sm">
+                          ID Number: <code className="text-[#06402B] bg-gray-100 px-1.5 py-0.5 rounded">{emp.individualIdNo}</code>
                         </div>
                       )}
                     </div>
@@ -344,19 +344,19 @@ const AdminDashboard = () => {
 
         {activeTab === 'reports' && (
           <div>
-            <h2 className="text-3xl font-extrabold text-white mb-2">Student Reports Queue</h2>
-            <p className="text-gray-400 mb-8">Review reports submitted by students on jobs or other users.</p>
+            <h2 className="text-3xl font-extrabold text-[#06402B] mb-2">Student Reports Queue</h2>
+            <p className="text-gray-500 mb-8">Review reports submitted by students on jobs or other users.</p>
 
             {reports.length === 0 ? (
-              <div className="text-center py-20 bg-gray-900/30 rounded-2xl border border-gray-700 border-dashed">
+              <div className="text-center py-20 bg-gray-50 rounded-2xl border border-gray-200 border-dashed">
                 <div className="text-gray-650 text-5xl mb-4">🛡️</div>
-                <h3 className="text-xl font-medium text-gray-300">Clean slate</h3>
+                <h3 className="text-xl font-medium text-[#06402B]">Clean slate</h3>
                 <p className="text-gray-500 mt-2">No reports currently submitted.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-300">
-                  <thead className="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
+                <table className="w-full text-left text-sm text-gray-700">
+                  <thead className="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-4">Reporter</th>
                       <th className="px-6 py-4">Target Type</th>
@@ -366,22 +366,22 @@ const AdminDashboard = () => {
                       <th className="px-6 py-4 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-700">
+                  <tbody className="divide-y divide-gray-100">
                     {reports.map((report) => (
-                      <tr key={report.id} className="hover:bg-gray-750/30 transition-colors">
-                        <td className="px-6 py-4 font-semibold text-white">
+                      <tr key={report.id} className="hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+                        <td className="px-6 py-4 font-semibold text-[#06402B]">
                           {report.reporter?.name || `User ID: ${report.fromUser}`}
                         </td>
                         <td className="px-6 py-4 capitalize">{report.targetType}</td>
                         <td className="px-6 py-4">
-                          <code className="bg-gray-900 px-2 py-0.5 rounded text-white">{report.targetId}</code>
+                          <code className="bg-gray-100 px-2 py-0.5 rounded text-[#06402B]">{report.targetId}</code>
                         </td>
                         <td className="px-6 py-4 max-w-xs truncate">{report.reason}</td>
                         <td className="px-6 py-4">
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full uppercase border ${
-                            report.status === 'resolved' ? 'bg-green-900/30 text-green-400 border-green-800' :
-                            report.status === 'reviewed' ? 'bg-blue-900/30 text-blue-400 border-blue-800' :
-                            'bg-yellow-900/30 text-yellow-400 border-yellow-800'
+                            report.status === 'resolved' ? 'bg-green-50 text-green-700 border-green-200' :
+                            report.status === 'reviewed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
                           }`}>
                             {report.status}
                           </span>
@@ -391,7 +391,7 @@ const AdminDashboard = () => {
                             <button
                               disabled={processingId === report.id}
                               onClick={() => handleResolveReport(report.id, 'resolved')}
-                              className="text-xs bg-blue-600 hover:bg-blue-500 text-white py-1 px-2.5 rounded transition-colors"
+                              className="text-xs bg-[#06402B] hover:bg-[#0a5c3f] text-white py-1 px-2.5 rounded transition-colors"
                             >
                               Resolve
                             </button>
@@ -409,13 +409,13 @@ const AdminDashboard = () => {
         {activeTab === 'moderation' && (
           <div className="space-y-8 max-w-xl">
             <div>
-              <h2 className="text-3xl font-extrabold text-white mb-2">Content Moderation</h2>
-              <p className="text-gray-400">Quickly remove content that violates guidelines using target IDs.</p>
+              <h2 className="text-3xl font-extrabold text-[#06402B] mb-2">Content Moderation</h2>
+              <p className="text-gray-500">Quickly remove content that violates guidelines using target IDs.</p>
             </div>
 
             {/* Delete Job */}
-            <form onSubmit={handleDeleteJob} className="bg-gray-900/30 p-6 rounded-xl border border-gray-700 space-y-4">
-              <h3 className="text-lg font-bold text-white">Remove Job Post</h3>
+            <form onSubmit={handleDeleteJob} className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-lg font-bold text-[#06402B]">Remove Job Post</h3>
               <p className="text-xs text-gray-500">Entering a valid Job ID will permanently remove the post and all its applications.</p>
               <div className="flex gap-4">
                 <input 
@@ -424,7 +424,7 @@ const AdminDashboard = () => {
                   required
                   value={jobIdToDelete}
                   onChange={(e) => setJobIdToDelete(e.target.value)}
-                  className="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2 text-sm flex-1 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                  className="bg-white border border-gray-300 text-gray-900 rounded-lg px-4 py-2 text-sm flex-1 focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]"
                 />
                 <button
                   type="submit"
@@ -436,8 +436,8 @@ const AdminDashboard = () => {
             </form>
 
             {/* Delete Review */}
-            <form onSubmit={handleDeleteReview} className="bg-gray-900/30 p-6 rounded-xl border border-gray-700 space-y-4">
-              <h3 className="text-lg font-bold text-white">Remove Bad Review</h3>
+            <form onSubmit={handleDeleteReview} className="bg-gray-50 p-6 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-lg font-bold text-[#06402B]">Remove Bad Review</h3>
               <p className="text-xs text-gray-500">Entering a valid Review ID will permanently delete the rating and comments.</p>
               <div className="flex gap-4">
                 <input 
@@ -446,7 +446,7 @@ const AdminDashboard = () => {
                   required
                   value={reviewIdToDelete}
                   onChange={(e) => setReviewIdToDelete(e.target.value)}
-                  className="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2 text-sm flex-1 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                  className="bg-white border border-gray-300 text-gray-900 rounded-lg px-4 py-2 text-sm flex-1 focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]"
                 />
                 <button
                   type="submit"
