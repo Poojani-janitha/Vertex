@@ -265,8 +265,8 @@ const StudentDashboard = () => {
 
   const sidebarButtonClass = (tabName) => {
     return `w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tabName
-        ? 'bg-[#06402B] text-white shadow-md shadow-blue-500/20'
-        : 'text-gray-500 hover:bg-gray-100 hover:text-[#06402B]'
+        ? 'bg-white text-[#06402B] shadow-md'
+        : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'
       }`;
   };
 
@@ -341,10 +341,10 @@ const StudentDashboard = () => {
           </div>
 
           {/* EMERGENCY ALERT */}
-          <div className="mt-8 px-2">
+          <div className="mt-8 px-4">
             <button
               onClick={() => setShowEmergencyModal(true)}
-              className="w-full flex justify-center items-center gap-2 bg-red-900/40 hover:bg-red-600 text-red-200 hover:text-white border border-red-800/50 hover:border-red-500 transition-colors py-3 rounded-xl shadow-lg shadow-red-900/20 font-bold text-sm tracking-wide"
+              className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-500 text-white transition-colors py-3 rounded-xl font-bold text-sm tracking-wide shadow-md shadow-red-900/20"
             >
               🚨 EMERGENCY
             </button>
@@ -359,8 +359,8 @@ const StudentDashboard = () => {
               {getInitials(user?.name)}
             </div>
             <div>
-              <div className="text-xs font-bold text-[#06402B] truncate max-w-[120px]">{user?.name}</div>
-              <div className="text-[10px] text-gray-500 capitalize">Student</div>
+              <div className="text-xs font-bold text-white truncate max-w-[120px]">{user?.name}</div>
+              <div className="text-[10px] text-gray-400 capitalize">Student</div>
             </div>
           </div>
           <button
@@ -399,8 +399,8 @@ const StudentDashboard = () => {
           <div className="flex items-center space-x-6">
             <div className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
               <span className="text-gray-500 font-medium">LKR Wallet:</span>
-              <strong className="text-green-400">LKR 0.00</strong>
-              <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-950/40 text-green-300">Active</span>
+              <strong className="text-green-700">LKR 0.00</strong>
+              <span className="text-[9px] text-[#06402B] uppercase font-bold px-1.5 py-0.5 rounded bg-green-100 border border-green-300">Active</span>
             </div>
 
             <div className="flex items-center space-x-3 text-gray-500 text-sm">
