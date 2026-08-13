@@ -1,8 +1,33 @@
-const { Review } = require('../models');
+const { Review, User, Job } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
-    const items = await Review.findAll();
+    const { fromUser, toUser } = req.query;
+    const where = {};
+    if (fromUser) where.fromUser = fromUser;
+    if (toUser) where.toUser = toUser;
+
+    const items = await Review.findAll({
+      where,
+      include: [
+        {
+          model: User,
+          as: 'sender',
+          attributes: ['id', 'name', 'email', 'role']
+        },
+        {
+          model: User,
+          as: 'receiver',
+          attributes: ['id', 'name', 'email', 'role']
+        },
+        {
+          model: Job,
+          as: 'job',
+          attributes: ['id', 'title', 'payAmount', 'locationName']
+        }
+      ],
+      order: [['created_at', 'DESC']]
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ error: error.message });

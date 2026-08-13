@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import Users from './pages/Users';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import StudentDashboard from './pages/student/StudentDashboard';
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/users" element={<Users />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<StudentDashboard />} />

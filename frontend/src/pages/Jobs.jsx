@@ -1,5 +1,16 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix default marker icon issue in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -14,6 +25,7 @@ const Jobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [applyMessage, setApplyMessage] = useState(null);
+  const [trustScore, setTrustScore] = useState(null);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -29,6 +41,22 @@ const Jobs = () => {
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    if (selectedJob) {
+      const fetchTrustScore = async () => {
+        try {
+          const response = await api.get(`/users/${selectedJob.employerId}/trust-score`);
+          setTrustScore(response.data);
+        } catch (err) {
+          console.error('Failed to fetch trust score:', err);
+        }
+      };
+      fetchTrustScore();
+    } else {
+      setTrustScore(null);
+    }
+  }, [selectedJob]);
+
   const handleViewDetails = (job) => {
     setSelectedJob(job);
     setApplyMessage(null);
@@ -43,15 +71,25 @@ const Jobs = () => {
     setIsApplying(true);
     setApplyMessage(null);
     try {
-      // Hardcoded studentId to 1 for now until authentication is fully implemented
+      // Fetch logged-in user details dynamically
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      
+      if (!user) {
+        setApplyMessage({ type: 'error', text: 'You must be logged in to apply for jobs.' });
+        setIsApplying(false);
+        return;
+      }
+
       await api.post('/applications', {
         jobId: selectedJob.id,
-        studentId: 1, 
+        studentId: user.id, 
         status: 'pending'
       });
       setApplyMessage({ type: 'success', text: 'Successfully applied! The employer will review your application.' });
     } catch (err) {
-      setApplyMessage({ type: 'error', text: 'Failed to apply. You might have already applied or the server is down.' });
+      const errMsg = err.response?.data?.error || 'Failed to apply. Please try again.';
+      setApplyMessage({ type: 'error', text: errMsg });
     } finally {
       setIsApplying(false);
     }
@@ -156,7 +194,7 @@ const Jobs = () => {
                 <div className="space-y-2 mb-6">
                   {job.payAmount && (
                     <div className="flex items-center text-sm text-gray-300">
-                      <span className="mr-2">💰</span> ${job.payAmount}
+                      <span className="mr-2">💰</span> Rs {job.payAmount}
                     </div>
                   )}
                   {job.locationName && (
@@ -209,13 +247,71 @@ const Jobs = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
                     <div className="text-gray-400 text-sm mb-1">Pay Amount</div>
-                    <div className="text-xl font-semibold text-green-400">${selectedJob.payAmount || 'N/A'}</div>
+                    <div className="text-xl font-semibold text-green-400">Rs {selectedJob.payAmount || 'N/A'}</div>
                   </div>
                   <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
                     <div className="text-gray-400 text-sm mb-1">Location</div>
                     <div className="text-lg font-medium text-white">{selectedJob.locationName || 'Remote / Unspecified'}</div>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-450 bg-gray-900/30 p-4 rounded-xl border border-gray-800">
+                  <div>📅 Start Time: <span className="text-white font-medium">{selectedJob.startTime ? new Date(selectedJob.startTime).toLocaleString() : 'N/A'}</span></div>
+                  <div>📅 End Time: <span className="text-white font-medium">{selectedJob.endTime ? new Date(selectedJob.endTime).toLocaleString() : 'N/A'}</span></div>
+                </div>
+
+                {(() => {
+                  const lat = parseFloat(selectedJob.latitude);
+                  const lng = parseFloat(selectedJob.longitude);
+                  if (!isNaN(lat) && !isNaN(lng)) {
+                    return (
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Job Location Map</h4>
+                        <div className="h-60 rounded-xl overflow-hidden border border-gray-750">
+                          <MapContainer center={[lat, lng]} zoom={14} style={{ height: '100%', width: '100%', zIndex: 10 }}>
+                            <TileLayer
+                              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                              attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+                            />
+                            <Marker position={[lat, lng]} />
+                          </MapContainer>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                {/* Trust Score Breakdown Widget */}
+                {trustScore && (
+                  <div className="bg-[#121824] p-5 rounded-xl border border-gray-700 space-y-3">
+                    <div className="flex justify-between items-center border-b border-gray-700/60 pb-2">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Employer Trust Score</h4>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base font-extrabold text-green-400">{trustScore.score}/100</span>
+                        <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-950/40 text-green-300">Verified</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-300">
+                      <div className="flex justify-between p-2 rounded bg-gray-900/40">
+                        <span>⭐ Rating (40%):</span>
+                        <strong className="text-white">{trustScore.breakdown.rating}/40 ({trustScore.metrics.avgRating}★)</strong>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-gray-900/40">
+                        <span>⏱️ Worked Hours (30%):</span>
+                        <strong className="text-white">{trustScore.breakdown.hours}/30 ({trustScore.metrics.verifiedHours}h)</strong>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-gray-900/40">
+                        <span>💬 Reply Rate (20%):</span>
+                        <strong className="text-white">{trustScore.breakdown.reply}/20 (95%)</strong>
+                      </div>
+                      <div className="flex justify-between p-2 rounded bg-gray-900/40">
+                        <span>💼 Completed Jobs (10%):</span>
+                        <strong className="text-white">{trustScore.breakdown.completed}/10 ({trustScore.metrics.completedJobs})</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {selectedJob.skillsNeeded && (
                   <div>

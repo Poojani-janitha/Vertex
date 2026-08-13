@@ -10,7 +10,7 @@ const Home = () => {
         </h1>
         
         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-          Vertex is the ultimate platform for university students to find flexible jobs, build their profiles, and get paid fairly by trusted employers.
+          WorkOra is the ultimate platform for university students to find flexible jobs, build their profiles, and get paid fairly by trusted employers.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">

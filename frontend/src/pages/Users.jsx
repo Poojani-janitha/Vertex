@@ -41,7 +41,7 @@ const Users = () => {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">User Directory</h1>
-        <p className="text-gray-400">Browse registered students and employers on Vertex.</p>
+        <p className="text-gray-400">Browse registered students and employers on WorkOra.</p>
       </div>
 
       {users.length === 0 ? (

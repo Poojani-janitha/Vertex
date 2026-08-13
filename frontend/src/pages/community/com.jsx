@@ -8,6 +8,7 @@ import PostJob from './views/PostJob';
 import MyJobs from './views/MyJobs';
 import Messages from './views/Messages';
 import ProfileSettings from './views/ProfileSettings';
+import Reviews from './views/Reviews';
 import ScanQR from './views/ScanQR';
 
 const CommunityDashboard = () => {
@@ -173,8 +174,8 @@ const CommunityDashboard = () => {
 
         {/* Brand Logo header */}
         <div className="h-16 px-6 border-b border-gray-800 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">V</div>
-          <span className="text-lg font-bold text-white tracking-wider">Vertex Comm</span>
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">W</div>
+          <span className="text-lg font-bold text-white tracking-wider">WorkOra Comm</span>
         </div>
 
         {/* Sidebar Nav content */}
@@ -190,6 +191,7 @@ const CommunityDashboard = () => {
                 { id: 'post-job', label: 'Post a Job', icon: '➕' },
                 { id: 'scan-qr', label: 'Scan Check-In', icon: '📷' },
                 { id: 'messages', label: 'Messages', icon: '💬' },
+                { id: 'reviews', label: 'Reviews Feed', icon: '⭐' },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -334,6 +336,7 @@ const CommunityDashboard = () => {
 
           {activeTab === 'messages' && <Messages />}
 
+          {activeTab === 'reviews' && <Reviews user={user} />}
           {activeTab === 'scan-qr' && <ScanQR onClose={() => setActiveTab('dashboard')} />}
 
           {activeTab === 'settings' && (

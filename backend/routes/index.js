@@ -37,4 +37,7 @@ router.use('/skills', skillRoutes);
 const adminRoutes = require('./adminRoutes');
 router.use('/admin', adminRoutes);
 
+const emergencyRoutes = require('./emergencyRoutes');
+router.use('/emergencies', emergencyRoutes);
+
 module.exports = router;
