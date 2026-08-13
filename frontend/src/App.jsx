@@ -5,7 +5,7 @@ import Jobs from './pages/Jobs';
 import Users from './pages/Users';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import StudentDashboard from './pages/StudentDashboard';
+import StudentDashboard from './pages/student/StudentDashboard';
 import AdminDashboard from './pages/admin/admin';
 import CommunityDashboard from './pages/community/com';
 
