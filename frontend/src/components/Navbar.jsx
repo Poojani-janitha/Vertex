@@ -48,7 +48,7 @@ const Navbar = () => {
               <div className="flex items-baseline space-x-6">
                 <Link to="/" className={getLinkClass('/')}>Home</Link>
                 <Link to="/jobs" className={getLinkClass('/jobs')}>Jobs Board</Link>
-                <Link to="/users" className={getLinkClass('/users')}>Directory</Link>
+
                 <Link to="/contact" className={getLinkClass('/contact')}>Contact Us</Link>
                 {user && user.role === 'student' && (
                   <Link to="/dashboard" className={getLinkClass('/dashboard')}>Dashboard</Link>
