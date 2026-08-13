@@ -28,18 +28,6 @@ const MyJobs = ({ jobs, onGenerateQR, onViewApplicants }) => {
                 >
                   Applicants ({job.applicationsCount || 0})
                 </button>
-                <button 
-                  onClick={() => onGenerateQR(job, 'check-in')}
-                  className="bg-green-600 hover:bg-green-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
-                >
-                  Check-in QR
-                </button>
-                <button 
-                  onClick={() => onGenerateQR(job, 'check-out')}
-                  className="bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
-                >
-                  Check-out QR
-                </button>
               </div>
             </div>
           ))
