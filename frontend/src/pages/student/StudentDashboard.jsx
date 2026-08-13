@@ -341,10 +341,10 @@ const StudentDashboard = () => {
           </div>
 
           {/* EMERGENCY ALERT */}
-          <div className="mt-8 px-2">
+          <div className="mt-8 px-4">
             <button
               onClick={() => setShowEmergencyModal(true)}
-              className="w-full flex justify-center items-center gap-2 bg-red-900/40 hover:bg-red-600 text-red-200 hover:text-white border border-red-800/50 hover:border-red-500 transition-colors py-3 rounded-xl shadow-lg shadow-red-900/20 font-bold text-sm tracking-wide"
+              className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-500 text-white transition-colors py-3 rounded-xl font-bold text-sm tracking-wide shadow-md shadow-red-900/20"
             >
               🚨 EMERGENCY
             </button>

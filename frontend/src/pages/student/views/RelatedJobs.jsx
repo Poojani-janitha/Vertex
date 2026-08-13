@@ -87,16 +87,16 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
         <p className="text-gray-500 text-sm">
           Recommended jobs based on your profile skills:{' '}
           {studentSkills.length > 0 ? (
-            <span className="text-blue-450 font-semibold">{profile.skills}</span>
+            <span className="text-blue-600 font-semibold">{profile.skills}</span>
           ) : (
-            <span className="text-yellow-450 italic">None set yet (update your Profile Settings)</span>
+            <span className="text-yellow-600 italic">None set yet (update your Profile Settings)</span>
           )}
         </p>
       </div>
 
       {feedback && (
         <div className={`p-4 rounded-lg text-sm border text-center ${
-          feedback.type === 'success' ? 'bg-green-900/30 text-green-300 border-green-800' : 'bg-red-900/30 text-red-300 border-red-800'
+          feedback.type === 'success' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'
         }`}>
           {feedback.text}
         </div>
@@ -125,7 +125,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
               <div className="space-y-2">
                 <div className="flex justify-between items-start gap-4">
                   <h3 className="font-bold text-[#06402B] text-base">{job.title}</h3>
-                  <span className="text-green-400 font-bold text-xs bg-green-950/40 border border-green-900 px-2 py-0.5 rounded">
+                  <span className="text-[#06402B] font-bold text-xs bg-green-100 border border-green-300 px-2 py-0.5 rounded">
                     LKR {job.payAmount || 'N/A'}
                   </span>
                 </div>
@@ -149,8 +149,8 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                           key={sIdx} 
                           className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
                             isMatching 
-                              ? 'bg-blue-950/40 text-blue-600 border-blue-900' 
-                              : 'bg-gray-100 text-gray-550 border-gray-200'
+                              ? 'bg-blue-100 text-blue-800 border-blue-300' 
+                              : 'bg-gray-100 text-gray-500 border-gray-200'
                           }`}
                         >
                           {trimmed}
@@ -163,7 +163,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                 <button
                   onClick={() => handleApply(job.id)}
                   disabled={applyingJobId === job.id}
-                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   {applyingJobId === job.id ? 'Applying...' : 'Apply in One-Click'}
                 </button>

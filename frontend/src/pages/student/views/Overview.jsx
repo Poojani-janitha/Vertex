@@ -54,28 +54,7 @@ const Overview = ({ profile, applications, availability, onNavigateToTab }) => {
 
       </div>
 
-      {/* Visual Analytics Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Wallet Activity Graph Placeholder */}
-        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-sm font-bold text-[#06402B] mb-6">Wallet Activity</h3>
-          <div className="h-64 flex flex-col justify-center items-center bg-gray-50/50 border border-gray-200/80 rounded-xl">
-            <span className="text-2xl mb-2">📊</span>
-            <span className="text-xs text-gray-500">Wallet Activity graph visualization (LKR 0.00 Top-ups)</span>
-          </div>
-        </div>
 
-        {/* Time Breakdown Graph Placeholder */}
-        <div className="lg:col-span-1 bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-sm font-bold text-[#06402B] mb-6">Time Breakdown</h3>
-          <div className="h-64 flex flex-col justify-center items-center bg-gray-50/50 border border-gray-200/80 rounded-xl">
-            <span className="text-2xl mb-2">🍩</span>
-            <span className="text-xs text-gray-500">Hour-by-hour circle breakdown</span>
-          </div>
-        </div>
-
-      </div>
 
       {/* Quick Tips */}
       <div className="bg-white p-6 rounded-xl border border-gray-200">
