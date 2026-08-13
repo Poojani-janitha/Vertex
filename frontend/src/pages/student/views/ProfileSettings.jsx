@@ -3,10 +3,50 @@ import api from '../../../api/axios';
 
 const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availability: initialAvailability, onUpdate }) => {
   const [bio, setBio] = useState(initialBio);
-  const [skills, setSkills] = useState(initialSkills);
-  const [availability, setAvailability] = useState(initialAvailability);
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState(null);
+
+  // Skills Array & Recommendations list
+  const getSkillsArray = (skillsStr) => skillsStr ? skillsStr.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+  const [skillTags, setSkillTags] = useState(getSkillsArray(initialSkills));
+  const [newSkillInput, setNewSkillInput] = useState('');
+
+  const [availability, setAvailability] = useState(initialAvailability);
+
+  const popularSkills = [
+    'Social Media Management',
+    'Customer Service',
+    'Event Coordination',
+    'Data Entry',
+    'Content Writing',
+    'Tutoring / Teaching',
+    'Graphic Design',
+    'Web Development',
+    'Photography / Videography',
+    'Research Assistance',
+    'Catering / Food Service',
+    'Cleaning / Housekeeping',
+    'HTML',
+    'CSS',
+    'JavaScript',
+    'React'
+  ];
+
+  const handleAddSkill = (skillName) => {
+    const trimmed = skillName.trim();
+    if (!trimmed) return;
+
+    // Check for duplicates case-insensitively
+    const exists = skillTags.some(s => s.toLowerCase() === trimmed.toLowerCase());
+    if (!exists) {
+      setSkillTags(prev => [...prev, trimmed]);
+    }
+    setNewSkillInput('');
+  };
+
+  const handleRemoveSkill = (indexToRemove) => {
+    setSkillTags(prev => prev.filter((_, idx) => idx !== indexToRemove));
+  };
 
   const handleAvailabilityChange = (dayIndex, field, value) => {
     setAvailability(prev => prev.map((item, idx) => {
@@ -22,8 +62,10 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
     setUpdating(true);
     setMessage(null);
     try {
+      const skillsString = skillTags.join(', ');
+      
       // 1. Save profile (bio & skills)
-      const profilePromise = api.put('/profiles/my-profile', { bio, skills });
+      const profilePromise = api.put('/profiles/my-profile', { bio, skills: skillsString });
 
       // 2. Save availability list
       const formattedAvailability = availability.map(item => ({
@@ -96,14 +138,78 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
 
         <div>
           <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">Your Skills</label>
-          <input 
-            type="text" 
-            placeholder="React, CSS, SQL, Python (comma-separated)"
-            value={skills}
-            onChange={(e) => setSkills(e.target.value)}
-            className="w-full bg-gray-900 text-white border border-gray-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors" 
-          />
-          <span className="text-[10px] text-gray-500 mt-2 block">Separate skills with commas. Employers use these tags to filter applicants.</span>
+          
+          {/* Active Skill Chips Container */}
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-900 border border-gray-800 rounded-lg mb-3 min-h-[50px] items-center">
+            {skillTags.length === 0 ? (
+              <span className="text-gray-500 text-xs italic">No skills selected. Click recommendations below or type custom tags.</span>
+            ) : (
+              skillTags.map((skill, index) => (
+                <span 
+                  key={index} 
+                  className="bg-blue-600/25 border border-blue-500 text-blue-300 px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                >
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSkill(index)}
+                    className="hover:text-red-400 font-bold focus:outline-none text-[10px] w-4 h-4 rounded-full flex items-center justify-center bg-blue-900/50 hover:bg-red-950/45 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))
+            )}
+          </div>
+
+          {/* Add custom skill input */}
+          <div className="flex gap-2 mb-3">
+            <input 
+              type="text" 
+              placeholder="Add custom skill (e.g. Docker, Photoshop)..."
+              value={newSkillInput}
+              onChange={(e) => setNewSkillInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddSkill(newSkillInput);
+                }
+              }}
+              className="flex-grow bg-gray-900 text-white border border-gray-850 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
+            />
+            <button
+              type="button"
+              onClick={() => handleAddSkill(newSkillInput)}
+              className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition cursor-pointer"
+            >
+              Add
+            </button>
+          </div>
+
+          {/* Recommended Skills suggestion box */}
+          <div className="space-y-1">
+            <label className="block text-[9px] font-bold text-gray-500 uppercase tracking-wider">Suggested Recommendations</label>
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-gray-900/10 rounded-lg">
+              {popularSkills.map((pSkill) => {
+                const isSelected = skillTags.some(s => s.toLowerCase() === pSkill.toLowerCase());
+                return (
+                  <button
+                    key={pSkill}
+                    type="button"
+                    disabled={isSelected}
+                    onClick={() => handleAddSkill(pSkill)}
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition ${
+                      isSelected 
+                        ? 'bg-gray-850/55 text-gray-600 cursor-not-allowed border border-gray-800' 
+                        : 'bg-gray-850 hover:bg-blue-950/20 text-gray-400 hover:text-blue-400 border border-gray-800 hover:border-blue-900/50 cursor-pointer'
+                    }`}
+                  >
+                    + {pSkill}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Weekly Availability Schedule */}

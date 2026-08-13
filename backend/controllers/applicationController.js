@@ -59,48 +59,11 @@ exports.create = async (req, res) => {
       }
     }
 
-    // 4. Weekly Availability Validation
+    // 4. Check overlaps with already approved jobs
     if (job.startTime && job.endTime) {
       const startD = new Date(job.startTime);
       const endD = new Date(job.endTime);
 
-      const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const jobDay = daysMap[startD.getDay()];
-
-      const avail = await Availability.findOne({
-        where: {
-          profileId: student.profile?.id,
-          dayOfWeek: jobDay
-        }
-      });
-
-      if (!avail || !avail.isAvailable) {
-        return res.status(400).json({
-          error: `Availability Conflict: Your profile shows you are unavailable on ${jobDay}s. Please update your schedule.`
-        });
-      }
-
-      // Format job times (HH:MM) to compare with student availability ranges
-      const formatTimeOfDay = (date) => {
-        const h = String(date.getHours()).padStart(2, '0');
-        const m = String(date.getMinutes()).padStart(2, '0');
-        return `${h}:${m}`;
-      };
-
-      const jobStartStr = formatTimeOfDay(startD);
-      const jobEndStr = formatTimeOfDay(endD);
-
-      const cleanTime = (timeStr) => timeStr ? timeStr.substring(0, 5) : '00:00';
-      const studentStartStr = cleanTime(avail.startTime);
-      const studentEndStr = cleanTime(avail.endTime);
-
-      if (jobStartStr < studentStartStr || jobEndStr > studentEndStr) {
-        return res.status(400).json({
-          error: `Time Conflict: The job runs from ${jobStartStr} to ${jobEndStr} on ${jobDay}, but your availability is ${studentStartStr} to ${studentEndStr}.`
-        });
-      }
-
-      // 5. Check overlaps with already approved jobs
       const acceptedApps = await Application.findAll({
         where: {
           studentId: studentId,

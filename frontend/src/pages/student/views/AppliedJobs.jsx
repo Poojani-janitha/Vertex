@@ -18,6 +18,13 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsTrustScore, setDetailsTrustScore] = useState(null);
 
+  // Student Attendance QR Modal State
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [qrToken, setQrToken] = useState(null);
+  const [qrJobTitle, setQrJobTitle] = useState('');
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState(null);
+
   const filteredApplications = applications.filter(app => {
     if (filter === 'all') return true;
     return app.status === filter;
@@ -96,6 +103,41 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
       setFeedback({ type: 'error', text: 'Failed to submit review. Please try again.' });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleShareShift = (app) => {
+    const job = app.job;
+    if (!job) return;
+
+    const message = `🚨 *WorkOra SOS & Shift Share* 🚨\n\nI am starting my shift with the following details:\n` +
+      `• *Job:* ${job.title}\n` +
+      `• *Company/Recruiter ID:* ${job.employerId}\n` +
+      `• *Location:* ${job.locationName || 'Unspecified'}\n` +
+      `• *Pay:* Rs ${job.payAmount || 'N/A'}/hr\n` +
+      `• *Shift Time:* ${new Date(job.startTime).toLocaleString()} - ${new Date(job.endTime).toLocaleString()}\n` +
+      `• *Student:* ${user?.name || 'Student'}\n\n` +
+      `Please monitor my safety!`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleViewQR = async (app) => {
+    if (!app) return;
+    setQrToken(null);
+    setQrError(null);
+    setQrJobTitle(app.job?.title || 'Shift Attendance');
+    setQrLoading(true);
+    setShowQRModal(true);
+    try {
+      const response = await api.get(`/jobs/applications/${app.id}/qr`);
+      setQrToken(response.data.qrToken);
+    } catch (err) {
+      setQrError(err.response?.data?.message || 'Failed to load attendance QR token.');
+    } finally {
+      setQrLoading(false);
     }
   };
 
@@ -180,20 +222,40 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      {isApproved && hasEnded ? (
-                        alreadyReviewed ? (
-                          <span className="text-[10px] text-gray-500 font-bold bg-gray-900 border border-gray-800 px-2 py-1 rounded uppercase tracking-wider">Reviewed</span>
+                      <div className="flex items-center justify-center gap-2">
+                        {isApproved && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleShareShift(app)}
+                              className="bg-green-600 hover:bg-green-500 text-[10px] font-bold text-white px-2.5 py-1 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer"
+                            >
+                              🟢 Share Shift (SOS)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleViewQR(app)}
+                              className="bg-purple-600 hover:bg-purple-500 text-[10px] font-bold text-white px-2.5 py-1 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer"
+                            >
+                              📷 Attendance QR
+                            </button>
+                          </>
+                        )}
+                        {isApproved && hasEnded ? (
+                          alreadyReviewed ? (
+                            <span className="text-[10px] text-gray-500 font-bold bg-gray-900 border border-gray-800 px-2 py-1 rounded uppercase tracking-wider">Reviewed</span>
+                          ) : (
+                            <button 
+                              onClick={() => handleOpenReview(app.job)}
+                              className="bg-blue-600 hover:bg-blue-500 text-[10px] font-bold text-white px-3 py-1 rounded-lg uppercase tracking-wider transition shadow shadow-blue-500/20"
+                            >
+                              Review
+                            </button>
+                          )
                         ) : (
-                          <button 
-                            onClick={() => handleOpenReview(app.job)}
-                            className="bg-blue-600 hover:bg-blue-500 text-[10px] font-bold text-white px-3 py-1 rounded-lg uppercase tracking-wider transition shadow shadow-blue-500/20"
-                          >
-                            Review
-                          </button>
-                        )
-                      ) : (
-                        <span className="text-gray-600 text-xs">-</span>
-                      )}
+                          !isApproved && <span className="text-gray-600 text-xs">-</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -351,7 +413,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                         </div>
                         <div className="flex justify-between p-2 rounded bg-gray-900/45">
                           <span>💬 Reply Rate:</span>
-                          <strong className="text-white">95% ({detailsTrustScore.breakdown?.reply}/20 pts)</strong>
+                          <strong className="text-white">{detailsTrustScore.metrics?.replyRate || 0}% ({detailsTrustScore.breakdown?.reply}/20 pts)</strong>
                         </div>
                         <div className="flex justify-between p-2 rounded bg-gray-900/45">
                           <span>💼 Completed Jobs:</span>
@@ -376,7 +438,25 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 </div>
               ) : null}
 
-              <div className="pt-4 border-t border-gray-800 flex justify-end">
+              <div className="pt-4 border-t border-gray-800 flex justify-end gap-2">
+                {selectedDetailsJob && applications.find(a => a.jobId === selectedDetailsJob.id)?.status === 'accepted' && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleShareShift(applications.find(a => a.jobId === selectedDetailsJob.id))}
+                      className="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
+                    >
+                      🟢 Share Shift (SOS)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleViewQR(applications.find(a => a.jobId === selectedDetailsJob.id))}
+                      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
+                    >
+                      📷 Attendance QR
+                    </button>
+                  </>
+                )}
                 <button 
                   type="button"
                   onClick={() => setShowDetailsModal(false)}
@@ -386,6 +466,71 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 </button>
               </div>
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Attendance QR Modal */}
+      {showQRModal && (
+        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#121824] border border-gray-800 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-gray-800 flex justify-between items-center bg-[#111726]/80">
+              <h3 className="text-base font-bold text-white">
+                📷 Shift Attendance QR
+              </h3>
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowQRModal(false);
+                  setQrToken(null);
+                  setQrError(null);
+                }}
+                className="text-gray-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="p-6 text-center space-y-4 bg-[#0e131f]/20">
+              <div className="text-xs text-blue-400 font-semibold">{qrJobTitle}</div>
+              
+              {qrLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              ) : qrError ? (
+                <div className="p-3 bg-red-950/40 border border-red-800 text-red-300 text-xs rounded-lg">
+                  {qrError}
+                </div>
+              ) : qrToken ? (
+                <div className="space-y-4">
+                  <div className="bg-white p-3 rounded-xl inline-block shadow-lg mx-auto">
+                    <img 
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrToken)}`} 
+                      alt="Attendance Token Code" 
+                      className="w-48 h-48"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 leading-relaxed max-w-xs mx-auto">
+                    Present this QR code to your employer at the shift location to record your check-in and check-out times.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-500">No token code available.</p>
+              )}
+              
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowQRModal(false);
+                  setQrToken(null);
+                  setQrError(null);
+                }}
+                className="w-full bg-gray-850 hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg transition text-xs cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
