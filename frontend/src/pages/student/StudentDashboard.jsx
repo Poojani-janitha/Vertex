@@ -8,6 +8,7 @@ import ProfileSettings from './views/ProfileSettings';
 import AppliedJobs from './views/AppliedJobs';
 import Messages from './views/Messages';
 import RelatedJobs from './views/RelatedJobs';
+import Reviews from './views/Reviews';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -204,6 +205,13 @@ const StudentDashboard = () => {
                 <span className="text-base">💬</span>
                 Messages
               </button>
+              <button
+                onClick={() => setActiveTab('reviews')}
+                className={sidebarButtonClass('reviews')}
+              >
+                <span className="text-base">⭐</span>
+                Reviews
+              </button>
             </nav>
           </div>
 
@@ -323,6 +331,10 @@ const StudentDashboard = () => {
 
           {activeTab === 'messages' && (
             <Messages />
+          )}
+
+          {activeTab === 'reviews' && (
+            <Reviews user={user} />
           )}
 
         </div>

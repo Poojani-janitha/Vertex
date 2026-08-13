@@ -10,6 +10,7 @@ import JobApplicants from './views/JobApplicants';
 import QRGenerator from './views/QRGenerator';
 import Messages from './views/Messages';
 import ProfileSettings from './views/ProfileSettings';
+import Reviews from './views/Reviews';
 
 const CommunityDashboard = () => {
   const navigate = useNavigate();
@@ -205,6 +206,7 @@ const CommunityDashboard = () => {
                 { id: 'my-jobs', label: 'My Job Posts', icon: '💼' },
                 { id: 'post-job', label: 'Post a Job', icon: '➕' },
                 { id: 'messages', label: 'Messages', icon: '💬' },
+                { id: 'reviews', label: 'Reviews Feed', icon: '⭐' },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -387,6 +389,8 @@ const CommunityDashboard = () => {
           )}
 
           {activeTab === 'messages' && <Messages />}
+
+          {activeTab === 'reviews' && <Reviews user={user} />}
 
           {activeTab === 'settings' && (
             <ProfileSettings user={user} verification={verification} />
