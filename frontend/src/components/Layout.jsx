@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const isCommunity = location.pathname.startsWith('/community');
+  const isDashboardView = location.pathname.startsWith('/community') || location.pathname.startsWith('/admin');
 
-  if (isCommunity) {
+  if (isDashboardView) {
     return (
       <div className="min-h-screen bg-[#0e131f] text-gray-100 flex flex-col font-sans">
         {children}

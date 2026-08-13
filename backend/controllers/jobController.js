@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
-const { Job, Application, User, EmployerVerification, Message, sequelize } = require('../models');
+const { Job, Application, User, EmployerVerification, Message, Checkin, sequelize } = require('../models');
 
 // @desc    Create a new job post
 // @route   POST /api/jobs
@@ -154,7 +154,7 @@ const updateApplicationStatus = async (req, res) => {
     application.status = status;
     await application.save();
 
-    // If accepted, decrement requiredEmployees and check if filled
+    // If accepted, decrement requiredEmployees, check if filled, and create a unique student check-in QR record
     if (status === 'accepted') {
       const job = application.job;
       if (job.requiredEmployees > 0) {
@@ -164,6 +164,21 @@ const updateApplicationStatus = async (req, res) => {
         }
         await job.save();
       }
+
+      // Generate a minimal secure token containing the application reference
+      const qrToken = jwt.sign(
+        { appId: application.id },
+        process.env.JWT_SECRET
+      );
+
+      // Create check-in entry with the unique student token
+      await Checkin.create({
+        jobId: application.jobId,
+        studentId: application.studentId,
+        qrCode: qrToken,
+        checkInTime: null,
+        checkOutTime: null
+      });
     }
 
     // Automatically send direct message from employer to the student
@@ -187,6 +202,74 @@ const updateApplicationStatus = async (req, res) => {
   } catch (error) {
     console.error('Update status error:', error);
     return res.status(500).json({ message: 'Server error during status update.', error: error.message });
+  }
+};
+
+// @desc    Scan student's unique QR code to check in / check out
+// @route   POST /api/jobs/checkin/scan
+// @access  Private (Employer)
+const scanStudentQR = async (req, res) => {
+  try {
+    const { qrToken } = req.body;
+    if (!qrToken) {
+      return res.status(400).json({ message: 'No QR token provided.' });
+    }
+
+    // Verify token validity
+    let decoded;
+    try {
+      decoded = jwt.verify(qrToken, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(400).json({ message: 'Invalid or expired QR token.' });
+    }
+
+    const { appId } = decoded;
+
+    // Find application
+    const application = await Application.findByPk(appId, {
+      include: [{ model: Job, as: 'job' }]
+    });
+
+    if (!application) {
+      return res.status(404).json({ message: 'Application associated with this token not found.' });
+    }
+
+    // Check authorization: only the employer who posted this job can scan the student check-in
+    if (application.job.employerId !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to scan attendance for this job.' });
+    }
+
+    // Retrieve checkin entry
+    const checkin = await Checkin.findOne({
+      where: { jobId: application.jobId, studentId: application.studentId }
+    });
+
+    if (!checkin) {
+      return res.status(404).json({ message: 'Attendance record not found for this candidate.' });
+    }
+
+    const now = new Date();
+    let actionMessage = '';
+
+    if (!checkin.checkInTime) {
+      checkin.checkInTime = now;
+      await checkin.save();
+      actionMessage = 'Student checked in successfully!';
+    } else if (!checkin.checkOutTime) {
+      checkin.checkOutTime = now;
+      await checkin.save();
+      actionMessage = 'Student checked out successfully!';
+    } else {
+      return res.status(400).json({ message: 'This student has already checked in and checked out for this shift.' });
+    }
+
+    return res.json({
+      message: actionMessage,
+      checkin
+    });
+  } catch (error) {
+    console.error('Scan student QR error:', error);
+    return res.status(500).json({ message: 'Server error during QR scan.', error: error.message });
   }
 };
 
@@ -273,6 +356,7 @@ module.exports = {
   getJobApplicants,
   updateApplicationStatus,
   generateJobQR,
+  scanStudentQR,
   getAllJobs,
   getJobById
 };

@@ -5,7 +5,10 @@ const {
   deleteReview,
   deleteJob,
   getAllReports,
-  updateReportStatus
+  updateReportStatus,
+  getAllStudents,
+  deleteStudent,
+  getStudentHistory
 } = require('../controllers/adminController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -26,5 +29,10 @@ router.delete('/jobs/:id', deleteJob);
 // Reports
 router.get('/reports', getAllReports);
 router.patch('/reports/:id', updateReportStatus);
+
+// Student Management
+router.get('/students', getAllStudents);
+router.delete('/students/:id', deleteStudent);
+router.get('/students/:id/history', getStudentHistory);
 
 module.exports = router;

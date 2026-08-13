@@ -10,6 +10,7 @@ import JobApplicants from './views/JobApplicants';
 import QRGenerator from './views/QRGenerator';
 import Messages from './views/Messages';
 import ProfileSettings from './views/ProfileSettings';
+import ScanQR from './views/ScanQR';
 
 const CommunityDashboard = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const CommunityDashboard = () => {
     try {
       const meResponse = await api.get('/auth/me');
       setUser(meResponse.data);
-      
+
       const verificationData = meResponse.data.employerVerification || null;
       setVerification(verificationData);
 
@@ -119,7 +120,7 @@ const CommunityDashboard = () => {
         <div className="bg-red-900/50 border border-red-500 text-red-200 px-6 py-4 rounded-xl shadow-lg text-center">
           <h3 className="font-bold text-lg mb-2">Access Restrict</h3>
           <p>{error || 'This dashboard is reserved for verified Community (Employer) members only.'}</p>
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="mt-4 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-6 rounded-lg transition"
           >
@@ -138,7 +139,7 @@ const CommunityDashboard = () => {
           <div className="text-yellow-400 text-5xl animate-pulse">⏳</div>
           <h2 className="text-3xl font-extrabold text-white">Pending Admin Approval</h2>
           <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
-            Your verification status is currently <span className="text-yellow-400 font-bold uppercase">{verification?.verificationStatus || 'pending'}</span>. 
+            Your verification status is currently <span className="text-yellow-400 font-bold uppercase">{verification?.verificationStatus || 'pending'}</span>.
             An administrator needs to approve your credentials before you can post jobs, manage applicants, or view student details.
           </p>
 
@@ -158,13 +159,13 @@ const CommunityDashboard = () => {
           </div>
 
           <div className="pt-4 flex gap-4 justify-center">
-            <button 
+            <button
               onClick={fetchData}
               className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-6 rounded-lg transition"
             >
               Refresh Status
             </button>
-            <button 
+            <button
               onClick={handleLogout}
               className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition"
             >
@@ -183,10 +184,10 @@ const CommunityDashboard = () => {
 
   return (
     <div className="flex h-screen bg-[#0b0e17] text-gray-200 overflow-hidden font-sans">
-      
+
       {/* LEFT SIDEBAR (Matching Developers Stack exactly) */}
       <aside className="w-64 bg-[#111726] border-r border-gray-800 flex flex-col h-full shrink-0 select-none">
-        
+
         {/* Brand Logo header */}
         <div className="h-16 px-6 border-b border-gray-800 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white text-lg">V</div>
@@ -195,7 +196,7 @@ const CommunityDashboard = () => {
 
         {/* Sidebar Nav content */}
         <div className="flex-grow overflow-y-auto px-4 py-6 space-y-6">
-          
+
           {/* MAIN MENU */}
           <div>
             <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Main</div>
@@ -204,6 +205,7 @@ const CommunityDashboard = () => {
                 { id: 'dashboard', label: 'Dashboard', icon: '📊' },
                 { id: 'my-jobs', label: 'My Job Posts', icon: '💼' },
                 { id: 'post-job', label: 'Post a Job', icon: '➕' },
+                { id: 'scan-qr', label: 'Scan Check-In', icon: '📷' },
                 { id: 'messages', label: 'Messages', icon: '💬' },
               ].map((tab) => (
                 <button
@@ -212,11 +214,10 @@ const CommunityDashboard = () => {
                     setActiveTab(tab.id);
                     setSelectedJob(null);
                   }}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                    activeTab === tab.id
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tab.id
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <span className="text-base">{tab.icon}</span>
                   {tab.label}
@@ -244,11 +245,10 @@ const CommunityDashboard = () => {
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${
-                  activeTab === 'settings'
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === 'settings'
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                }`}
+                  }`}
               >
                 <span className="text-base">⚙</span> Profile Settings
               </button>
@@ -274,7 +274,7 @@ const CommunityDashboard = () => {
               <div className="text-[10px] text-gray-500 capitalize">{verification.accountType}</div>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             title="Log out"
             className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-red-400 transition"
@@ -287,10 +287,10 @@ const CommunityDashboard = () => {
 
       {/* RIGHT WORKSPACE (Renders top bar and page views) */}
       <main className="flex-grow flex flex-col h-full overflow-hidden">
-        
+
         {/* TOP STATUS BAR (Matching Developers Stack) */}
         <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#111726]/40 shrink-0">
-          
+
           {/* Top Welcome Title */}
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             Good night, {user.name.split(' ')[0]} 👋
@@ -299,9 +299,9 @@ const CommunityDashboard = () => {
           {/* Top center mock search */}
           <div className="hidden md:flex items-center w-80 relative">
             <span className="absolute left-3 text-gray-500 text-xs">🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search active applicants, jobs, transcripts..." 
+            <input
+              type="text"
+              placeholder="Search active applicants, jobs, transcripts..."
               className="w-full bg-gray-900 border border-gray-800 text-white rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
               disabled
             />
@@ -309,7 +309,7 @@ const CommunityDashboard = () => {
 
           {/* Top Right Stats Widget */}
           <div className="flex items-center space-x-6">
-            
+
             {/* LKR Wallet widget matches LKR 335 LKR Active balance */}
             <div className="bg-[#121824] border border-gray-800 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
               <span className="text-gray-400 font-medium">LKR Wallet:</span>
@@ -328,7 +328,7 @@ const CommunityDashboard = () => {
 
         {/* MAIN BODY CONTAINER */}
         <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-[#0b0e17]">
-          
+
           {/* TECH NEWS MARQUEE BANNER (Match provided SS) */}
           <div className="bg-gradient-to-r from-blue-900/30 to-indigo-900/10 border border-blue-900/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-start gap-3">
@@ -338,7 +338,7 @@ const CommunityDashboard = () => {
                 <p className="text-xs text-gray-400">via politico.com 1/5</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setActiveTab('my-jobs')}
               className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition whitespace-nowrap self-start sm:self-center"
             >
@@ -348,8 +348,8 @@ const CommunityDashboard = () => {
 
           {/* DYNAMIC VIEW ROUTER */}
           {activeTab === 'dashboard' && (
-            <Overview 
-              jobs={jobs} 
+            <Overview
+              jobs={jobs}
               onNavigateToTab={(tab) => {
                 setActiveTab(tab);
                 setSelectedJob(null);
@@ -360,15 +360,15 @@ const CommunityDashboard = () => {
           )}
 
           {activeTab === 'my-jobs' && (
-            <MyJobs 
-              jobs={jobs} 
+            <MyJobs
+              jobs={jobs}
               onGenerateQR={handleGenerateQR}
               onViewApplicants={handleViewApplicants}
             />
           )}
 
           {activeTab === 'post-job' && (
-            <PostJob 
+            <PostJob
               onJobCreated={() => {
                 setActiveTab('my-jobs');
                 fetchData();
@@ -377,8 +377,8 @@ const CommunityDashboard = () => {
           )}
 
           {activeTab === 'applicants' && selectedJob && (
-            <JobApplicants 
-              job={selectedJob} 
+            <JobApplicants
+              job={selectedJob}
               onBack={() => {
                 setActiveTab('my-jobs');
                 setSelectedJob(null);
@@ -387,6 +387,8 @@ const CommunityDashboard = () => {
           )}
 
           {activeTab === 'messages' && <Messages />}
+
+          {activeTab === 'scan-qr' && <ScanQR onClose={() => setActiveTab('dashboard')} />}
 
           {activeTab === 'settings' && (
             <ProfileSettings user={user} verification={verification} />
@@ -404,7 +406,7 @@ const CommunityDashboard = () => {
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <span>🚨</span> File Report Against Student
               </h3>
-              <button 
+              <button
                 onClick={() => {
                   setShowReportModal(false);
                   setReportSuccess(null);
@@ -414,24 +416,23 @@ const CommunityDashboard = () => {
                 ✕
               </button>
             </div>
-            
+
             <form onSubmit={handleFileReport} className="p-6 space-y-4">
               {reportSuccess && (
-                <div className={`p-3 rounded-lg text-xs text-center border ${
-                  reportSuccess.includes('success') 
-                    ? 'bg-green-950/40 border-green-800 text-green-300' 
+                <div className={`p-3 rounded-lg text-xs text-center border ${reportSuccess.includes('success')
+                    ? 'bg-green-950/40 border-green-800 text-green-300'
                     : 'bg-red-950/40 border-red-800 text-red-300'
-                }`}>
+                  }`}>
                   {reportSuccess}
                 </div>
               )}
-              
+
               <div>
                 <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Student Email</label>
-                <input 
-                  type="email" 
-                  required 
-                  placeholder="student@university.edu" 
+                <input
+                  type="email"
+                  required
+                  placeholder="student@university.edu"
                   className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportEmail}
                   onChange={(e) => setReportEmail(e.target.value)}
@@ -440,10 +441,10 @@ const CommunityDashboard = () => {
 
               <div>
                 <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Student Name</label>
-                <input 
-                  type="text" 
-                  required 
-                  placeholder="John Doe" 
+                <input
+                  type="text"
+                  required
+                  placeholder="John Doe"
                   className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
@@ -452,10 +453,10 @@ const CommunityDashboard = () => {
 
               <div>
                 <label className="block text-[10px] font-semibold text-gray-300 mb-1 uppercase tracking-wider">Inquiry Details</label>
-                <textarea 
-                  required 
-                  rows="3" 
-                  placeholder="Detail the issue (e.g. no-show, fake check-in attempt)..." 
+                <textarea
+                  required
+                  rows="3"
+                  placeholder="Detail the issue (e.g. no-show, fake check-in attempt)..."
                   className="w-full bg-gray-900 border border-gray-850 text-white rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
@@ -463,14 +464,14 @@ const CommunityDashboard = () => {
               </div>
 
               <div className="pt-2 flex gap-3">
-                <button 
+                <button
                   type="submit"
                   className="flex-1 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Submit Inquiry
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => {
                     setShowReportModal(false);
                     setReportSuccess(null);
@@ -487,10 +488,10 @@ const CommunityDashboard = () => {
 
       {/* QR Generation Modal */}
       {selectedJobForQR && qrCodeData && (
-        <QRGenerator 
-          job={selectedJobForQR} 
-          type={qrType} 
-          qrCodeData={qrCodeData} 
+        <QRGenerator
+          job={selectedJobForQR}
+          type={qrType}
+          qrCodeData={qrCodeData}
           onClose={() => {
             setSelectedJobForQR(null);
             setQrCodeData(null);

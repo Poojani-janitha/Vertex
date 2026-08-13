@@ -5,6 +5,7 @@ const {
   getJobApplicants,
   updateApplicationStatus,
   generateJobQR,
+  scanStudentQR,
   getAllJobs,
   getJobById
 } = require('../controllers/jobController');
@@ -19,6 +20,7 @@ router.get('/', getAllJobs);
 router.get('/my-jobs', protect, restrictTo('employer'), getMyJobs);
 router.get('/my-jobs/:id/applicants', protect, restrictTo('employer'), getJobApplicants);
 router.patch('/applications/:applicationId', protect, restrictTo('employer'), updateApplicationStatus);
+router.post('/checkin/scan', protect, restrictTo('employer'), scanStudentQR);
 router.post('/:id/generate-qr', protect, restrictTo('employer'), generateJobQR);
 router.post('/', protect, restrictTo('employer'), createJob);
 

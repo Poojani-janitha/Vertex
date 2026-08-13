@@ -1,4 +1,4 @@
-const { User, Job, Review, Report, EmployerVerification } = require('../models');
+const { User, Job, Review, Report, EmployerVerification, Application } = require('../models');
 const { sendVerificationEmail } = require('../services/mailService');
 
 // @desc    Get all pending employer verifications
@@ -133,5 +133,74 @@ exports.updateReportStatus = async (req, res) => {
   } catch (error) {
     console.error('Update report error:', error);
     return res.status(500).json({ message: 'Server error updating report status.', error: error.message });
+  }
+};
+
+// @desc    Get all students
+// @route   GET /api/admin/students
+// @access  Private (Admin)
+exports.getAllStudents = async (req, res) => {
+  try {
+    const students = await User.findAll({
+      where: { role: 'student' },
+      attributes: { exclude: ['password'] }
+    });
+    return res.json(students);
+  } catch (error) {
+    console.error('Get all students error:', error);
+    return res.status(500).json({ message: 'Server error retrieving students.', error: error.message });
+  }
+};
+
+// @desc    Delete a student user
+// @route   DELETE /api/admin/students/:id
+// @access  Private (Admin)
+exports.deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await User.destroy({
+      where: { id, role: 'student' }
+    });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Student user not found.' });
+    }
+    return res.json({ message: 'Student user account deleted successfully.' });
+  } catch (error) {
+    console.error('Delete student error:', error);
+    return res.status(500).json({ message: 'Server error deleting student.', error: error.message });
+  }
+};
+
+// @desc    Get student job application history
+// @route   GET /api/admin/students/:id/history
+// @access  Private (Admin)
+exports.getStudentHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find student
+    const student = await User.findOne({
+      where: { id, role: 'student' },
+      attributes: { exclude: ['password'] }
+    });
+
+    if (!student) {
+      return res.status(404).json({ message: 'Student user not found.' });
+    }
+
+    // Get their applications with job details
+    const applications = await Application.findAll({
+      where: { studentId: id },
+      include: [{ model: Job, as: 'job', attributes: ['id', 'title', 'payAmount', 'locationName'] }],
+      order: [['appliedAt', 'DESC']]
+    });
+
+    return res.json({
+      student,
+      applications
+    });
+  } catch (error) {
+    console.error('Get student history error:', error);
+    return res.status(500).json({ message: 'Server error retrieving student history.', error: error.message });
   }
 };
