@@ -263,9 +263,18 @@ const scanStudentQR = async (req, res) => {
       return res.status(400).json({ message: 'This student has already checked in and checked out for this shift.' });
     }
 
+    // Reload checkin with student profile and job associations
+    const checkinResult = await Checkin.findOne({
+      where: { id: checkin.id },
+      include: [
+        { model: User, as: 'student', attributes: ['id', 'name', 'email'] },
+        { model: Job, as: 'job', attributes: ['id', 'title'] }
+      ]
+    });
+
     return res.json({
       message: actionMessage,
-      checkin
+      checkin: checkinResult
     });
   } catch (error) {
     console.error('Scan student QR error:', error);

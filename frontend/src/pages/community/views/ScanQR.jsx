@@ -115,13 +115,22 @@ const ScanQR = ({ onClose }) => {
           <div className="font-bold text-sm mb-1">{feedback.message}</div>
           {feedback.details && (
             <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-850 font-mono text-[10px] text-gray-300">
-              <div>Job ID: {feedback.details.jobId}</div>
-              <div>Student ID: {feedback.details.studentId}</div>
+              {feedback.details.student && (
+                <>
+                  <div className="font-bold text-white mb-1">🎓 Student Details:</div>
+                  <div className="pl-2">Name: {feedback.details.student.name}</div>
+                  <div className="pl-2 pb-2 text-[9px] text-gray-400">Email: {feedback.details.student.email}</div>
+                </>
+              )}
+              {feedback.details.job && (
+                <div className="pl-2 pb-2 text-blue-400">Shift: {feedback.details.job.title}</div>
+              )}
+              <div className="font-bold text-white mb-1 border-t border-gray-800 pt-1.5 mt-1.5">⏱ Attendance Log:</div>
               {feedback.details.checkInTime && (
-                <div>Check-in Time: {new Date(feedback.details.checkInTime).toLocaleString()}</div>
+                <div className="pl-2">Checked In At: {new Date(feedback.details.checkInTime).toLocaleString()}</div>
               )}
               {feedback.details.checkOutTime && (
-                <div>Check-out Time: {new Date(feedback.details.checkOutTime).toLocaleString()}</div>
+                <div className="pl-2 text-green-400 font-semibold">Checked Out At: {new Date(feedback.details.checkOutTime).toLocaleString()}</div>
               )}
             </div>
           )}
