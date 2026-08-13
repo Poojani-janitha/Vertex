@@ -1,0 +1,477 @@
+{
+  "info": {
+    "name": "Vertex API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "studentToken", "value": "" },
+    { "key": "employerToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "jobId", "value": "" },
+    { "key": "applicationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kasun\",\n  \"email\": \"kasun@test.com\",\n  \"password\": \"123456\",\n  \"role\": \"student\",\n  \"phone\": \"0771234567\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('studentToken', pm.response.json().token);",
+                  "  console.log('studentToken saved');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Employer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nimal Traders\",\n  \"email\": \"nimal@test.com\",\n  \"password\": \"123456\",\n  \"role\": \"employer\",\n  \"phone\": \"0779876543\",\n  \"accountType\": \"individual\",\n  \"individualIdNo\": \"991234567V\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('employerToken', pm.response.json().token);",
+                  "  console.log('employerToken saved');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kasun@test.com\",\n  \"password\": \"123456\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('studentToken', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Profile (auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Create Job (Employer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/jobs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cafe Helper\",\n  \"description\": \"Weekend shift help needed\",\n  \"skillsNeeded\": \"communication, cleaning\",\n  \"payAmount\": 1500,\n  \"locationName\": \"Colombo\",\n  \"latitude\": 6.9271,\n  \"longitude\": 79.8612,\n  \"startTime\": \"2026-08-20T09:00:00\",\n  \"endTime\": \"2026-08-20T17:00:00\",\n  \"requiredEmployees\": 2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('jobId', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Open Jobs (Public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/jobs" }
+        },
+        {
+          "name": "Get Job By Id (Public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/jobs/{{jobId}}" }
+        },
+        {
+          "name": "Get My Jobs (Employer)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/jobs/my-jobs"
+          }
+        },
+        {
+          "name": "Get Job Applicants (Employer)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employerToken}}" }],
+            "url": "{{baseUrl}}/jobs/my-jobs/{{jobId}}/applicants"
+          }
+        },
+        {
+          "name": "Update Application Status (Employer)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/jobs/applications/{{applicationId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Generate Job QR (Employer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employerToken}}" }
+            ],
+            "url": "{{baseUrl}}/jobs/{{jobId}}/generate-qr",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"check-in\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply For Job (Student)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/applications",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"studentId\": 2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "  var body = pm.response.json();",
+                  "  if (body.id) { pm.collectionVariables.set('applicationId', body.id); }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Applications (Student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/applications/my-applications"
+          }
+        },
+        {
+          "name": "Get All Applications",
+          "request": { "method": "GET", "url": "{{baseUrl}}/applications" }
+        },
+        {
+          "name": "Get Application By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/applications/:id" }
+        }
+      ]
+    },
+    {
+      "name": "Profiles",
+      "item": [
+        {
+          "name": "Update My Profile (Student)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "url": "{{baseUrl}}/profiles/my-profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": \"communication, cashier, cleaning\",\n  \"bio\": \"3rd year undergrad, part-time work looking\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Profiles",
+          "request": { "method": "GET", "url": "{{baseUrl}}/profiles" }
+        },
+        {
+          "name": "Get Profile By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/profiles/:id" }
+        }
+      ]
+    },
+    {
+      "name": "Availability",
+      "item": [
+        {
+          "name": "Get My Availability (Student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/availabilities/my-availability"
+          }
+        },
+        {
+          "name": "Update My Availability (Student)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "url": "{{baseUrl}}/availabilities/my-availability",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  { \"dayOfWeek\": \"Monday\", \"startTime\": \"09:00\", \"endTime\": \"17:00\", \"isAvailable\": true },\n  { \"dayOfWeek\": \"Tuesday\", \"startTime\": \"09:00\", \"endTime\": \"13:00\", \"isAvailable\": true },\n  { \"dayOfWeek\": \"Sunday\", \"isAvailable\": false }\n]"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Checkins",
+      "item": [
+        {
+          "name": "Create Checkin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/checkins",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"studentId\": 2,\n  \"checkInTime\": \"2026-08-20T09:05:00\",\n  \"qrCode\": \"paste-generate-qr-token-here\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Checkout",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/checkins/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkOutTime\": \"2026-08-20T17:00:00\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/reviews",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"fromUser\": 2,\n  \"toUser\": 5,\n  \"rating\": 5,\n  \"comment\": \"Very punctual and helpful\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/reports",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromUser\": 2,\n  \"targetId\": 5,\n  \"targetType\": \"user\",\n  \"reason\": \"Employer asked for payment upfront\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Badges",
+      "item": [
+        {
+          "name": "Create Badge",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/badges",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 2,\n  \"badgeName\": \"Punctual Star\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/messages",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"senderId\": 5,\n  \"receiverId\": 2,\n  \"message\": \"Hi, can you confirm your start time tomorrow?\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Skills",
+      "item": [
+        {
+          "name": "Get All Skills",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/skills"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Pending Employers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/employers/pending"
+          }
+        },
+        {
+          "name": "Verify Employer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/employers/:userId/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/reviews/:id"
+          }
+        },
+        {
+          "name": "Delete Job",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/jobs/:id"
+          }
+        },
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/reports"
+          }
+        },
+        {
+          "name": "Update Report Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/reports/:id",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health",
+          "request": { "method": "GET", "url": "http://localhost:3000/health" }
+        }
+      ]
+    }
+  ]
+}
