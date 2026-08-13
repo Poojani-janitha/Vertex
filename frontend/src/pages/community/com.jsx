@@ -6,8 +6,6 @@ import api from '../../api/axios';
 import Overview from './views/Overview';
 import PostJob from './views/PostJob';
 import MyJobs from './views/MyJobs';
-import JobApplicants from './views/JobApplicants';
-import QRGenerator from './views/QRGenerator';
 import Messages from './views/Messages';
 import ProfileSettings from './views/ProfileSettings';
 import ScanQR from './views/ScanQR';
@@ -27,11 +25,6 @@ const CommunityDashboard = () => {
   const [reportName, setReportName] = useState('');
   const [reportReason, setReportReason] = useState('');
   const [reportSuccess, setReportSuccess] = useState(null);
-
-  // QR Modal states
-  const [selectedJobForQR, setSelectedJobForQR] = useState(null);
-  const [qrType, setQrType] = useState('check-in');
-  const [qrCodeData, setQrCodeData] = useState(null);
 
   // Active Job Details state (to view applicants)
   const [selectedJob, setSelectedJob] = useState(null);
@@ -68,17 +61,7 @@ const CommunityDashboard = () => {
     navigate('/login');
   };
 
-  // Generate QR Code trigger
-  const handleGenerateQR = async (job, type) => {
-    try {
-      setSelectedJobForQR(job);
-      setQrType(type);
-      const response = await api.post(`/jobs/${job.id}/generate-qr`, { type });
-      setQrCodeData(response.data.qrCode);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+
 
   // View Applicants list
   const handleViewApplicants = (job) => {
@@ -226,18 +209,7 @@ const CommunityDashboard = () => {
             </nav>
           </div>
 
-          {/* OPPORTUNITIES (Match provided SS) */}
-          <div>
-            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-3 mb-2">Opportunities</div>
-            <nav className="space-y-1 opacity-70">
-              <span className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-gray-400 cursor-not-allowed">
-                <span className="text-base">🔍</span> Browse Directory
-              </span>
-              <span className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-gray-400 cursor-not-allowed">
-                <span className="text-base">💼</span> Interview Prep
-              </span>
-            </nav>
-          </div>
+
 
           {/* TOOLS */}
           <div>
@@ -310,13 +282,6 @@ const CommunityDashboard = () => {
           {/* Top Right Stats Widget */}
           <div className="flex items-center space-x-6">
 
-            {/* LKR Wallet widget matches LKR 335 LKR Active balance */}
-            <div className="bg-[#121824] border border-gray-800 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
-              <span className="text-gray-400 font-medium">LKR Wallet:</span>
-              <strong className="text-green-400">Rs 335.00</strong>
-              <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-950/40 text-green-300">Active</span>
-            </div>
-
             {/* Mock Nav controls */}
             <div className="flex items-center space-x-3 text-gray-400 text-sm">
               <button title="Notifications" className="hover:text-white">🔔</button>
@@ -329,23 +294,6 @@ const CommunityDashboard = () => {
         {/* MAIN BODY CONTAINER */}
         <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-[#0b0e17]">
 
-          {/* TECH NEWS MARQUEE BANNER (Match provided SS) */}
-          <div className="bg-gradient-to-r from-blue-900/30 to-indigo-900/10 border border-blue-900/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <span className="bg-blue-600 text-white text-[9px] font-extrabold uppercase px-2 py-1 rounded mt-0.5 select-none">COMMUNITY NEWS</span>
-              <div>
-                <h4 className="font-bold text-white text-sm">Startup founders urge U.S. government not to shut off Chinese open weight AI</h4>
-                <p className="text-xs text-gray-400">via politico.com 1/5</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setActiveTab('my-jobs')}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition whitespace-nowrap self-start sm:self-center"
-            >
-              Manage Postings
-            </button>
-          </div>
-
           {/* DYNAMIC VIEW ROUTER */}
           {activeTab === 'dashboard' && (
             <Overview
@@ -354,7 +302,6 @@ const CommunityDashboard = () => {
                 setActiveTab(tab);
                 setSelectedJob(null);
               }}
-              onGenerateQR={handleGenerateQR}
               onViewApplicants={handleViewApplicants}
             />
           )}
@@ -362,7 +309,6 @@ const CommunityDashboard = () => {
           {activeTab === 'my-jobs' && (
             <MyJobs
               jobs={jobs}
-              onGenerateQR={handleGenerateQR}
               onViewApplicants={handleViewApplicants}
             />
           )}
@@ -484,19 +430,6 @@ const CommunityDashboard = () => {
             </form>
           </div>
         </div>
-      )}
-
-      {/* QR Generation Modal */}
-      {selectedJobForQR && qrCodeData && (
-        <QRGenerator
-          job={selectedJobForQR}
-          type={qrType}
-          qrCodeData={qrCodeData}
-          onClose={() => {
-            setSelectedJobForQR(null);
-            setQrCodeData(null);
-          }}
-        />
       )}
 
     </div>
