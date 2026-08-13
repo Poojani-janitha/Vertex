@@ -1,8 +1,15 @@
-const { Message } = require('../models');
+const { Message, User, Job } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
-    const items = await Message.findAll();
+    const items = await Message.findAll({
+      include: [
+        { model: Job, as: 'job', attributes: ['id', 'title'] },
+        { model: User, as: 'sender', attributes: ['id', 'name', 'email'] },
+        { model: User, as: 'receiver', attributes: ['id', 'name', 'email'] }
+      ],
+      order: [['sentAt', 'ASC']]
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ error: error.message });

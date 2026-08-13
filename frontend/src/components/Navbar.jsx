@@ -55,6 +55,9 @@ const Navbar = () => {
                 {user && user.role === 'employer' && (
                   <Link to="/community" className={getLinkClass('/community')}>Employer Panel</Link>
                 )}
+                {user && user.role === 'admin' && (
+                  <Link to="/admin" className={getLinkClass('/admin')}>Admin Dashboard</Link>
+                )}
               </div>
             </div>
           </div>
