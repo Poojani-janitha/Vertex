@@ -11,6 +11,7 @@ const Badge = require('./Badge');
 const Message = require('./Message');
 const EmployerVerification = require('./EmployerVerification');
 const Skill = require('./Skill');
+const Emergency = require('./Emergency');
 
 const models = {
   User,
@@ -25,6 +26,7 @@ const models = {
   Message,
   EmployerVerification,
   Skill,
+  Emergency,
 };
 
 // Initialize all models using the shared Sequelize connection instance

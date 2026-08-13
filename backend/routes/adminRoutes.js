@@ -8,7 +8,9 @@ const {
   updateReportStatus,
   getAllStudents,
   deleteStudent,
-  getStudentHistory
+  getStudentHistory,
+  getAllEmergencies,
+  resolveEmergency
 } = require('../controllers/adminController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -34,5 +36,9 @@ router.patch('/reports/:id', updateReportStatus);
 router.get('/students', getAllStudents);
 router.delete('/students/:id', deleteStudent);
 router.get('/students/:id/history', getStudentHistory);
+
+// Emergencies
+router.get('/emergencies', getAllEmergencies);
+router.patch('/emergencies/:id/resolve', resolveEmergency);
 
 module.exports = router;

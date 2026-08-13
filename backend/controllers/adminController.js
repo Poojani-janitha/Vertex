@@ -1,4 +1,4 @@
-const { User, Job, Review, Report, EmployerVerification, Application } = require('../models');
+const { User, Job, Review, Report, EmployerVerification, Application, Emergency } = require('../models');
 const { sendVerificationEmail } = require('../services/mailService');
 
 // @desc    Get all pending employer verifications
@@ -202,5 +202,42 @@ exports.getStudentHistory = async (req, res) => {
   } catch (error) {
     console.error('Get student history error:', error);
     return res.status(500).json({ message: 'Server error retrieving student history.', error: error.message });
+  }
+};
+
+// @desc    Get all active emergencies
+// @route   GET /api/admin/emergencies
+// @access  Private (Admin)
+exports.getAllEmergencies = async (req, res) => {
+  try {
+    const emergencies = await Emergency.findAll({
+      where: { status: 'active' },
+      include: [{ model: User, as: 'student', attributes: ['id', 'name', 'email', 'phone'] }],
+      order: [['createdAt', 'DESC']]
+    });
+    return res.json(emergencies);
+  } catch (error) {
+    console.error('Get all emergencies error:', error);
+    return res.status(500).json({ message: 'Server error retrieving emergencies.', error: error.message });
+  }
+};
+
+// @desc    Resolve an emergency
+// @route   PATCH /api/admin/emergencies/:id/resolve
+// @access  Private (Admin)
+exports.resolveEmergency = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const emergency = await Emergency.findByPk(id);
+    if (!emergency) {
+      return res.status(404).json({ message: 'Emergency not found.' });
+    }
+    
+    emergency.status = 'resolved';
+    await emergency.save();
+    return res.json({ message: 'Emergency resolved successfully.', emergency });
+  } catch (error) {
+    console.error('Resolve emergency error:', error);
+    return res.status(500).json({ message: 'Server error resolving emergency.', error: error.message });
   }
 };

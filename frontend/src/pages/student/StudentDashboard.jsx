@@ -24,6 +24,11 @@ const StudentDashboard = () => {
   // Tab State: 'dashboard' | 'profile' | 'jobs' | 'messages'
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  // Emergency State
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyStatus, setEmergencyStatus] = useState(null);
+  const [triggeringEmergency, setTriggeringEmergency] = useState(false);
+
   // Availability Schedule state (Default initialized for Mon-Sun)
   const defaultDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const [availability, setAvailability] = useState(
@@ -111,6 +116,23 @@ const StudentDashboard = () => {
         }
         return defaultDay;
       }));
+    }
+  };
+
+  const handleTriggerEmergency = async () => {
+    setTriggeringEmergency(true);
+    setEmergencyStatus(null);
+    try {
+      await api.post('/emergencies');
+      setEmergencyStatus({ type: 'success', text: 'Emergency alert sent to Admin!' });
+      setTimeout(() => {
+        setShowEmergencyModal(false);
+        setEmergencyStatus(null);
+      }, 3000);
+    } catch (err) {
+      setEmergencyStatus({ type: 'error', text: err.response?.data?.message || 'Failed to send emergency alert.' });
+    } finally {
+      setTriggeringEmergency(false);
     }
   };
 
@@ -228,6 +250,16 @@ const StudentDashboard = () => {
             </nav>
           </div>
 
+          {/* EMERGENCY ALERT */}
+          <div className="mt-8 px-2">
+            <button
+              onClick={() => setShowEmergencyModal(true)}
+              className="w-full flex justify-center items-center gap-2 bg-red-900/40 hover:bg-red-600 text-red-200 hover:text-white border border-red-800/50 hover:border-red-500 transition-colors py-3 rounded-xl shadow-lg shadow-red-900/20 font-bold text-sm tracking-wide"
+            >
+              🚨 EMERGENCY
+            </button>
+          </div>
+
         </div>
 
         {/* BOTTOM USER PROFILE CARD */}
@@ -341,6 +373,49 @@ const StudentDashboard = () => {
 
       </main>
 
+      {/* EMERGENCY MODAL */}
+      {showEmergencyModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-[#1a0f14] border border-red-900/50 rounded-2xl max-w-sm w-full shadow-2xl shadow-red-900/20 overflow-hidden transform transition-all scale-100">
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-800">
+                <span className="text-3xl">🚨</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Trigger Emergency?</h3>
+              <p className="text-gray-400 text-sm mb-6">
+                This will immediately alert the administration with your details and location. Only use in true emergencies.
+              </p>
+              
+              {emergencyStatus && (
+                <div className={`mb-4 p-3 rounded-lg text-sm ${emergencyStatus.type === 'success' ? 'bg-green-900/40 text-green-400 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800'}`}>
+                  {emergencyStatus.text}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEmergencyModal(false)}
+                  disabled={triggeringEmergency}
+                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-semibold transition disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleTriggerEmergency}
+                  disabled={triggeringEmergency}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold transition shadow-lg shadow-red-600/30 disabled:opacity-50 flex items-center justify-center"
+                >
+                  {triggeringEmergency ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    'Confirm Alert'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
