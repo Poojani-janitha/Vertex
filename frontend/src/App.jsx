@@ -7,7 +7,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import StudentDashboard from './pages/student/StudentDashboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from './pages/admin/admin';
 import CommunityDashboard from './pages/community/com';
 
 function App() {
