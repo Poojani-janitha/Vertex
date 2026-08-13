@@ -77,7 +77,12 @@ const Login = () => {
               />
             </div>
             <div className="relative">
-              <label className="block text-xs font-bold text-[#06402B] uppercase tracking-wider mb-2">Password</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-bold text-[#06402B] uppercase tracking-wider">Password</label>
+                <Link to="/forgot-password" className="text-xs font-semibold text-gray-500 hover:text-[#06402B] transition-colors">
+                  Forgot Password?
+                </Link>
+              </div>
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
