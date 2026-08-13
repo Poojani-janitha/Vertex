@@ -1,4 +1,4 @@
-const { User, Review, Checkin, Job } = require('../models');
+const { User, Review, Checkin, Job, Message } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
@@ -90,8 +90,10 @@ exports.getTrustScore = async (req, res) => {
     // Capped at 30 hours for maximum 30 points
     const hoursScore = Math.min((verifiedHours / 30) * 30, 30);
 
-    // 3. Reply Rate (20%)
-    const replyRate = 0.95; // default 95%
+    // 3. Reply Rate (20%) - Calculate based on messages: replies sent vs inquiries received
+    const sentCount = await Message.count({ where: { senderId: id } });
+    const receivedCount = await Message.count({ where: { receiverId: id } });
+    const replyRate = receivedCount === 0 ? 1.0 : Math.min(sentCount / receivedCount, 1.0);
     const replyScore = replyRate * 20;
 
     // 4. Completed Jobs (10%)
@@ -111,6 +113,7 @@ exports.getTrustScore = async (req, res) => {
       metrics: {
         avgRating: avgRating.toFixed(1),
         verifiedHours: verifiedHours.toFixed(1),
+        replyRate: Math.round(replyRate * 100),
         completedJobs
       }
     });

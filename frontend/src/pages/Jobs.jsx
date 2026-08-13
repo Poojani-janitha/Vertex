@@ -303,7 +303,7 @@ const Jobs = () => {
                       </div>
                       <div className="flex justify-between p-2 rounded bg-gray-900/40">
                         <span>💬 Reply Rate (20%):</span>
-                        <strong className="text-white">{trustScore.breakdown.reply}/20 (95%)</strong>
+                        <strong className="text-white">{trustScore.breakdown.reply}/20 ({trustScore.metrics.replyRate || 0}%)</strong>
                       </div>
                       <div className="flex justify-between p-2 rounded bg-gray-900/40">
                         <span>💼 Completed Jobs (10%):</span>

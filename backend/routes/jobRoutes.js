@@ -6,6 +6,7 @@ const {
   updateApplicationStatus,
   generateJobQR,
   scanStudentQR,
+  getStudentCheckinQR,
   getAllJobs,
   getJobById
 } = require('../controllers/jobController');
@@ -24,7 +25,10 @@ router.post('/checkin/scan', protect, restrictTo('employer'), scanStudentQR);
 router.post('/:id/generate-qr', protect, restrictTo('employer'), generateJobQR);
 router.post('/', protect, restrictTo('employer'), createJob);
 
-// 3. Public dynamic routes (Must be at the very bottom so it doesn't hijack /my-jobs)
+// 3. Protected Student-only route
+router.get('/applications/:applicationId/qr', protect, getStudentCheckinQR);
+
+// 4. Public dynamic routes (Must be at the very bottom so it doesn't hijack /my-jobs)
 router.get('/:id', getJobById);
 
 module.exports = router;

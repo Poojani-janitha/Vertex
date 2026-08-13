@@ -365,6 +365,44 @@ const getJobById = async (req, res) => {
   }
 };
 
+// @desc    Get check-in QR token for a student application
+// @route   GET /api/jobs/applications/:applicationId/qr
+// @access  Private (Student)
+const getStudentCheckinQR = async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+
+    // Find the application
+    const application = await Application.findByPk(applicationId);
+    if (!application) {
+      return res.status(404).json({ message: 'Application not found.' });
+    }
+
+    // Verify ownership: only the student who applied can get their QR code
+    if (application.studentId !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to view this check-in token.' });
+    }
+
+    // Retrieve the checkin entry containing the qr token
+    const checkin = await Checkin.findOne({
+      where: { jobId: application.jobId, studentId: application.studentId }
+    });
+
+    if (!checkin) {
+      return res.status(404).json({ message: 'Check-in record has not been generated for this approved shift.' });
+    }
+
+    return res.json({
+      qrToken: checkin.qrCode,
+      checkInTime: checkin.checkInTime,
+      checkOutTime: checkin.checkOutTime
+    });
+  } catch (error) {
+    console.error('Get student checkin QR error:', error);
+    return res.status(500).json({ message: 'Server error retrieving QR token.', error: error.message });
+  }
+};
+
 module.exports = {
   createJob,
   getMyJobs,
@@ -372,6 +410,7 @@ module.exports = {
   updateApplicationStatus,
   generateJobQR,
   scanStudentQR,
+  getStudentCheckinQR,
   getAllJobs,
   getJobById
 };
