@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   // Data States
   const [pendingEmployers, setPendingEmployers] = useState([]);
   const [reports, setReports] = useState([]);
+  const [emergencies, setEmergencies] = useState([]);
 
   // Form States for Moderation
   const [jobIdToDelete, setJobIdToDelete] = useState('');
@@ -22,6 +23,44 @@ const AdminDashboard = () => {
 
   // Status updates loading states
   const [processingId, setProcessingId] = useState(null);
+
+  // Play beep sound 3 times
+  const playBeeps = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const context = new AudioContext();
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const oscillator = context.createOscillator();
+          const gainNode = context.createGain();
+          oscillator.connect(gainNode);
+          gainNode.connect(context.destination);
+          oscillator.type = 'sine';
+          oscillator.frequency.value = 800;
+          gainNode.gain.setValueAtTime(0.5, context.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
+          oscillator.start(context.currentTime);
+          oscillator.stop(context.currentTime + 0.3);
+        }, i * 600);
+      }
+    } catch (err) {
+      console.log('Audio playback failed', err);
+    }
+  };
+
+  useEffect(() => {
+    let beepInterval;
+    if (emergencies.length > 0) {
+      playBeeps(); // Initial beep
+      beepInterval = setInterval(() => {
+        playBeeps();
+      }, 60000); // Repeat every 1 minute
+    }
+    return () => {
+      if (beepInterval) clearInterval(beepInterval);
+    };
+  }, [emergencies.length]);
 
   useEffect(() => {
     // Basic frontend check: redirect if not admin
@@ -38,18 +77,36 @@ const AdminDashboard = () => {
     setUser(loggedUser);
 
     fetchAdminData();
+
+    // Poll for emergencies every 15 seconds
+    const interval = setInterval(() => {
+      fetchEmergencies();
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchEmergencies = async () => {
+    try {
+      const res = await api.get('/admin/emergencies');
+      setEmergencies(res.data);
+    } catch (err) {
+      console.error('Failed to fetch emergencies', err);
+    }
+  };
 
   const fetchAdminData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [employersRes, reportsRes] = await Promise.all([
+      const [employersRes, reportsRes, emergenciesRes] = await Promise.all([
         api.get('/admin/employers/pending'),
-        api.get('/admin/reports')
+        api.get('/admin/reports'),
+        api.get('/admin/emergencies')
       ]);
       setPendingEmployers(employersRes.data);
       setReports(reportsRes.data);
+      setEmergencies(emergenciesRes.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load administration data.');
     } finally {
@@ -114,6 +171,15 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleResolveEmergency = async (id) => {
+    try {
+      await api.patch(`/admin/emergencies/${id}/resolve`);
+      setEmergencies(prev => prev.filter(e => e.id !== id));
+    } catch (err) {
+      console.error('Failed to resolve emergency', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -140,9 +206,36 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 min-h-[70vh]">
-      {/* Sidebar Panel */}
-      <div className="w-full md:w-64 bg-gray-800 rounded-2xl border border-gray-700 p-4 space-y-2 h-fit">
+    <div className="flex flex-col gap-6">
+      
+      {emergencies.length > 0 && (
+        <div className="bg-red-600 px-6 py-4 rounded-2xl border-2 border-red-800 shadow-[0_0_30px_rgba(220,38,38,0.4)] animate-pulse">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+            <span className="text-3xl animate-bounce">🚨</span> EMERGENCY ALERT
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {emergencies.map(em => (
+              <div key={em.id} className="bg-red-900/60 p-4 rounded-xl flex items-center justify-between border border-red-500/50">
+                <div>
+                  <div className="font-bold text-white text-lg">Student: {em.student?.name}</div>
+                  <div className="text-red-200 font-semibold mt-1">Contact: {em.student?.phone || em.student?.email}</div>
+                  <div className="text-xs text-red-300 mt-2">Time: {new Date(em.createdAt).toLocaleString()}</div>
+                </div>
+                <button 
+                  onClick={() => handleResolveEmergency(em.id)}
+                  className="bg-white text-red-700 hover:bg-gray-200 font-bold px-4 py-3 rounded-lg transition shadow-lg shrink-0 ml-4"
+                >
+                  Mark Resolved
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-8 min-h-[70vh]">
+        {/* Sidebar Panel */}
+        <div className="w-full md:w-64 bg-gray-800 rounded-2xl border border-gray-700 p-4 space-y-2 h-fit">
         <div className="px-4 py-3 border-b border-gray-700 mb-4">
           <div className="font-bold text-white text-lg">{user?.name}</div>
           <div className="text-xs text-red-400 uppercase font-semibold">Administrator</div>
@@ -365,6 +458,7 @@ const AdminDashboard = () => {
             </form>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
