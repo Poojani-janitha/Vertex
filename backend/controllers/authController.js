@@ -50,12 +50,19 @@ const register = async (req, res) => {
       }
     }
 
+    // Prevent admin role injection
+    if (role === 'admin') {
+      return res.status(403).json({ message: 'Registration as an administrator is not permitted.' });
+    }
+
+    const safeRole = role === 'employer' ? 'employer' : 'student';
+
     // Create user
     const user = await User.create({
       name,
       email,
       password,
-      role: role || 'student',
+      role: safeRole,
       phone
     });
 
