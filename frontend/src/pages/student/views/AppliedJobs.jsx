@@ -172,7 +172,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
         <div className="text-center py-20 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
           <div className="text-gray-600 text-5xl mb-4">💼</div>
           <h3 className="text-lg font-medium text-gray-600">No applications found</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             {filter === 'all' 
               ? 'Browse the Jobs Board to apply for student listings.' 
               : `You do not have any applications marked as ${filter}.`
@@ -182,7 +182,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
       ) : (
         <div className="overflow-x-auto bg-white border border-gray-200 rounded-xl">
           <table className="w-full text-left text-sm text-gray-600">
-            <thead className="text-xs text-gray-450 uppercase bg-gray-100/40 border-b border-gray-200">
+            <thead className="text-xs text-gray-500 uppercase bg-gray-100/40 border-b border-gray-200">
               <tr>
                 <th className="px-6 py-4">Job Title</th>
                 <th className="px-6 py-4">Pay Amount</th>
@@ -214,9 +214,9 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${
-                        app.status === 'accepted' ? 'bg-green-950/40 text-green-400 border-green-800' :
-                        app.status === 'rejected' ? 'bg-red-950/40 text-red-400 border-red-800' :
-                        'bg-yellow-950/40 text-yellow-450 border-yellow-800'
+                        app.status === 'accepted' ? 'bg-green-100 text-green-700 border-green-200' :
+                        app.status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                        'bg-yellow-100 text-yellow-700 border-yellow-200'
                       }`}>
                         {app.status === 'accepted' ? 'approved' : (app.status || 'pending')}
                       </span>
@@ -285,8 +285,8 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
               {feedback && (
                 <div className={`p-3 rounded-lg text-xs text-center border ${
                   feedback.type === 'success' 
-                    ? 'bg-green-950/40 border-green-800 text-green-300' 
-                    : 'bg-red-950/40 border-red-800 text-red-300'
+                    ? 'bg-green-100 border-green-200 text-green-700' 
+                    : 'bg-red-100 border-red-200 text-red-700'
                 }`}>
                   {feedback.text}
                 </div>
@@ -322,7 +322,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   required 
                   rows="4" 
                   placeholder="Share your experience working on this gig..." 
-                  className="w-full bg-gray-100 border border-gray-750 text-[#06402B] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                 />
@@ -339,7 +339,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 <button 
                   type="button" 
                   onClick={handleCloseReview}
-                  className="bg-gray-850 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="bg-gray-100 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Cancel
                 </button>
@@ -391,13 +391,13 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-450 bg-gray-100/30 p-4 rounded-xl border border-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-100/30 p-4 rounded-xl border border-gray-200">
                     <div>📅 Start Time: <span className="text-[#06402B] font-medium">{selectedDetailsJob.startTime ? new Date(selectedDetailsJob.startTime).toLocaleString() : 'N/A'}</span></div>
                     <div>📅 End Time: <span className="text-[#06402B] font-medium">{selectedDetailsJob.endTime ? new Date(selectedDetailsJob.endTime).toLocaleString() : 'N/A'}</span></div>
                   </div>
 
                   {detailsTrustScore && (
-                    <div className="bg-[#1c2234] p-5 rounded-xl border border-gray-750 space-y-3">
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-3">
                       <div className="flex justify-between items-center border-b border-gray-200/60 pb-2">
                         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employer Trust Score</h4>
                         <span className="text-sm font-extrabold text-green-400">{detailsTrustScore.score}/100</span>
@@ -428,7 +428,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                       <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</h4>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedDetailsJob.skillsNeeded.split(',').map((skill, index) => (
-                          <span key={index} className="bg-blue-950/40 text-blue-600 border border-blue-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                          <span key={index} className="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
                             {skill.trim()}
                           </span>
                         ))}
@@ -500,7 +500,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#06402B]"></div>
                 </div>
               ) : qrError ? (
-                <div className="p-3 bg-red-950/40 border border-red-800 text-red-300 text-xs rounded-lg">
+                <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-xs rounded-lg">
                   {qrError}
                 </div>
               ) : qrToken ? (
@@ -527,7 +527,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   setQrToken(null);
                   setQrError(null);
                 }}
-                className="w-full bg-gray-850 hover:bg-gray-100 text-[#06402B] font-semibold py-2 px-4 rounded-lg transition text-xs cursor-pointer"
+                className="w-full bg-gray-100 hover:bg-gray-100 text-[#06402B] font-semibold py-2 px-4 rounded-lg transition text-xs cursor-pointer"
               >
                 Close
               </button>

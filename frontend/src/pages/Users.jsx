@@ -66,7 +66,7 @@ const Users = () => {
               </span>
               <p className="text-gray-500 text-sm w-full truncate">{user.email}</p>
               
-              <button className="mt-6 w-full text-sm font-medium text-indigo-400 hover:text-indigo-300 py-2 border border-indigo-900/50 hover:border-indigo-500/30 rounded-lg transition-colors bg-indigo-950/20">
+              <button className="mt-6 w-full text-sm font-medium text-indigo-600 hover:text-indigo-700 py-2 border border-indigo-200 hover:border-indigo-300 rounded-lg transition-colors bg-indigo-50/50">
                 View Profile
               </button>
             </div>

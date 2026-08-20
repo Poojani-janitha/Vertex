@@ -49,7 +49,7 @@ const JobApplicants = ({ job, onBack }) => {
       </div>
 
       {loading ? (
-        <div className="text-center py-6 text-xs text-gray-450">Loading applicants...</div>
+        <div className="text-center py-6 text-xs text-gray-500">Loading applicants...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Sidebar applicant names list */}
@@ -65,7 +65,7 @@ const JobApplicants = ({ job, onBack }) => {
                   className={`w-full text-left p-3 rounded-lg border transition ${
                     selectedApplicant?.id === app.id
                       ? 'bg-[#06402B]/20 border-[#06402B]/50'
-                      : 'bg-gray-100/40 border-gray-200 hover:border-gray-750'
+                      : 'bg-gray-100/40 border-gray-200 hover:border-gray-200'
                   }`}
                 >
                   <div className="font-semibold text-[#06402B] text-sm">{app.student?.name || 'Student'}</div>

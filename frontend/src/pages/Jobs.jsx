@@ -255,7 +255,7 @@ const Jobs = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-450 bg-gray-50/30 p-4 rounded-xl border border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-50/30 p-4 rounded-xl border border-gray-200">
                   <div>📅 Start Time: <span className="text-[#06402B] font-medium">{selectedJob.startTime ? new Date(selectedJob.startTime).toLocaleString() : 'N/A'}</span></div>
                   <div>📅 End Time: <span className="text-[#06402B] font-medium">{selectedJob.endTime ? new Date(selectedJob.endTime).toLocaleString() : 'N/A'}</span></div>
                 </div>
@@ -267,7 +267,7 @@ const Jobs = () => {
                     return (
                       <div>
                         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Job Location Map</h4>
-                        <div className="h-60 rounded-xl overflow-hidden border border-gray-750">
+                        <div className="h-60 rounded-xl overflow-hidden border border-gray-200">
                           <MapContainer center={[lat, lng]} zoom={14} style={{ height: '100%', width: '100%', zIndex: 10 }}>
                             <TileLayer
                               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -289,7 +289,7 @@ const Jobs = () => {
                       <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employer Trust Score</h4>
                       <div className="flex items-center gap-2">
                         <span className="text-base font-extrabold text-green-700">{trustScore.score}/100</span>
-                        <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-950/40 text-green-300">Verified</span>
+                        <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700">Verified</span>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-600">

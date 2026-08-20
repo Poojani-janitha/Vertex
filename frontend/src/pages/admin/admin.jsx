@@ -23,6 +23,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [students, setStudents] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [emergencies, setEmergencies] = useState([]);
   
   // Selected Student Details for History View
   const [selectedStudentHistory, setSelectedStudentHistory] = useState(null);
@@ -45,6 +46,17 @@ const AdminDashboard = () => {
     }
     setCurrentUser(user);
     loadDashboardData();
+
+    // Poll for emergencies every 15 seconds
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get('/admin/emergencies');
+        setEmergencies(res.data);
+      } catch (err) {
+        console.error('Failed to fetch emergencies', err);
+      }
+    }, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const showFeedback = (text, type = 'success') => {
@@ -55,12 +67,15 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch Pending Employers
+      // 1. Fetch Pending Employers & Emergencies
       const empRes = await api.get('/admin/employers/pending');
       setPendingEmployers(empRes.data);
 
       const appEmpRes = await api.get('/admin/employers/approved');
       setApprovedEmployers(appEmpRes.data);
+
+      const emRes = await api.get('/admin/emergencies');
+      setEmergencies(emRes.data);
 
       // 2. Fetch Reports
       const repRes = await api.get('/admin/reports');
@@ -134,6 +149,17 @@ const AdminDashboard = () => {
     }
   };
 
+  // Action: Resolve Emergency
+  const handleResolveEmergency = async (id) => {
+    try {
+      await api.patch(`/admin/emergencies/${id}/resolve`);
+      setEmergencies(prev => prev.filter(e => e.id !== id));
+      showFeedback('Emergency marked as resolved.', 'success');
+    } catch (err) {
+      showFeedback('Failed to resolve emergency.', 'error');
+    }
+  };
+
   // Action: View Student History
   const handleViewStudentHistory = async (studentId) => {
     try {
@@ -160,7 +186,7 @@ const AdminDashboard = () => {
           <span className="text-xl font-extrabold text-[#06402B]">
             WorkOra Admin Panel
           </span>
-          <span className="text-[10px] bg-red-950/40 border border-red-900/50 text-red-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+          <span className="text-[10px] bg-red-100 border border-red-200 text-red-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
             Superuser Mode
           </span>
         </div>
@@ -246,6 +272,32 @@ const AdminDashboard = () => {
         {/* WORKSPACE WORK AREA */}
         <main className="flex-grow p-6 overflow-y-auto space-y-6">
           
+          {/* EMERGENCY BANNER */}
+          {emergencies.length > 0 && (
+            <div className="bg-red-600 px-6 py-4 rounded-2xl border-2 border-red-800 shadow-[0_0_30px_rgba(220,38,38,0.4)] animate-pulse">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-4">
+                <span className="text-3xl animate-bounce">🚨</span> EMERGENCY ALERT
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {emergencies.map(em => (
+                  <div key={em.id} className="bg-red-900/60 p-4 rounded-xl flex items-center justify-between border border-red-500/50">
+                    <div>
+                      <div className="font-bold text-white text-lg">Student: {em.student?.name}</div>
+                      <div className="text-red-200 font-semibold mt-1">Contact: {em.student?.phone || em.student?.email}</div>
+                      <div className="text-xs text-red-300 mt-2">Time: {new Date(em.createdAt).toLocaleString()}</div>
+                    </div>
+                    <button 
+                      onClick={() => handleResolveEmergency(em.id)}
+                      className="bg-white text-red-700 hover:bg-gray-200 font-bold px-4 py-3 rounded-lg transition shadow-lg shrink-0 ml-4"
+                    >
+                      Mark Resolved
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {actionFeedback && (
             <div className={`p-4 rounded-lg border text-sm text-center font-medium ${
               actionFeedback.type === 'success' ? 'bg-green-50 border-green-200 text-green-300' : 'bg-red-50 border-red-200 text-red-300'
@@ -421,7 +473,7 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {pendingEmployers.length === 0 ? (
                           <tr>
                             <td colSpan="5" className="py-6 text-center text-gray-500">No pending employer accounts waiting.</td>
@@ -477,7 +529,7 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {students.length === 0 ? (
                           <tr>
                             <td colSpan="4" className="py-6 text-center text-gray-500">No students registered yet.</td>
@@ -532,7 +584,7 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {jobs.length === 0 ? (
                           <tr>
                             <td colSpan="5" className="py-6 text-center text-gray-500">No active job listings found.</td>
@@ -547,7 +599,7 @@ const AdminDashboard = () => {
                               <td className="py-4 max-w-[200px] truncate">{job.locationName || 'Unmapped'}</td>
                               <td className="py-4">
                                 <span className={`px-2 py-0.5 rounded text-[10px] ${
-                                  job.status === 'open' ? 'bg-green-950 border border-green-900 text-green-300' : 'bg-white text-gray-500'
+                                  job.status === 'open' ? 'bg-green-100 border border-green-200 text-green-700' : 'bg-white text-gray-500'
                                 }`}>
                                   {job.status}
                                 </span>
@@ -588,7 +640,7 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {reports.length === 0 ? (
                           <tr>
                             <td colSpan="5" className="py-6 text-center text-gray-500">No misconduct reports filed yet.</td>
@@ -605,8 +657,8 @@ const AdminDashboard = () => {
                               <td className="py-4">
                                 <span className={`px-2 py-0.5 rounded text-[10px] ${
                                   rep.status === 'open' 
-                                    ? 'bg-yellow-950 border border-yellow-900 text-yellow-300' 
-                                    : 'bg-green-950 border border-green-900 text-green-300'
+                                    ? 'bg-yellow-100 border border-yellow-200 text-yellow-700' 
+                                    : 'bg-green-100 border border-green-200 text-green-700'
                                 }`}>
                                   {rep.status}
                                 </span>
@@ -698,9 +750,9 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
-                          app.status === 'accepted' ? 'bg-green-950 border border-green-900 text-green-300' :
-                          app.status === 'rejected' ? 'bg-red-950 border border-red-900 text-red-300' :
-                          'bg-yellow-950 border border-yellow-900 text-yellow-300'
+                          app.status === 'accepted' ? 'bg-green-100 border border-green-200 text-green-700' :
+                          app.status === 'rejected' ? 'bg-red-100 border border-red-200 text-red-700' :
+                          'bg-yellow-100 border border-yellow-200 text-yellow-700'
                         }`}>
                           {app.status}
                         </span>
@@ -712,7 +764,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-gray-200 bg-[#111726]/30 text-right">
+            <div className="p-4 border-t border-gray-200 bg-gray-50 text-right">
               <button
                 onClick={() => {
                   setSelectedStudentHistory(null);

@@ -49,7 +49,7 @@ const Overview = ({ profile, applications, availability, onNavigateToTab }) => {
         <div className="bg-white border border-gray-200 p-6 rounded-xl space-y-2">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Wallet Balance</div>
           <div className="text-3xl font-extrabold text-green-400">LKR 0.00</div>
-          <div className="text-[10px] text-gray-550">LKR - Active</div>
+          <div className="text-[10px] text-gray-500">LKR - Active</div>
         </div>
 
       </div>

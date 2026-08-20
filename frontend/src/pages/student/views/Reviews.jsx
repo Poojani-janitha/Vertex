@@ -87,7 +87,7 @@ const Reviews = ({ user }) => {
         <div className="text-center py-16 bg-white border border-gray-200 border-dashed rounded-xl">
           <div className="text-gray-600 text-5xl mb-4">💬</div>
           <h3 className="text-lg font-medium text-gray-600">No reviews found</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             {activeSubTab === 'received' 
               ? "You haven't received any reviews from employers yet." 
               : "You haven't submitted any reviews for employers yet."}

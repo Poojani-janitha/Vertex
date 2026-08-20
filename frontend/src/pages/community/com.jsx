@@ -223,7 +223,7 @@ const CommunityDashboard = () => {
               </button>
               <button
                 onClick={() => setShowReportModal(true)}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-950/20 transition"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-100 transition"
               >
                 <span className="text-base">🚨</span> Report Misconduct
               </button>
@@ -364,8 +364,8 @@ const CommunityDashboard = () => {
             <form onSubmit={handleFileReport} className="p-6 space-y-4">
               {reportSuccess && (
                 <div className={`p-3 rounded-lg text-xs text-center border ${reportSuccess.includes('success')
-                    ? 'bg-green-950/40 border-green-800 text-green-300'
-                    : 'bg-red-950/40 border-red-800 text-red-300'
+                    ? 'bg-green-100 border-green-200 text-green-700'
+                    : 'bg-red-100 border-red-200 text-red-700'
                   }`}>
                   {reportSuccess}
                 </div>
@@ -377,7 +377,7 @@ const CommunityDashboard = () => {
                   type="email"
                   required
                   placeholder="student@university.edu"
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportEmail}
                   onChange={(e) => setReportEmail(e.target.value)}
                 />
@@ -389,7 +389,7 @@ const CommunityDashboard = () => {
                   type="text"
                   required
                   placeholder="John Doe"
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
                 />
@@ -401,7 +401,7 @@ const CommunityDashboard = () => {
                   required
                   rows="3"
                   placeholder="Detail the issue (e.g. no-show, fake check-in attempt)..."
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
                 />
@@ -420,7 +420,7 @@ const CommunityDashboard = () => {
                     setShowReportModal(false);
                     setReportSuccess(null);
                   }}
-                  className="bg-gray-850 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="bg-gray-100 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Cancel
                 </button>

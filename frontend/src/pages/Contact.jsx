@@ -84,7 +84,7 @@ const Contact = () => {
           <h2 className="text-xl font-bold text-[#06402B]">Send a Message</h2>
           
           {feedback && (
-            <div className="bg-green-950/40 border border-green-300 text-green-300 px-4 py-3 rounded-xl text-xs text-center">
+            <div className="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-xs text-center">
               {feedback}
             </div>
           )}
@@ -98,7 +98,7 @@ const Contact = () => {
                 placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-750 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
+                className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
               />
             </div>
             
@@ -110,7 +110,7 @@ const Contact = () => {
                 placeholder="you@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-750 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
+                className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
               />
             </div>
           </div>
@@ -123,7 +123,7 @@ const Contact = () => {
               placeholder="Inquiry / Verification / General Question"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-750 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
+              className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
             />
           </div>
 
@@ -135,7 +135,7 @@ const Contact = () => {
               placeholder="Describe your inquiry details..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-750 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
+              className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-blue-500 transition-colors" 
             />
           </div>
 

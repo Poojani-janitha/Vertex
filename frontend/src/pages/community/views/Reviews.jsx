@@ -87,7 +87,7 @@ const Reviews = ({ user }) => {
         <div className="text-center py-16 bg-white border border-gray-200 border-dashed rounded-xl">
           <div className="text-gray-600 text-5xl mb-4">💬</div>
           <h3 className="text-lg font-medium text-gray-600">No reviews found</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             {activeSubTab === 'received' 
               ? "No students have submitted reviews for your jobs yet." 
               : "You haven't submitted any reviews for students yet."}
@@ -109,7 +109,7 @@ const Reviews = ({ user }) => {
                     </h3>
                     
                     {/* Review Partner / Student details */}
-                    <div className="text-[10px] text-gray-500 mt-2 bg-gray-50/60 p-2 rounded border border-gray-850 space-y-1">
+                    <div className="text-[10px] text-gray-500 mt-2 bg-gray-50/60 p-2 rounded border border-gray-200 space-y-1">
                       <div className="uppercase tracking-wider text-[8px] font-bold text-gray-600">
                         {activeSubTab === 'received' ? 'Reviewer Student Details' : 'Recipient Details'}
                       </div>

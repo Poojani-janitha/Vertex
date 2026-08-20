@@ -153,7 +153,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                   <button
                     type="button"
                     onClick={() => handleRemoveSkill(index)}
-                    className="hover:text-red-400 font-bold focus:outline-none text-[10px] w-4 h-4 rounded-full flex items-center justify-center bg-blue-900/50 hover:bg-red-950/45 cursor-pointer"
+                    className="hover:text-red-400 font-bold focus:outline-none text-[10px] w-4 h-4 rounded-full flex items-center justify-center bg-blue-100 hover:bg-red-100 text-blue-600 hover:text-red-700 cursor-pointer"
                   >
                     ✕
                   </button>
@@ -175,7 +175,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                   handleAddSkill(newSkillInput);
                 }
               }}
-              className="flex-grow bg-gray-100 text-[#06402B] border border-gray-850 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#06402B] transition-colors" 
+              className="flex-grow bg-gray-100 text-[#06402B] border border-gray-200 rounded-lg px-4 py-2.5 text-xs focus:outline-none focus:border-[#06402B] transition-colors" 
             />
             <button
               type="button"
@@ -200,8 +200,8 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                     onClick={() => handleAddSkill(pSkill)}
                     className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition ${
                       isSelected 
-                        ? 'bg-gray-850/55 text-gray-600 cursor-not-allowed border border-gray-200' 
-                        : 'bg-gray-850 hover:bg-blue-950/20 text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-900/50 cursor-pointer'
+                        ? 'bg-gray-100/55 text-gray-600 cursor-not-allowed border border-gray-200' 
+                        : 'bg-gray-100 hover:bg-blue-50/50 text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-900/50 cursor-pointer'
                     }`}
                   >
                     + {pSkill}
@@ -238,7 +238,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                     disabled={!item.isAvailable}
                     value={item.startTime}
                     onChange={(e) => handleAvailabilityChange(idx, 'startTime', e.target.value)}
-                    className="bg-gray-805 border border-gray-850 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
                   />
                   <span className="text-gray-500 text-xs">to</span>
                   <input 
@@ -246,7 +246,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                     disabled={!item.isAvailable}
                     value={item.endTime}
                     onChange={(e) => handleAvailabilityChange(idx, 'endTime', e.target.value)}
-                    className="bg-gray-805 border border-gray-850 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>

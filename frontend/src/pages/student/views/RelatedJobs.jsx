@@ -106,7 +106,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
         <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
           <div className="text-gray-600 text-5xl mb-4">💡</div>
           <h3 className="text-lg font-medium text-gray-600">Set your skills first</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             Add tags to your profile settings to get matching job recommendations.
           </p>
         </div>
@@ -114,7 +114,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
         <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
           <div className="text-gray-600 text-5xl mb-4">🔍</div>
           <h3 className="text-lg font-medium text-gray-600">No matching jobs</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             No open jobs matched your specific skills today. Check back later or update your skills!
           </p>
         </div>
@@ -137,7 +137,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                 <div className="text-[10px] text-gray-500">📍 {job.locationName || 'Remote / General'}</div>
               </div>
 
-              <div className="space-y-4 pt-3 border-t border-gray-850">
+              <div className="space-y-4 pt-3 border-t border-gray-200">
                 <div>
                   <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</div>
                   <div className="flex flex-wrap gap-1.5">

@@ -501,7 +501,7 @@ const StudentDashboard = () => {
                         >
                           ← Back to inbox
                         </button>
-                        <div className="bg-gray-100 border border-gray-850 p-2.5 rounded-lg mb-3 shrink-0">
+                        <div className="bg-gray-100 border border-gray-200 p-2.5 rounded-lg mb-3 shrink-0">
                           <div className="font-bold text-[#06402B] text-xs">{thread.otherUserName}</div>
                           <div className="text-[10px] text-blue-600 font-semibold">{thread.jobTitle}</div>
                         </div>
@@ -560,7 +560,7 @@ const StudentDashboard = () => {
                         <button
                           key={thread.key}
                           onClick={() => setActiveThreadKey(thread.key)}
-                          className="w-full text-left p-3 rounded-lg bg-gray-100 border border-gray-850 hover:bg-gray-100/50 transition flex flex-col gap-1 cursor-pointer"
+                          className="w-full text-left p-3 rounded-lg bg-gray-100 border border-gray-200 hover:bg-gray-100/50 transition flex flex-col gap-1 cursor-pointer"
                         >
                           <div className="flex justify-between items-baseline w-full">
                             <span className="font-bold text-[#06402B] truncate max-w-[150px]">{thread.otherUserName}</span>
