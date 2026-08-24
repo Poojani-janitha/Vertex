@@ -13,6 +13,42 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
 
   const [availability, setAvailability] = useState(initialAvailability);
 
+  // Resume Upload State
+  const [currentResumeUrl, setCurrentResumeUrl] = useState(user?.profile?.resumeUrl || '');
+  const [resumeFile, setResumeFile] = useState(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [resumeMessage, setResumeMessage] = useState(null);
+
+  const handleResumeUpload = async (e) => {
+    e.preventDefault();
+    if (!resumeFile) {
+      setResumeMessage({ type: 'error', text: 'Please select a PDF file first.' });
+      return;
+    }
+
+    setUploadingResume(true);
+    setResumeMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append('resume', resumeFile);
+
+      const res = await api.post('/profiles/resume', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      setCurrentResumeUrl(res.data.resumeUrl);
+      setResumeMessage({ type: 'success', text: 'Resume uploaded and attached to your profile!' });
+      setResumeFile(null);
+    } catch (err) {
+      setResumeMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Failed to upload resume document.'
+      });
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
   const popularSkills = [
     'Social Media Management',
     'Customer Service',
@@ -134,6 +170,55 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
             onChange={(e) => setBio(e.target.value)}
             className="w-full bg-gray-100 text-[#06402B] border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#06402B] transition-colors" 
           />
+        </div>
+
+        {/* CV / Resume Upload Card */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-bold text-sm text-[#06402B] flex items-center gap-2">
+                <span>📄</span> Curriculum Vitae (CV) / Resume
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">
+                Upload your PDF resume to let employers review your qualifications when applying.
+              </p>
+            </div>
+            {currentResumeUrl && (
+              <a
+                href={`http://localhost:3000${currentResumeUrl}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 font-bold px-3 py-1.5 rounded-xl transition"
+              >
+                👁️ View Current PDF
+              </a>
+            )}
+          </div>
+
+          {resumeMessage && (
+            <div className={`p-3 rounded-xl text-xs font-medium border ${
+              resumeMessage.type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'
+            }`}>
+              {resumeMessage.text}
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={(e) => setResumeFile(e.target.files[0])}
+              className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-800 hover:file:bg-emerald-100 cursor-pointer"
+            />
+            <button
+              type="button"
+              onClick={handleResumeUpload}
+              disabled={uploadingResume || !resumeFile}
+              className="w-full sm:w-auto bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-gray-300 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap"
+            >
+              {uploadingResume ? 'Uploading...' : 'Upload PDF'}
+            </button>
+          </div>
         </div>
 
         <div>

@@ -114,6 +114,19 @@ const JobApplicants = ({ job, onBack }) => {
                       {selectedApplicant.student.profile.portfolioUrl && (
                         <div className="mt-2"><span className="font-semibold text-gray-500">Portfolio:</span> <a href={selectedApplicant.student.profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{selectedApplicant.student.profile.portfolioUrl}</a></div>
                       )}
+                      {selectedApplicant.student.profile.resumeUrl && (
+                        <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+                          <span className="font-bold text-[#06402B] text-xs">📄 Student Resume Attached</span>
+                          <a
+                            href={`http://localhost:3000${selectedApplicant.student.profile.resumeUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#06402B] hover:bg-[#0a5c3f] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow-sm"
+                          >
+                            Open PDF ↗
+                          </a>
+                        </div>
+                      )}
                     </>
                   )}
 

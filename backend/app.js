@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
@@ -7,6 +8,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Serve uploaded static assets (e.g. resumes, certificates)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Main API Routes
 app.use('/api', apiRoutes);

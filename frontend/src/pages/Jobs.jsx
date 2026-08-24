@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import api from '../api/axios';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { SkeletonCard } from '../components/SkeletonLoader';
 
 // Fix default marker icon issue in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -12,20 +14,69 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+// Haversine formula to compute distance in km
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return parseFloat((R * c).toFixed(1));
+};
+
 const Jobs = () => {
+  const [searchParams] = useSearchParams();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Filter states
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [maxDistance, setMaxDistance] = useState('all');
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('detecting');
 
   // Modal states
   const [selectedJob, setSelectedJob] = useState(null);
   const [isApplying, setIsApplying] = useState(false);
   const [applyMessage, setApplyMessage] = useState(null);
   const [trustScore, setTrustScore] = useState(null);
+
+  // Get user geolocation on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+          setLocationStatus('ready');
+        },
+        () => {
+          // Default to Colombo center if permission denied or unavailable
+          setUserLocation({ lat: 6.9271, lng: 79.8612 });
+          setLocationStatus('default');
+        }
+      );
+    } else {
+      setUserLocation({ lat: 6.9271, lng: 79.8612 });
+      setLocationStatus('default');
+    }
+  }, []);
+
+  // Update search term when URL param changes
+  useEffect(() => {
+    const urlQuery = searchParams.get('search');
+    if (urlQuery !== null) {
+      setSearchTerm(urlQuery);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -98,59 +149,78 @@ const Jobs = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  // Derive filtered jobs with distance
+  const filteredJobs = jobs
+    .map((job) => {
+      const dist = userLocation && job.latitude && job.longitude
+        ? calculateDistance(userLocation.lat, userLocation.lng, parseFloat(job.latitude), parseFloat(job.longitude))
+        : null;
+      return { ...job, distanceKm: dist };
+    })
+    .filter((job) => {
+      const titleMatch = job.title?.toLowerCase().includes(searchTerm.toLowerCase());
+      const skillsMatch = job.skillsNeeded?.toLowerCase().includes(searchTerm.toLowerCase());
+      const locationMatch = job.locationName?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = titleMatch || skillsMatch || locationMatch;
+      
+      const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
 
-  if (error) {
-    return (
-      <div className="bg-red-900/50 border border-red-500 text-red-200 px-6 py-4 rounded-lg">
-        <h3 className="font-bold">Error Loading Jobs</h3>
-        <p>{error}</p>
-        <p className="text-sm mt-2">Make sure your backend is running properly.</p>
-      </div>
-    );
-  }
-
-  // Derive filtered jobs
-  const filteredJobs = jobs.filter((job) => {
-    const titleMatch = job.title?.toLowerCase().includes(searchTerm.toLowerCase());
-    const skillsMatch = job.skillsNeeded?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSearch = titleMatch || skillsMatch;
-    
-    const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+      let matchesDistance = true;
+      if (maxDistance !== 'all' && job.distanceKm !== null) {
+        matchesDistance = job.distanceKm <= parseFloat(maxDistance);
+      }
+      
+      return matchesSearch && matchesStatus && matchesDistance;
+    });
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#06402B] mb-2">Available Jobs</h1>
-        <p className="text-gray-500">Discover opportunities that match your skills.</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-[#06402B] tracking-tight">Available Shifts & Jobs</h1>
+          <p className="text-gray-500 text-sm">Discover verified opportunities matched to your skills and free hours.</p>
+        </div>
+        {userLocation && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold self-start md:self-auto">
+            <span>📍 GPS Location Active</span>
+          </div>
+        )}
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white p-4 rounded-2xl mb-8 flex flex-col sm:flex-row gap-4 border border-gray-200 shadow-sm">
+      <div className="bg-white p-4 rounded-2xl flex flex-col md:flex-row gap-4 border border-gray-200 shadow-sm">
         <div className="flex-1 relative">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <span className="text-gray-400 text-sm">🔍</span>
           </div>
           <input
             type="text"
-            placeholder="Search jobs by title or required skills..."
+            placeholder="Search by title, location or required skills..."
             className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]/30 transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="sm:w-48">
+        
+        {/* Distance Filter */}
+        <div className="md:w-44">
           <select
-            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]/30 transition-colors cursor-pointer"
+            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-semibold focus:outline-none focus:border-[#06402B] cursor-pointer"
+            value={maxDistance}
+            onChange={(e) => setMaxDistance(e.target.value)}
+          >
+            <option value="all">📍 All Distances</option>
+            <option value="5">Within 5 km</option>
+            <option value="10">Within 10 km</option>
+            <option value="25">Within 25 km</option>
+            <option value="50">Within 50 km</option>
+          </select>
+        </div>
+
+        {/* Status Filter */}
+        <div className="md:w-40">
+          <select
+            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-semibold focus:outline-none focus:border-[#06402B] cursor-pointer"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -162,63 +232,83 @@ const Jobs = () => {
         </div>
       </div>
 
-      {filteredJobs.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
-          <div className="text-gray-400 text-5xl mb-4">
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <SkeletonCard key={n} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl">
+          <h3 className="font-bold">Error Loading Jobs</h3>
+          <p className="text-sm mt-1">{error}</p>
+        </div>
+      ) : filteredJobs.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-3xl border border-gray-200 border-dashed space-y-3">
+          <div className="text-gray-400 text-5xl">
             {jobs.length === 0 ? '💼' : '🔍'}
           </div>
-          <h3 className="text-xl font-medium text-gray-700">
+          <h3 className="text-xl font-bold text-gray-700">
             {jobs.length === 0 ? 'No jobs posted yet' : 'No jobs match your filters'}
           </h3>
-          <p className="text-gray-500 mt-2 text-sm">
-            {jobs.length === 0 ? 'Check back later.' : 'Try adjusting your search terms or status filter.'}
+          <p className="text-gray-500 text-xs max-w-sm mx-auto">
+            {jobs.length === 0 ? 'Check back later for newly posted shifts.' : 'Try clearing your search terms or increasing the distance radius.'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-            <div key={job.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#06402B]/40 hover:shadow-xl hover:shadow-green-900/10 transition-all duration-300 group flex flex-col justify-between">
-              <div className="p-6 flex flex-col h-full">
-                <div className="flex justify-between items-start mb-4 gap-2">
-                  <h3 className="text-xl font-bold text-[#06402B] group-hover:text-[#0a5c3f] transition-colors">{job.title}</h3>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${
-                    job.status === 'open' || !job.status ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
-                    job.status === 'filled' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                    'bg-gray-100 text-gray-600 border-gray-200'
+            <div 
+              key={job.id} 
+              className="bg-white rounded-3xl border border-gray-200/80 p-6 flex flex-col justify-between hover:shadow-lg hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-1 relative"
+            >
+              <div>
+                <div className="flex justify-between items-start mb-3 gap-2">
+                  <h3 className="text-lg font-bold text-[#06402B] leading-tight line-clamp-1">{job.title}</h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    job.status === 'open' ? 'bg-green-100 text-green-800' :
+                    job.status === 'filled' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {job.status || 'Open'}
+                    {job.status}
                   </span>
                 </div>
                 
-                <p className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow leading-relaxed">
+                <p className="text-gray-500 text-xs mb-4 line-clamp-2 leading-relaxed">
                   {job.description || 'No description provided.'}
                 </p>
                 
-                <div className="space-y-2 mb-6">
+                <div className="space-y-2 mb-6 text-xs">
                   {job.payAmount && (
-                    <div className="flex items-center text-sm font-semibold text-emerald-800">
-                      <span className="mr-2">💰</span> LKR {job.payAmount}
+                    <div className="flex items-center font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl">
+                      <span className="mr-2">💰</span> LKR {parseFloat(job.payAmount).toFixed(2)} / shift
                     </div>
                   )}
                   {job.locationName && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <span className="mr-2">📍</span> {job.locationName}
+                    <div className="flex items-center text-gray-600 justify-between">
+                      <div className="flex items-center truncate">
+                        <span className="mr-2">📍</span> {job.locationName}
+                      </div>
+                      {job.distanceKm !== null && (
+                        <span className="text-[10px] bg-gray-100 font-bold text-gray-700 px-2 py-0.5 rounded-full whitespace-nowrap ml-2">
+                          {job.distanceKm} km
+                        </span>
+                      )}
                     </div>
                   )}
                   {job.skillsNeeded && (
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-gray-500 text-[11px] truncate">
                       <span className="mr-2">🔧</span> {job.skillsNeeded}
                     </div>
                   )}
                 </div>
-                
-                <button 
-                  onClick={() => handleViewDetails(job)}
-                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm mt-auto cursor-pointer"
-                >
-                  View Details & Apply
-                </button>
               </div>
+              
+              <button 
+                onClick={() => handleViewDetails(job)}
+                className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-bold text-xs py-3 px-4 rounded-xl transition shadow-md shadow-emerald-950/10 cursor-pointer"
+              >
+                View Details & Apply →
+              </button>
             </div>
           ))}
         </div>

@@ -4,6 +4,7 @@ const profileController = require('../controllers/profileController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.put('/my-profile', protect, profileController.updateMyProfile);
+router.post('/resume', protect, profileController.upload.single('resume'), profileController.uploadResume);
 
 router.get('/', profileController.getAll);
 router.get('/:id', profileController.getById);
