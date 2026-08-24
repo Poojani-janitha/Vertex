@@ -86,6 +86,7 @@ class Job extends Model {
     this.hasMany(models.Checkin, { foreignKey: 'jobId', as: 'checkins', onDelete: 'CASCADE' });
     this.hasMany(models.Review, { foreignKey: 'jobId', as: 'reviews', onDelete: 'CASCADE' });
     this.hasMany(models.Message, { foreignKey: 'jobId', as: 'messages', onDelete: 'CASCADE' });
+    this.hasMany(models.Transaction, { foreignKey: 'jobId', as: 'transactions', onDelete: 'SET NULL' });
   }
 }
 

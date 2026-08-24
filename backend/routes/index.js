@@ -43,4 +43,7 @@ router.use('/admin', adminRoutes);
 const emergencyRoutes = require('./emergencyRoutes');
 router.use('/emergencies', emergencyRoutes);
 
+const walletRoutes = require('./walletRoutes');
+router.use('/wallet', walletRoutes);
+
 module.exports = router;

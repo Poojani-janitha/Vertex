@@ -24,6 +24,7 @@ const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [emergencies, setEmergencies] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   
   // Selected Student Details for History View
   const [selectedStudentHistory, setSelectedStudentHistory] = useState(null);
@@ -85,9 +86,12 @@ const AdminDashboard = () => {
       const jobRes = await api.get('/jobs');
       setJobs(jobRes.data);
 
-      // 4. Fetch Students
+      // 4. Fetch Students & Withdrawals
       const stuRes = await api.get('/admin/students');
       setStudents(stuRes.data);
+
+      const withRes = await api.get('/wallet/admin/withdrawals');
+      setWithdrawals(withRes.data);
 
       // 5. Update Quick Stats
       setStats({
@@ -160,14 +164,14 @@ const AdminDashboard = () => {
     }
   };
 
-  // Action: View Student History
-  const handleViewStudentHistory = async (studentId) => {
+  // Action: Process Student Bank Withdrawal
+  const handleProcessWithdrawal = async (id, status) => {
     try {
-      const response = await api.get(`/admin/students/${studentId}/history`);
-      setSelectedStudentHistory(response.data);
-      setIsHistoryModalOpen(true);
+      await api.patch(`/wallet/admin/withdrawals/${id}`, { status });
+      showFeedback(`Withdrawal payout request has been ${status.toUpperCase()} successfully.`);
+      loadDashboardData();
     } catch (err) {
-      showFeedback('Failed to load student job history.', 'error');
+      showFeedback(err.response?.data?.message || 'Failed to process withdrawal.', 'error');
     }
   };
 
@@ -264,6 +268,19 @@ const AdminDashboard = () => {
               ⚠ Rule-Breaking Reports
               {stats.openReports > 0 && (
                 <span className="ml-auto bg-yellow-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">{stats.openReports}</span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('withdrawals')}
+              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-semibold transition flex items-center gap-2.5 ${
+                activeTab === 'withdrawals' ? 'bg-white text-[#06402B] shadow-md' : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'
+              }`}
+            >
+              💳 Bank Payouts
+              {withdrawals.filter(w => w.status === 'pending').length > 0 && (
+                <span className="ml-auto bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">
+                  {withdrawals.filter(w => w.status === 'pending').length}
+                </span>
               )}
             </button>
           </nav>
@@ -690,6 +707,107 @@ const AdminDashboard = () => {
                               </td>
                             </tr>
                           ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 6: BANK WITHDRAWAL PAYOUTS */}
+              {activeTab === 'withdrawals' && (
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg space-y-6">
+                  <div>
+                    <h3 className="text-sm font-bold text-[#06402B]">Student Bank Withdrawal Requests</h3>
+                    <p className="text-xs text-gray-500">Review student payout requests and approve once bank transfer is dispatched.</p>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-200 text-gray-500">
+                          <th className="pb-3 font-semibold">Student</th>
+                          <th className="pb-3 font-semibold">Amount</th>
+                          <th className="pb-3 font-semibold">Bank Information</th>
+                          <th className="pb-3 font-semibold">Requested Date</th>
+                          <th className="pb-3 font-semibold">Status</th>
+                          <th className="pb-3 font-semibold text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {withdrawals.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="py-8 text-center text-gray-400">
+                              No bank withdrawal requests filed yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          withdrawals.map((w) => {
+                            let bank = {};
+                            try {
+                              bank = JSON.parse(w.bankDetails || '{}');
+                            } catch (e) {
+                              bank = {};
+                            }
+
+                            return (
+                              <tr key={w.id} className="text-gray-700">
+                                <td className="py-4">
+                                  <div className="font-bold text-[#06402B]">{w.user?.name || `User #${w.userId}`}</div>
+                                  <div className="text-[10px] text-gray-500">{w.user?.email}</div>
+                                  {w.user?.phone && <div className="text-[10px] text-gray-400">{w.user.phone}</div>}
+                                </td>
+                                <td className="py-4">
+                                  <span className="font-extrabold text-sm text-[#06402B]">
+                                    LKR {parseFloat(w.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                  </span>
+                                </td>
+                                <td className="py-4">
+                                  <div className="font-semibold text-gray-800">{bank.bankName || 'N/A'}</div>
+                                  <div className="text-[10px] text-gray-600 font-mono">
+                                    Acc: {bank.accountNumber || 'N/A'} ({bank.accountHolderName || 'N/A'})
+                                  </div>
+                                  <div className="text-[9px] text-gray-400">Branch: {bank.branch || 'N/A'}</div>
+                                </td>
+                                <td className="py-4">
+                                  {new Date(w.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="py-4">
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                      w.status === 'completed'
+                                        ? 'bg-green-100 border border-green-200 text-green-700'
+                                        : w.status === 'pending'
+                                        ? 'bg-yellow-100 border border-yellow-200 text-yellow-700'
+                                        : 'bg-red-100 border border-red-200 text-red-700'
+                                    }`}
+                                  >
+                                    {w.status}
+                                  </span>
+                                </td>
+                                <td className="py-4 text-right space-x-2">
+                                  {w.status === 'pending' ? (
+                                    <>
+                                      <button
+                                        onClick={() => handleProcessWithdrawal(w.id, 'completed')}
+                                        className="bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded transition cursor-pointer"
+                                      >
+                                        Approve Payout
+                                      </button>
+                                      <button
+                                        onClick={() => handleProcessWithdrawal(w.id, 'rejected')}
+                                        className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded transition cursor-pointer"
+                                      >
+                                        Reject
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <span className="text-gray-400 text-[10px]">Processed</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
                         )}
                       </tbody>
                     </table>

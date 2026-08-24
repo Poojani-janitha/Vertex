@@ -167,6 +167,14 @@ const CommunityDashboard = () => {
     return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'PJ';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 22) return 'Good evening';
+    return 'Good night';
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 text-gray-700 overflow-hidden font-sans">
 
@@ -262,7 +270,7 @@ const CommunityDashboard = () => {
 
           {/* Top Welcome Title */}
           <h2 className="text-sm font-bold text-[#06402B] flex items-center gap-2">
-            Good night, {user.name.split(' ')[0]} 👋
+            {getGreeting()}, {user.name.split(' ')[0]} 👋
           </h2>
 
           {/* Top center mock search */}

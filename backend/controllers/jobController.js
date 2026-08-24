@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
-const { Job, Application, User, EmployerVerification, Message, Checkin, Profile, sequelize } = require('../models');
+const { Job, Application, User, EmployerVerification, Message, Checkin, Profile, Wallet, Transaction, sequelize } = require('../models');
 
 // @desc    Create a new job post
 // @route   POST /api/jobs
@@ -265,6 +265,43 @@ const scanStudentQR = async (req, res) => {
       checkin.checkOutTime = now;
       await checkin.save();
       actionMessage = 'Student checked out successfully!';
+
+      // Automatic earnings calculation & wallet credit
+      try {
+        const checkInMs = new Date(checkin.checkInTime).getTime();
+        const checkOutMs = now.getTime();
+        const diffHours = Math.max(0.25, (checkOutMs - checkInMs) / (1000 * 60 * 60));
+        const payAmount = parseFloat(application.job?.payAmount || 0);
+        const earned = parseFloat((diffHours * payAmount).toFixed(2));
+
+        if (earned > 0) {
+          const [studentWallet] = await Wallet.findOrCreate({
+            where: { userId: application.studentId },
+            defaults: {
+              userId: application.studentId,
+              balance: 0.00,
+              pendingBalance: 0.00,
+              currency: 'LKR'
+            }
+          });
+
+          studentWallet.balance = parseFloat(studentWallet.balance) + earned;
+          await studentWallet.save();
+
+          await Transaction.create({
+            walletId: studentWallet.id,
+            userId: application.studentId,
+            amount: earned,
+            type: 'earnings',
+            status: 'completed',
+            jobId: application.jobId,
+            description: `Earned LKR ${earned.toFixed(2)} (${diffHours.toFixed(1)}h shift) for '${application.job?.title || 'Job'}'`,
+            createdAt: now
+          });
+        }
+      } catch (walletErr) {
+        console.error('Failed to credit student wallet on check-out:', walletErr);
+      }
     } else {
       return res.status(400).json({ message: 'This student has already checked in and checked out for this shift.' });
     }

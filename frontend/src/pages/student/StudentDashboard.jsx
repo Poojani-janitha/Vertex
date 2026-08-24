@@ -9,6 +9,7 @@ import AppliedJobs from './views/AppliedJobs';
 import Messages from './views/Messages';
 import RelatedJobs from './views/RelatedJobs';
 import Reviews from './views/Reviews';
+import Wallet from './views/Wallet';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -18,10 +19,12 @@ const StudentDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [applications, setApplications] = useState([]);
   const [reviewedJobIds, setReviewedJobIds] = useState([]);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Tab State: 'dashboard' | 'profile' | 'jobs' | 'messages'
+  // Tab State: 'dashboard' | 'jobs' | 'related-jobs' | 'wallet' | 'messages' | 'reviews' | 'profile'
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Emergency State
@@ -81,16 +84,21 @@ const StudentDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const [userRes, appsRes, availabilityRes, reviewsRes] = await Promise.all([
+      const [userRes, appsRes, availabilityRes, reviewsRes, walletRes] = await Promise.all([
         api.get('/auth/me'),
         api.get('/applications/my-applications'),
         api.get('/availabilities/my-availability'),
-        api.get('/reviews')
+        api.get('/reviews'),
+        api.get('/wallet/my-wallet')
       ]);
 
       setUser(userRes.data);
       setProfile(userRes.data.profile);
       setApplications(appsRes.data);
+      if (walletRes.data) {
+        setWallet(walletRes.data.wallet);
+        setTransactions(walletRes.data.transactions || []);
+      }
 
       // Filter reviews by this student to know which jobs they already reviewed
       const myReviews = reviewsRes.data.filter(r => r.fromUser === userRes.data.id);
@@ -201,9 +209,10 @@ const StudentDashboard = () => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 22) return 'Good evening';
+    return 'Good night';
   };
 
   if (loading) {
@@ -318,6 +327,13 @@ const StudentDashboard = () => {
                 Related Jobs
               </button>
               <button
+                onClick={() => setActiveTab('wallet')}
+                className={sidebarButtonClass('wallet')}
+              >
+                <span className="text-base">💳</span>
+                Wallet & Payouts
+              </button>
+              <button
                 onClick={() => setActiveTab('messages')}
                 className={sidebarButtonClass('messages')}
               >
@@ -404,15 +420,29 @@ const StudentDashboard = () => {
 
           {/* Top Right Wallet Widget */}
           <div className="flex items-center space-x-6">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs">
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className="bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs transition cursor-pointer shadow-sm"
+              title="Click to open Wallet"
+            >
               <span className="text-gray-500 font-medium">LKR Wallet:</span>
-              <strong className="text-emerald-700">LKR 0.00</strong>
-              <span className="text-[9px] text-emerald-800 uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 border border-emerald-200">Active</span>
-            </div>
+              <strong className="text-emerald-700 font-bold">
+                LKR {parseFloat(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </strong>
+              <span className="text-[9px] text-emerald-800 uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 border border-emerald-200">
+                Active
+              </span>
+            </button>
 
             <div className="flex items-center space-x-3 text-gray-500 text-sm">
               <button title="Notifications" className="hover:text-[#06402B] transition-colors">🔔</button>
-              <button title="Messages" className="hover:text-[#06402B] transition-colors">✉️</button>
+              <button 
+                title="Messages" 
+                onClick={() => setIsChatOpen(!isChatOpen)}
+                className="hover:text-[#06402B] transition-colors"
+              >
+                ✉️
+              </button>
             </div>
           </div>
 
@@ -455,6 +485,14 @@ const StudentDashboard = () => {
               profile={profile}
               applications={applications}
               onApplicationSubmitted={fetchDashboardData}
+            />
+          )}
+
+          {activeTab === 'wallet' && (
+            <Wallet
+              wallet={wallet}
+              transactions={transactions}
+              onRefresh={fetchDashboardData}
             />
           )}
 
