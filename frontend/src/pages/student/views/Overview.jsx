@@ -5,51 +5,51 @@ const Overview = ({ profile, applications, availability, onNavigateToTab }) => {
     <div className="space-y-8 animate-fade-in">
       
       {/* News Banner */}
-      <div className="bg-gradient-to-r from-blue-900/30 to-indigo-900/10 border border-blue-900/50 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-gradient-to-r from-emerald-50/80 to-green-50/50 border border-emerald-200/80 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
         <div className="flex items-start gap-3">
-          <span className="bg-[#06402B] text-white text-[9px] font-extrabold uppercase px-2 py-1 rounded mt-0.5 select-none">COMMUNITY NEWS</span>
+          <span className="bg-[#06402B] text-white text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-md mt-0.5 select-none shadow-sm">COMMUNITY NEWS</span>
           <div>
             <h4 className="font-bold text-[#06402B] text-sm">Startup founders urge U.S. government not to shut off Chinese open weight AI</h4>
-            <p className="text-xs text-gray-500">via politico.com 1/5</p>
+            <p className="text-xs text-gray-500 mt-0.5">via politico.com 1/5</p>
           </div>
         </div>
         <button 
           onClick={() => onNavigateToTab('jobs')}
-          className="bg-[#06402B] hover:bg-[#0a5c3f] text-white text-xs font-semibold py-2 px-4 rounded-lg transition whitespace-nowrap self-start sm:self-center"
+          className="bg-[#06402B] hover:bg-[#0a5c3f] text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition whitespace-nowrap self-start sm:self-center shadow-sm cursor-pointer"
         >
           Browse Postings
         </button>
       </div>
 
-      {/* Stats Cards Grid (Matching Template Styles) */}
+      {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        <div className="bg-white border border-gray-200 p-6 rounded-xl space-y-2">
+        <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-2 shadow-sm">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Active Applications</div>
           <div className="text-3xl font-extrabold text-[#06402B]">
             {applications.filter(a => a.status === 'pending').length}
           </div>
-          <div className="text-[10px] text-yellow-400 font-semibold">Awaiting review</div>
+          <div className="text-xs text-amber-600 font-semibold">Awaiting review</div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6 rounded-xl space-y-2">
+        <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-2 shadow-sm">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Approved Jobs</div>
-          <div className="text-3xl font-extrabold text-green-450">
+          <div className="text-3xl font-extrabold text-emerald-700">
             {applications.filter(a => a.status === 'accepted').length}
           </div>
-          <div className="text-[10px] text-green-400 font-semibold">Ready to start</div>
+          <div className="text-xs text-emerald-600 font-semibold">Ready to start</div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6 rounded-xl space-y-2">
+        <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-2 shadow-sm">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Verified Hours</div>
           <div className="text-3xl font-extrabold text-[#06402B]">12.5h</div>
-          <div className="text-[10px] text-gray-500">On track with goal</div>
+          <div className="text-xs text-gray-500">On track with goal</div>
         </div>
 
-        <div className="bg-white border border-gray-200 p-6 rounded-xl space-y-2">
+        <div className="bg-white border border-gray-200 p-6 rounded-2xl space-y-2 shadow-sm">
           <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Wallet Balance</div>
-          <div className="text-3xl font-extrabold text-green-400">LKR 0.00</div>
-          <div className="text-[10px] text-gray-500">LKR - Active</div>
+          <div className="text-3xl font-extrabold text-emerald-700">LKR 0.00</div>
+          <div className="text-xs text-gray-500">LKR - Active</div>
         </div>
 
       </div>

@@ -132,22 +132,22 @@ const Jobs = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white p-4 rounded-xl mb-8 flex flex-col sm:flex-row gap-4 border border-gray-200 shadow-sm">
+      <div className="bg-white p-4 rounded-2xl mb-8 flex flex-col sm:flex-row gap-4 border border-gray-200 shadow-sm">
         <div className="flex-1 relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500">🔍</span>
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <span className="text-gray-400 text-sm">🔍</span>
           </div>
           <input
             type="text"
             placeholder="Search jobs by title or required skills..."
-            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]/30 transition-colors"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="sm:w-48">
           <select
-            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer"
+            className="w-full bg-gray-50 text-[#06402B] border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#06402B] focus:ring-1 focus:ring-[#06402B]/30 transition-colors cursor-pointer"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -160,40 +160,40 @@ const Jobs = () => {
       </div>
 
       {filteredJobs.length === 0 ? (
-        <div className="text-center py-20 bg-white/30 rounded-2xl border border-gray-200 border-dashed">
-          <div className="text-gray-500 text-5xl mb-4">
+        <div className="text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-gray-400 text-5xl mb-4">
             {jobs.length === 0 ? '💼' : '🔍'}
           </div>
-          <h3 className="text-xl font-medium text-gray-600">
+          <h3 className="text-xl font-medium text-gray-700">
             {jobs.length === 0 ? 'No jobs posted yet' : 'No jobs match your filters'}
           </h3>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 mt-2 text-sm">
             {jobs.length === 0 ? 'Check back later.' : 'Try adjusting your search terms or status filter.'}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredJobs.map((job) => (
-            <div key={job.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-[#06402B]/50 hover:shadow-lg hover:shadow-green-900/20 transition-all duration-300 group">
+            <div key={job.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-[#06402B]/40 hover:shadow-xl hover:shadow-green-900/10 transition-all duration-300 group flex flex-col justify-between">
               <div className="p-6 flex flex-col h-full">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4 gap-2">
                   <h3 className="text-xl font-bold text-[#06402B] group-hover:text-[#0a5c3f] transition-colors">{job.title}</h3>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-                    job.status === 'open' || !job.status ? 'bg-green-100 text-green-700 border-green-300' :
-                    job.status === 'filled' ? 'bg-blue-100 text-[#06402B] border-blue-300' :
-                    'bg-gray-700 text-gray-600 border-gray-600'
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border shrink-0 ${
+                    job.status === 'open' || !job.status ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                    job.status === 'filled' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                    'bg-gray-100 text-gray-600 border-gray-200'
                   }`}>
                     {job.status || 'Open'}
                   </span>
                 </div>
                 
-                <p className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow">
+                <p className="text-gray-500 text-sm line-clamp-2 mb-4 flex-grow leading-relaxed">
                   {job.description || 'No description provided.'}
                 </p>
                 
                 <div className="space-y-2 mb-6">
                   {job.payAmount && (
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm font-semibold text-emerald-800">
                       <span className="mr-2">💰</span> LKR {job.payAmount}
                     </div>
                   )}
@@ -211,7 +211,7 @@ const Jobs = () => {
                 
                 <button 
                   onClick={() => handleViewDetails(job)}
-                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-medium py-2 px-4 rounded-lg transition-colors mt-auto"
+                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-2.5 px-4 rounded-xl transition-all shadow-sm mt-auto cursor-pointer"
                 >
                   View Details & Apply
                 </button>
@@ -223,14 +223,14 @@ const Jobs = () => {
 
       {/* Job Details Modal */}
       {selectedJob && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl border border-gray-200 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white rounded-3xl border border-gray-200 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-8">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-3xl font-bold text-[#06402B]">{selectedJob.title}</h2>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#06402B]">{selectedJob.title}</h2>
                 <button 
                   onClick={handleCloseModal}
-                  className="text-gray-500 hover:text-[#06402B] transition-colors p-1"
+                  className="text-gray-400 hover:text-[#06402B] transition-colors p-1 font-bold"
                 >
                   ✕
                 </button>
@@ -238,26 +238,26 @@ const Jobs = () => {
 
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Description</h4>
-                  <p className="text-gray-700 leading-relaxed">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Description</h4>
+                  <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm">
                     {selectedJob.description || 'No description provided for this job.'}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50/50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-gray-500 text-sm mb-1">Pay Amount</div>
-                    <div className="text-xl font-semibold text-green-700">LKR {selectedJob.payAmount || 'N/A'}</div>
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div className="text-gray-500 text-xs mb-1">Pay Amount</div>
+                    <div className="text-xl font-bold text-emerald-800">LKR {selectedJob.payAmount || 'N/A'}</div>
                   </div>
-                  <div className="bg-gray-50/50 p-4 rounded-lg border border-gray-200">
-                    <div className="text-gray-500 text-sm mb-1">Location</div>
-                    <div className="text-lg font-medium text-[#06402B]">{selectedJob.locationName || 'Remote / Unspecified'}</div>
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div className="text-gray-500 text-xs mb-1">Location</div>
+                    <div className="text-base font-semibold text-[#06402B]">{selectedJob.locationName || 'Remote / Unspecified'}</div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-50/30 p-4 rounded-xl border border-gray-200">
-                  <div>📅 Start Time: <span className="text-[#06402B] font-medium">{selectedJob.startTime ? new Date(selectedJob.startTime).toLocaleString() : 'N/A'}</span></div>
-                  <div>📅 End Time: <span className="text-[#06402B] font-medium">{selectedJob.endTime ? new Date(selectedJob.endTime).toLocaleString() : 'N/A'}</span></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <div>📅 Start Time: <span className="text-[#06402B] font-semibold">{selectedJob.startTime ? new Date(selectedJob.startTime).toLocaleString() : 'N/A'}</span></div>
+                  <div>📅 End Time: <span className="text-[#06402B] font-semibold">{selectedJob.endTime ? new Date(selectedJob.endTime).toLocaleString() : 'N/A'}</span></div>
                 </div>
 
                 {(() => {
@@ -284,28 +284,28 @@ const Jobs = () => {
 
                 {/* Trust Score Breakdown Widget */}
                 {trustScore && (
-                  <div className="bg-[#121824] p-5 rounded-xl border border-gray-200 space-y-3">
-                    <div className="flex justify-between items-center border-b border-gray-200/60 pb-2">
+                  <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 space-y-3">
+                    <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                       <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employer Trust Score</h4>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-extrabold text-green-700">{trustScore.score}/100</span>
-                        <span className="text-[9px] text-gray-500 uppercase font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700">Verified</span>
+                        <span className="text-base font-extrabold text-emerald-800">{trustScore.score}/100</span>
+                        <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Verified</span>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-600">
-                      <div className="flex justify-between p-2 rounded bg-gray-50/40">
+                      <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                         <span>⭐ Rating (40%):</span>
                         <strong className="text-[#06402B]">{trustScore.breakdown.rating}/40 ({trustScore.metrics.avgRating}★)</strong>
                       </div>
-                      <div className="flex justify-between p-2 rounded bg-gray-50/40">
+                      <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                         <span>⏱️ Worked Hours (30%):</span>
                         <strong className="text-[#06402B]">{trustScore.breakdown.hours}/30 ({trustScore.metrics.verifiedHours}h)</strong>
                       </div>
-                      <div className="flex justify-between p-2 rounded bg-gray-50/40">
+                      <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                         <span>💬 Reply Rate (20%):</span>
                         <strong className="text-[#06402B]">{trustScore.breakdown.reply}/20 ({trustScore.metrics.replyRate || 0}%)</strong>
                       </div>
-                      <div className="flex justify-between p-2 rounded bg-gray-50/40">
+                      <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                         <span>💼 Completed Jobs (10%):</span>
                         <strong className="text-[#06402B]">{trustScore.breakdown.completed}/10 ({trustScore.metrics.completedJobs})</strong>
                       </div>
@@ -315,10 +315,10 @@ const Jobs = () => {
 
                 {selectedJob.skillsNeeded && (
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Required Skills</h4>
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</h4>
                     <div className="flex flex-wrap gap-2">
                       {selectedJob.skillsNeeded.split(',').map((skill, index) => (
-                        <span key={index} className="bg-blue-900/40 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-300/50">
+                        <span key={index} className="bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold border border-emerald-200">
                           {skill.trim()}
                         </span>
                       ))}
@@ -327,10 +327,10 @@ const Jobs = () => {
                 )}
 
                 {applyMessage && (
-                  <div className={`p-4 rounded-lg border ${
+                  <div className={`p-4 rounded-xl border text-sm font-medium ${
                     applyMessage.type === 'success' 
-                      ? 'bg-green-900/30 border-green-300 text-green-300' 
-                      : 'bg-red-900/30 border-red-800 text-red-300'
+                      ? 'bg-green-50 border-green-200 text-green-800' 
+                      : 'bg-red-50 border-red-200 text-red-800'
                   }`}>
                     {applyMessage.text}
                   </div>
@@ -341,17 +341,17 @@ const Jobs = () => {
                 <button 
                   onClick={handleApply}
                   disabled={isApplying || applyMessage?.type === 'success'}
-                  className={`flex-1 font-semibold py-3 px-6 rounded-lg transition-all transform ${
+                  className={`flex-1 font-bold py-3 px-6 rounded-xl transition-all transform text-sm ${
                     applyMessage?.type === 'success'
-                      ? 'bg-green-600/50 text-[#06402B] cursor-not-allowed'
-                      : 'bg-[#06402B] hover:bg-[#0a5c3f] hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/25 text-[#06402B]'
+                      ? 'bg-emerald-600 text-white opacity-80 cursor-not-allowed'
+                      : 'bg-[#06402B] hover:bg-[#0a5c3f] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-900/20 text-white cursor-pointer'
                   }`}
                 >
                   {isApplying ? 'Applying...' : applyMessage?.type === 'success' ? 'Applied' : 'Apply Now'}
                 </button>
                 <button 
                   onClick={handleCloseModal}
-                  className="px-6 py-3 bg-[#06402B] hover:bg-[#0a5c3f] text-white font-medium rounded-lg transition-colors"
+                  className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors border border-gray-200 text-sm cursor-pointer"
                 >
                   Close
                 </button>

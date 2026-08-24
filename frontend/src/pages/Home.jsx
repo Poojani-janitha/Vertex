@@ -14,12 +14,12 @@ const Home = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-          <Link to="/jobs" className="w-full sm:w-auto px-8 py-3 rounded-lg font-semibold text-white bg-[#06402B] hover:bg-[#0a5c3f] shadow-lg shadow-green-900/10 transition transform hover:-translate-y-1">
+          <Link to="/jobs" className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-white bg-[#06402B] hover:bg-[#0a5c3f] shadow-lg shadow-green-900/15 transition transform hover:-translate-y-0.5">
             Browse Jobs
           </Link>
-          <button className="w-full sm:w-auto px-8 py-3 rounded-lg font-semibold text-gray-600 bg-white hover:bg-gray-50 hover:text-[#06402B] border border-gray-200 transition transform hover:-translate-y-1">
+          <Link to="/signup" className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-gray-700 bg-white hover:bg-gray-50 hover:text-[#06402B] border border-gray-200 shadow-sm transition transform hover:-translate-y-0.5">
             Create Profile
-          </button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-20">

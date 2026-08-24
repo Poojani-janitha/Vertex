@@ -71,17 +71,17 @@ const Navbar = () => {
                   </span>
                   <button 
                     onClick={handleLogout}
-                    className="text-gray-600 hover:text-[#06402B] px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-red-900/50 hover:border-red-500 transition cursor-pointer"
+                    className="text-gray-700 hover:text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 hover:bg-red-50 hover:border-red-200 transition cursor-pointer"
                   >
                     Log out
                   </button>
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="text-gray-600 hover:text-[#06402B] px-3 py-2 rounded-md text-sm font-medium border border-gray-600 hover:bg-gray-700 transition">
+                  <Link to="/login" className="text-gray-700 hover:text-[#06402B] px-3.5 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 hover:bg-gray-50 transition">
                     Log in
                   </Link>
-                  <Link to="/signup" className="bg-[#06402B] hover:bg-[#0a5c3f] text-white px-4 py-2 rounded-md text-sm font-medium shadow-md transition transform hover:scale-105">
+                  <Link to="/signup" className="bg-[#06402B] hover:bg-[#0a5c3f] text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-emerald-900/10 transition transform hover:-translate-y-0.5">
                     Sign up
                   </Link>
                 </>

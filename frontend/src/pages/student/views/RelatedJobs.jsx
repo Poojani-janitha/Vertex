@@ -87,33 +87,33 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
         <p className="text-gray-500 text-sm">
           Recommended jobs based on your profile skills:{' '}
           {studentSkills.length > 0 ? (
-            <span className="text-blue-600 font-semibold">{profile.skills}</span>
+            <span className="text-[#06402B] font-semibold">{profile.skills}</span>
           ) : (
-            <span className="text-yellow-600 italic">None set yet (update your Profile Settings)</span>
+            <span className="text-amber-600 italic">None set yet (update your Profile Settings)</span>
           )}
         </p>
       </div>
 
       {feedback && (
-        <div className={`p-4 rounded-lg text-sm border text-center ${
-          feedback.type === 'success' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300'
+        <div className={`p-4 rounded-xl text-sm border font-medium text-center ${
+          feedback.type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'
         }`}>
           {feedback.text}
         </div>
       )}
 
       {studentSkills.length === 0 ? (
-        <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
-          <div className="text-gray-600 text-5xl mb-4">💡</div>
-          <h3 className="text-lg font-medium text-gray-600">Set your skills first</h3>
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-gray-500 text-5xl mb-4">💡</div>
+          <h3 className="text-lg font-medium text-gray-700">Set your skills first</h3>
           <p className="text-gray-500 text-xs mt-2">
             Add tags to your profile settings to get matching job recommendations.
           </p>
         </div>
       ) : matchedJobs.length === 0 ? (
-        <div className="text-center py-16 bg-gray-100/30 rounded-2xl border border-gray-200 border-dashed">
-          <div className="text-gray-600 text-5xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-600">No matching jobs</h3>
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 border-dashed">
+          <div className="text-gray-500 text-5xl mb-4">🔍</div>
+          <h3 className="text-lg font-medium text-gray-700">No matching jobs</h3>
           <p className="text-gray-500 text-xs mt-2">
             No open jobs matched your specific skills today. Check back later or update your skills!
           </p>
@@ -121,20 +121,20 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {matchedJobs.map(job => (
-            <div key={job.id} className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col justify-between space-y-4 hover:border-blue-900/50 transition-colors">
+            <div key={job.id} className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-emerald-600/40 hover:shadow-lg hover:shadow-green-900/10 transition-all">
               <div className="space-y-2">
                 <div className="flex justify-between items-start gap-4">
                   <h3 className="font-bold text-[#06402B] text-base">{job.title}</h3>
-                  <span className="text-[#06402B] font-bold text-xs bg-green-100 border border-green-300 px-2 py-0.5 rounded">
+                  <span className="text-emerald-800 font-bold text-xs bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg">
                     LKR {job.payAmount || 'N/A'}
                   </span>
                 </div>
                 
-                <p className="text-xs text-gray-500 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed">
                   {job.description || 'No description provided.'}
                 </p>
 
-                <div className="text-[10px] text-gray-500">📍 {job.locationName || 'Remote / General'}</div>
+                <div className="text-[10px] text-gray-500 font-medium">📍 {job.locationName || 'Remote / General'}</div>
               </div>
 
               <div className="space-y-4 pt-3 border-t border-gray-200">
@@ -147,10 +147,10 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                       return (
                         <span 
                           key={sIdx} 
-                          className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                          className={`text-[9px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${
                             isMatching 
-                              ? 'bg-blue-100 text-blue-800 border-blue-300' 
-                              : 'bg-gray-100 text-gray-500 border-gray-200'
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                              : 'bg-gray-100 text-gray-600 border-gray-200'
                           }`}
                         >
                           {trimmed}
@@ -163,7 +163,7 @@ const RelatedJobs = ({ user, profile, applications, onApplicationSubmitted }) =>
                 <button
                   onClick={() => handleApply(job.id)}
                   disabled={applyingJobId === job.id}
-                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="w-full bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition shadow-sm cursor-pointer"
                 >
                   {applyingJobId === job.id ? 'Applying...' : 'Apply in One-Click'}
                 </button>

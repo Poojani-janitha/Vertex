@@ -52,21 +52,21 @@ const Users = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {users.map((user) => (
-            <div key={user.id} className="bg-white rounded-xl border border-gray-200 p-6 flex flex-col items-center text-center hover:bg-gray-750 hover:border-gray-600 transition-colors">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-[#06402B] mb-4 shadow-lg shadow-indigo-500/20">
+            <div key={user.id} className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col items-center text-center hover:border-emerald-600/40 hover:shadow-xl hover:shadow-green-900/10 transition-all">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#06402B] to-[#0a5c3f] rounded-full flex items-center justify-center text-2xl font-bold text-white mb-4 shadow-lg shadow-green-900/10">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <h3 className="text-lg font-bold text-[#06402B] mb-1">{user.name}</h3>
-              <span className={`text-xs font-semibold px-2 py-1 rounded-full mb-3 uppercase tracking-wider ${
-                user.role === 'employer' ? 'bg-amber-900/50 text-amber-400' :
-                user.role === 'admin' ? 'bg-red-900/50 text-red-400' :
-                'bg-blue-100 text-[#06402B]'
+              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full mb-3 uppercase tracking-wider border ${
+                user.role === 'employer' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                user.role === 'admin' ? 'bg-red-100 text-red-800 border-red-200' :
+                'bg-emerald-100 text-emerald-800 border-emerald-200'
               }`}>
                 {user.role || 'Student'}
               </span>
               <p className="text-gray-500 text-sm w-full truncate">{user.email}</p>
               
-              <button className="mt-6 w-full text-sm font-medium text-indigo-600 hover:text-indigo-700 py-2 border border-indigo-200 hover:border-indigo-300 rounded-lg transition-colors bg-indigo-50/50">
+              <button className="mt-6 w-full text-sm font-semibold text-[#06402B] hover:text-white py-2.5 border border-[#06402B]/30 hover:bg-[#06402B] rounded-xl transition-all shadow-sm">
                 View Profile
               </button>
             </div>

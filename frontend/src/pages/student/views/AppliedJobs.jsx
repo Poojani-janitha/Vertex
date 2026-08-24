@@ -33,8 +33,8 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
   const getFilterBtnClass = (statusType) => {
     return `px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
       filter === statusType
-        ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-        : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-200'
+        ? 'bg-[#06402B] border-[#06402B] text-white shadow-md shadow-green-900/10'
+        : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-300'
     }`;
   };
 
@@ -228,14 +228,14 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                             <button
                               type="button"
                               onClick={() => handleShareShift(app)}
-                              className="bg-green-600 hover:bg-green-500 text-[10px] font-bold text-[#06402B] px-2.5 py-1 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer"
+                              className="bg-emerald-600 hover:bg-emerald-500 text-[10px] font-bold text-white px-2.5 py-1.5 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer shadow-sm"
                             >
                               🟢 Share Shift (SOS)
                             </button>
                             <button
                               type="button"
                               onClick={() => handleViewQR(app)}
-                              className="bg-purple-600 hover:bg-purple-500 text-[10px] font-bold text-[#06402B] px-2.5 py-1 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer"
+                              className="bg-purple-600 hover:bg-purple-500 text-[10px] font-bold text-white px-2.5 py-1.5 rounded-lg uppercase tracking-wider transition flex items-center gap-1 cursor-pointer shadow-sm"
                             >
                               📷 Attendance QR
                             </button>
@@ -243,17 +243,17 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                         )}
                         {isApproved && hasEnded ? (
                           alreadyReviewed ? (
-                            <span className="text-[10px] text-gray-500 font-bold bg-gray-100 border border-gray-200 px-2 py-1 rounded uppercase tracking-wider">Reviewed</span>
+                            <span className="text-[10px] text-gray-500 font-bold bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-lg uppercase tracking-wider">Reviewed</span>
                           ) : (
                             <button 
                               onClick={() => handleOpenReview(app.job)}
-                              className="bg-[#06402B] hover:bg-[#0a5c3f] text-[10px] font-bold text-[#06402B] px-3 py-1 rounded-lg uppercase tracking-wider transition shadow shadow-blue-500/20"
+                              className="bg-[#06402B] hover:bg-[#0a5c3f] text-[10px] font-bold text-white px-3 py-1.5 rounded-lg uppercase tracking-wider transition shadow-sm"
                             >
                               Review
                             </button>
                           )
                         ) : (
-                          !isApproved && <span className="text-gray-600 text-xs">-</span>
+                          !isApproved && <span className="text-gray-400 text-xs">-</span>
                         )}
                       </div>
                     </td>
@@ -267,15 +267,15 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
 
       {/* Review Submission Modal */}
       {showReviewModal && selectedJob && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border border-gray-200 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white/80">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-base font-bold text-[#06402B]">
                 ⭐️ Review Employer / Job
               </h3>
               <button 
                 onClick={handleCloseReview}
-                className="text-gray-500 hover:text-[#06402B]"
+                className="text-gray-400 hover:text-[#06402B] font-bold"
               >
                 ✕
               </button>
@@ -283,10 +283,10 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
             
             <form onSubmit={handleReviewSubmit} className="p-6 space-y-4">
               {feedback && (
-                <div className={`p-3 rounded-lg text-xs text-center border ${
+                <div className={`p-3 rounded-lg text-xs text-center border font-medium ${
                   feedback.type === 'success' 
-                    ? 'bg-green-100 border-green-200 text-green-700' 
-                    : 'bg-red-100 border-red-200 text-red-700'
+                    ? 'bg-green-50 border-green-200 text-green-800' 
+                    : 'bg-red-50 border-red-200 text-red-800'
                 }`}>
                   {feedback.text}
                 </div>
@@ -307,7 +307,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                       type="button"
                       onClick={() => setRating(star)}
                       className={`text-2xl transition-transform transform active:scale-95 ${
-                        star <= rating ? 'text-yellow-400' : 'text-gray-600'
+                        star <= rating ? 'text-amber-400' : 'text-gray-300'
                       }`}
                     >
                       ★
@@ -322,7 +322,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   required 
                   rows="4" 
                   placeholder="Share your experience working on this gig..." 
-                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
+                  className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                 />
@@ -332,14 +332,14 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 <button 
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-[#06402B] hover:bg-[#0a5c3f] text-white text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="flex-1 bg-[#06402B] hover:bg-[#0a5c3f] text-white text-xs font-semibold py-2.5 px-4 rounded-lg transition"
                 >
                   {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>
                 <button 
                   type="button" 
                   onClick={handleCloseReview}
-                  className="bg-gray-100 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold py-2.5 px-4 rounded-lg transition border border-gray-200"
                 >
                   Cancel
                 </button>
@@ -351,7 +351,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
 
       {/* Job Details Modal */}
       {showDetailsModal && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border border-gray-200 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-8 space-y-6">
               
@@ -361,7 +361,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 </h2>
                 <button 
                   onClick={() => setShowDetailsModal(false)}
-                  className="text-gray-500 hover:text-[#06402B] transition-colors"
+                  className="text-gray-400 hover:text-[#06402B] transition-colors font-bold"
                 >
                   ✕
                 </button>
@@ -375,47 +375,47 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 <div className="space-y-6 text-sm text-gray-600">
                   <div>
                     <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Description</h4>
-                    <p className="text-gray-700 leading-relaxed bg-gray-100/30 p-4 rounded-xl border border-gray-200">
+                    <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
                       {selectedDetailsJob.description || 'No description provided.'}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-100/50 p-4 rounded-lg border border-gray-200/50">
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                       <div className="text-gray-500 text-xs mb-1">Pay Amount</div>
-                      <div className="text-lg font-semibold text-green-400">LKR {selectedDetailsJob.payAmount || 'N/A'}</div>
+                      <div className="text-lg font-semibold text-emerald-700">LKR {selectedDetailsJob.payAmount || 'N/A'}</div>
                     </div>
-                    <div className="bg-gray-100/50 p-4 rounded-lg border border-gray-200/50">
+                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                       <div className="text-gray-500 text-xs mb-1">Location</div>
                       <div className="text-md font-medium text-[#06402B]">{selectedDetailsJob.locationName || 'Remote / Unspecified'}</div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-100/30 p-4 rounded-xl border border-gray-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500 bg-gray-50 p-4 rounded-xl border border-gray-200">
                     <div>📅 Start Time: <span className="text-[#06402B] font-medium">{selectedDetailsJob.startTime ? new Date(selectedDetailsJob.startTime).toLocaleString() : 'N/A'}</span></div>
                     <div>📅 End Time: <span className="text-[#06402B] font-medium">{selectedDetailsJob.endTime ? new Date(selectedDetailsJob.endTime).toLocaleString() : 'N/A'}</span></div>
                   </div>
 
                   {detailsTrustScore && (
                     <div className="bg-gray-50 p-5 rounded-xl border border-gray-200 space-y-3">
-                      <div className="flex justify-between items-center border-b border-gray-200/60 pb-2">
+                      <div className="flex justify-between items-center border-b border-gray-200 pb-2">
                         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Employer Trust Score</h4>
-                        <span className="text-sm font-extrabold text-green-400">{detailsTrustScore.score}/100</span>
+                        <span className="text-sm font-extrabold text-emerald-700">{detailsTrustScore.score}/100</span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-600">
-                        <div className="flex justify-between p-2 rounded bg-gray-100/45">
+                        <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                           <span>⭐ Average Rating:</span>
                           <strong className="text-[#06402B]">{detailsTrustScore.metrics?.avgRating}★ ({detailsTrustScore.breakdown?.rating}/40 pts)</strong>
                         </div>
-                        <div className="flex justify-between p-2 rounded bg-gray-100/45">
+                        <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                           <span>⏱️ Worked Hours:</span>
                           <strong className="text-[#06402B]">{detailsTrustScore.metrics?.verifiedHours}h ({detailsTrustScore.breakdown?.hours}/30 pts)</strong>
                         </div>
-                        <div className="flex justify-between p-2 rounded bg-gray-100/45">
+                        <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                           <span>💬 Reply Rate:</span>
                           <strong className="text-[#06402B]">{detailsTrustScore.metrics?.replyRate || 0}% ({detailsTrustScore.breakdown?.reply}/20 pts)</strong>
                         </div>
-                        <div className="flex justify-between p-2 rounded bg-gray-100/45">
+                        <div className="flex justify-between p-2.5 rounded-lg bg-white border border-gray-200">
                           <span>💼 Completed Jobs:</span>
                           <strong className="text-[#06402B]">{detailsTrustScore.metrics?.completedJobs} ({detailsTrustScore.breakdown?.completed}/10 pts)</strong>
                         </div>
@@ -428,7 +428,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                       <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</h4>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedDetailsJob.skillsNeeded.split(',').map((skill, index) => (
-                          <span key={index} className="bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                          <span key={index} className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                             {skill.trim()}
                           </span>
                         ))}
@@ -444,14 +444,14 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                     <button
                       type="button"
                       onClick={() => handleShareShift(applications.find(a => a.jobId === selectedDetailsJob.id))}
-                      className="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
                     >
                       🟢 Share Shift (SOS)
                     </button>
                     <button
                       type="button"
                       onClick={() => handleViewQR(applications.find(a => a.jobId === selectedDetailsJob.id))}
-                      className="bg-purple-600 hover:bg-purple-500 text-[#06402B] font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
+                      className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-lg transition text-xs flex items-center gap-1 cursor-pointer"
                     >
                       📷 Attendance QR
                     </button>
@@ -460,7 +460,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                 <button 
                   type="button"
                   onClick={() => setShowDetailsModal(false)}
-                  className="bg-gray-700 hover:bg-gray-600 text-[#06402B] font-semibold py-2 px-6 rounded-lg transition"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 font-semibold py-2 px-6 rounded-lg transition text-xs cursor-pointer"
                 >
                   Close
                 </button>
@@ -473,9 +473,9 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
 
       {/* Attendance QR Modal */}
       {showQRModal && (
-        <div className="fixed inset-0 bg-black/75 flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white border border-gray-200 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white/80">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
               <h3 className="text-base font-bold text-[#06402B]">
                 📷 Shift Attendance QR
               </h3>
@@ -486,26 +486,26 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   setQrToken(null);
                   setQrError(null);
                 }}
-                className="text-gray-500 hover:text-[#06402B] cursor-pointer"
+                className="text-gray-400 hover:text-[#06402B] cursor-pointer font-bold"
               >
                 ✕
               </button>
             </div>
             
-            <div className="p-6 text-center space-y-4 bg-[#0e131f]/20">
-              <div className="text-xs text-blue-600 font-semibold">{qrJobTitle}</div>
+            <div className="p-6 text-center space-y-4 bg-white">
+              <div className="text-xs text-[#06402B] font-semibold">{qrJobTitle}</div>
               
               {qrLoading ? (
                 <div className="flex justify-center items-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#06402B]"></div>
                 </div>
               ) : qrError ? (
-                <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-xs rounded-lg">
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg font-medium">
                   {qrError}
                 </div>
               ) : qrToken ? (
                 <div className="space-y-4">
-                  <div className="bg-white p-3 rounded-xl inline-block shadow-lg mx-auto">
+                  <div className="bg-white p-3 rounded-xl inline-block shadow-md border border-gray-200 mx-auto">
                     <img 
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrToken)}`} 
                       alt="Attendance Token Code" 
@@ -527,7 +527,7 @@ const AppliedJobs = ({ applications, reviewedJobIds = [], user, onReviewSubmitte
                   setQrToken(null);
                   setQrError(null);
                 }}
-                className="w-full bg-gray-100 hover:bg-gray-100 text-[#06402B] font-semibold py-2 px-4 rounded-lg transition text-xs cursor-pointer"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-lg transition text-xs cursor-pointer border border-gray-200"
               >
                 Close
               </button>

@@ -97,8 +97,8 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
 
       <form onSubmit={handleSave} className="space-y-6">
         {message && (
-          <div className={`p-4 rounded-lg text-sm border ${
-            message.type === 'success' ? 'bg-green-900/30 text-green-300 border-green-800' : 'bg-red-900/30 text-red-300 border-red-800'
+          <div className={`p-4 rounded-xl text-sm border font-medium ${
+            message.type === 'success' ? 'bg-green-50 text-green-800 border-green-200' : 'bg-red-50 text-red-800 border-red-200'
           }`}>
             {message.text}
           </div>
@@ -140,20 +140,20 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
           <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Your Skills</label>
           
           {/* Active Skill Chips Container */}
-          <div className="flex flex-wrap gap-2 p-3 bg-gray-100 border border-gray-200 rounded-lg mb-3 min-h-[50px] items-center">
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg mb-3 min-h-[50px] items-center">
             {skillTags.length === 0 ? (
               <span className="text-gray-500 text-xs italic">No skills selected. Click recommendations below or type custom tags.</span>
             ) : (
               skillTags.map((skill, index) => (
                 <span 
                   key={index} 
-                  className="bg-[#06402B]/25 border border-[#06402B] text-blue-300 px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+                  className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm"
                 >
                   {skill}
                   <button
                     type="button"
                     onClick={() => handleRemoveSkill(index)}
-                    className="hover:text-red-400 font-bold focus:outline-none text-[10px] w-4 h-4 rounded-full flex items-center justify-center bg-blue-100 hover:bg-red-100 text-blue-600 hover:text-red-700 cursor-pointer"
+                    className="hover:text-red-700 font-bold focus:outline-none text-[10px] w-4 h-4 rounded-full flex items-center justify-center bg-emerald-200/60 hover:bg-red-100 text-emerald-800 hover:text-red-700 cursor-pointer"
                   >
                     ✕
                   </button>
@@ -189,7 +189,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
           {/* Recommended Skills suggestion box */}
           <div className="space-y-1">
             <label className="block text-[9px] font-bold text-gray-500 uppercase tracking-wider">Suggested Recommendations</label>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-gray-100/10 rounded-lg">
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-gray-100/30 rounded-lg">
               {popularSkills.map((pSkill) => {
                 const isSelected = skillTags.some(s => s.toLowerCase() === pSkill.toLowerCase());
                 return (
@@ -198,10 +198,10 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                     type="button"
                     disabled={isSelected}
                     onClick={() => handleAddSkill(pSkill)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider transition ${
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition ${
                       isSelected 
-                        ? 'bg-gray-100/55 text-gray-600 cursor-not-allowed border border-gray-200' 
-                        : 'bg-gray-100 hover:bg-blue-50/50 text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-900/50 cursor-pointer'
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' 
+                        : 'bg-white hover:bg-emerald-50 text-gray-600 hover:text-[#06402B] border border-gray-200 hover:border-emerald-300 cursor-pointer shadow-sm'
                     }`}
                   >
                     + {pSkill}
@@ -221,15 +221,15 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
 
           <div className="space-y-3">
             {availability.map((item, idx) => (
-              <div key={item.dayOfWeek} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100/30 p-4 rounded-xl border border-gray-200/50 gap-4">
+              <div key={item.dayOfWeek} className="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-4 rounded-xl border border-gray-200 shadow-sm gap-4">
                 <label className="flex items-center space-x-3 cursor-pointer sm:w-28 select-none">
                   <input 
                     type="checkbox"
                     checked={item.isAvailable}
                     onChange={(e) => handleAvailabilityChange(idx, 'isAvailable', e.target.checked)}
-                    className="form-checkbox text-blue-500 rounded focus:ring-blue-500 bg-gray-100 border-gray-200 h-5 w-5 cursor-pointer"
+                    className="form-checkbox text-[#06402B] rounded focus:ring-[#06402B] bg-gray-50 border-gray-300 h-5 w-5 cursor-pointer accent-[#06402B]"
                   />
-                  <span className={`font-semibold text-xs ${item.isAvailable ? 'text-[#06402B]' : 'text-gray-500'}`}>{item.dayOfWeek}</span>
+                  <span className={`font-semibold text-xs ${item.isAvailable ? 'text-[#06402B]' : 'text-gray-400'}`}>{item.dayOfWeek}</span>
                 </label>
 
                 <div className="flex items-center gap-2 flex-grow sm:justify-end">
@@ -238,15 +238,15 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
                     disabled={!item.isAvailable}
                     value={item.startTime}
                     onChange={(e) => handleAvailabilityChange(idx, 'startTime', e.target.value)}
-                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-30 disabled:cursor-not-allowed"
                   />
-                  <span className="text-gray-500 text-xs">to</span>
+                  <span className="text-gray-500 text-xs font-medium">to</span>
                   <input 
                     type="time"
                     disabled={!item.isAvailable}
                     value={item.endTime}
                     onChange={(e) => handleAvailabilityChange(idx, 'endTime', e.target.value)}
-                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-20 disabled:cursor-not-allowed"
+                    className="bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B] disabled:opacity-30 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ const ProfileSettings = ({ user, bio: initialBio, skills: initialSkills, availab
         <button
           type="submit"
           disabled={updating}
-          className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-2.5 px-6 rounded-lg transition transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/20"
+          className="w-full bg-[#06402B] hover:bg-[#0a5c3f] text-white font-semibold py-3 px-6 rounded-xl transition transform hover:-translate-y-0.5 shadow-lg shadow-emerald-900/20"
         >
           {updating ? 'Saving changes...' : 'Save Profile & Schedule'}
         </button>
