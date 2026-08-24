@@ -21,16 +21,29 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { jobId, studentId } = req.body;
+    const jobId = req.body.jobId;
+    const studentId = req.user ? req.user.id : req.body.studentId;
 
     if (!jobId || !studentId) {
-      return res.status(400).json({ error: 'Please provide both jobId and studentId.' });
+      return res.status(400).json({ error: 'Please provide jobId.' });
     }
 
     // 1. Fetch Job details
     const job = await Job.findByPk(jobId);
     if (!job) {
       return res.status(404).json({ error: 'Job not found.' });
+    }
+
+    if (job.status !== 'open') {
+      return res.status(400).json({ error: 'This job is no longer accepting applications.' });
+    }
+
+    // 1b. Check if already applied
+    const existingApp = await Application.findOne({
+      where: { jobId, studentId }
+    });
+    if (existingApp) {
+      return res.status(400).json({ error: 'You have already applied for this job.' });
     }
 
     // 2. Fetch Student details with Profile
@@ -87,7 +100,11 @@ exports.create = async (req, res) => {
       }
     }
 
-    const newItem = await Application.create(req.body);
+    const newItem = await Application.create({
+      jobId,
+      studentId,
+      status: 'pending'
+    });
     res.status(201).json(newItem);
   } catch (error) {
     res.status(400).json({ error: error.message });

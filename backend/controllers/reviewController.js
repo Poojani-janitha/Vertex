@@ -46,7 +46,18 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const newItem = await Review.create(req.body);
+    const { toUser, jobId, rating, comment } = req.body;
+    if (!toUser || !jobId || !rating) {
+      return res.status(400).json({ error: 'Please provide toUser, jobId, and rating.' });
+    }
+
+    const newItem = await Review.create({
+      fromUser: req.user ? req.user.id : req.body.fromUser,
+      toUser,
+      jobId,
+      rating,
+      comment
+    });
     res.status(201).json(newItem);
   } catch (error) {
     res.status(400).json({ error: error.message });

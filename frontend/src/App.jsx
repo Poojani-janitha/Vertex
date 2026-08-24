@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import Users from './pages/Users';
@@ -24,10 +25,32 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<StudentDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/community" element={<CommunityDashboard />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route 
+          path="/dashboard/*" 
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/*" 
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/community/*" 
+          element={
+            <ProtectedRoute allowedRoles={['employer']}>
+              <CommunityDashboard />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Layout>
   );

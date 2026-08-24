@@ -71,7 +71,6 @@ const Jobs = () => {
     setIsApplying(true);
     setApplyMessage(null);
     try {
-      // Fetch logged-in user details dynamically
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : null;
       
@@ -81,14 +80,18 @@ const Jobs = () => {
         return;
       }
 
+      if (user.role !== 'student') {
+        setApplyMessage({ type: 'error', text: 'Only student accounts can apply for job postings.' });
+        setIsApplying(false);
+        return;
+      }
+
       await api.post('/applications', {
-        jobId: selectedJob.id,
-        studentId: user.id, 
-        status: 'pending'
+        jobId: selectedJob.id
       });
       setApplyMessage({ type: 'success', text: 'Successfully applied! The employer will review your application.' });
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to apply. Please try again.';
+      const errMsg = err.response?.data?.error || err.response?.data?.message || 'Failed to apply. Please try again.';
       setApplyMessage({ type: 'error', text: errMsg });
     } finally {
       setIsApplying(false);
