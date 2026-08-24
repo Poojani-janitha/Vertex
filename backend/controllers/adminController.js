@@ -6,9 +6,27 @@ const { sendVerificationEmail } = require('../services/mailService');
 // @access  Private (Admin)
 exports.getPendingEmployers = async (req, res) => {
   try {
+    // 1. Auto-heal: Ensure every unverified employer has an EmployerVerification entry
+    const unverifiedEmployers = await User.findAll({
+      where: { role: 'employer', isVerified: false },
+      include: [{ model: EmployerVerification, as: 'employerVerification' }]
+    });
+
+    for (const empUser of unverifiedEmployers) {
+      if (!empUser.employerVerification) {
+        await EmployerVerification.create({
+          userId: empUser.id,
+          accountType: 'individual',
+          individualIdNo: 'Pending Info',
+          verificationStatus: 'pending'
+        });
+      }
+    }
+
     const pending = await EmployerVerification.findAll({
       where: { verificationStatus: 'pending' },
-      include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'phone'] }]
+      include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'phone'] }],
+      order: [['createdAt', 'DESC']]
     });
     return res.json(pending);
   } catch (error) {
@@ -33,7 +51,8 @@ exports.getApprovedEmployers = async (req, res) => {
           as: 'receivedReviews',
           attributes: ['id', 'rating', 'comment', 'createdAt']
         }]
-      }]
+      }],
+      order: [['createdAt', 'DESC']]
     });
     return res.json(approved);
   } catch (error) {
@@ -54,9 +73,13 @@ exports.verifyEmployer = async (req, res) => {
       return res.status(400).json({ message: 'Please provide status: approved or rejected.' });
     }
 
-    const verification = await EmployerVerification.findOne({ where: { userId } });
+    let verification = await EmployerVerification.findOne({ where: { userId } });
     if (!verification) {
-      return res.status(404).json({ message: 'Verification record not found for this user.' });
+      verification = await EmployerVerification.create({
+        userId,
+        accountType: 'individual',
+        verificationStatus: status
+      });
     }
 
     // Update verification details
@@ -72,7 +95,11 @@ exports.verifyEmployer = async (req, res) => {
       await user.save();
 
       // Send verification email to employer (non-blocking)
-      sendVerificationEmail(user.email, user.name, status);
+      try {
+        sendVerificationEmail(user.email, user.name, status);
+      } catch (mailErr) {
+        console.error('Failed to send verification email:', mailErr.message);
+      }
     }
 
     return res.json({

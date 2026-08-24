@@ -482,22 +482,26 @@ const AdminDashboard = () => {
                           pendingEmployers.map((emp) => (
                             <tr key={emp.id} className="text-gray-700">
                               <td className="py-4">
-                                <div className="font-bold text-[#06402B]">{emp.user?.name}</div>
-                                <div className="text-[10px] text-gray-500">{emp.user?.email}</div>
+                                <div className="font-bold text-[#06402B]">{emp.user?.name || 'N/A'}</div>
+                                <div className="text-[10px] text-gray-500">{emp.user?.email || 'N/A'}</div>
+                                {emp.user?.phone && <div className="text-[10px] text-gray-400">{emp.user.phone}</div>}
                               </td>
-                              <td className="py-4">{emp.companyName || 'Individual / Contractor'}</td>
-                              <td className="py-4">{emp.registrationNumber || 'N/A'}</td>
-                              <td className="py-4">{new Date(emp.submittedAt || Date.now()).toLocaleDateString()}</td>
+                              <td className="py-4">
+                                <div className="font-semibold text-gray-800">{emp.companyName || emp.user?.name || 'Individual'}</div>
+                                <div className="text-[10px] text-gray-500 capitalize">{emp.accountType}</div>
+                              </td>
+                              <td className="py-4 font-mono text-gray-700">{emp.companyRegNo || emp.individualIdNo || 'N/A'}</td>
+                              <td className="py-4">{new Date(emp.createdAt || emp.submittedAt || Date.now()).toLocaleDateString()}</td>
                               <td className="py-4 text-right space-x-2">
                                 <button
                                   onClick={() => handleVerifyEmployer(emp.userId, 'approved')}
-                                  className="bg-green-600 hover:bg-green-500 text-[#06402B] text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded transition cursor-pointer"
                                 >
                                   Approve
                                 </button>
                                 <button
                                   onClick={() => handleVerifyEmployer(emp.userId, 'rejected')}
-                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded transition cursor-pointer"
                                 >
                                   Reject
                                 </button>
