@@ -456,6 +456,7 @@ const StudentDashboard = () => {
               profile={profile}
               applications={applications}
               availability={availability}
+              wallet={wallet}
               onNavigateToTab={(tab) => setActiveTab(tab)}
             />
           )}
