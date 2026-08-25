@@ -253,20 +253,22 @@ const CommunityDashboard = () => {
         {/* BOTTOM USER PROFILE CARD */}
         <div className="p-4 border-t border-[#053020] bg-[#042A1D] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#0a5c3f] text-[#06402B] flex items-center justify-center font-bold text-sm shadow-inner">
-              {getInitials(user.name)}
+            <div className="w-10 h-10 rounded-full bg-[#0a5c3f] text-white flex items-center justify-center font-bold text-sm shadow-inner">
+              {getInitials(user?.name)}
             </div>
             <div>
-              <div className="text-xs font-bold text-[#06402B] truncate max-w-[120px]">{user.name}</div>
-              <div className="text-[10px] text-gray-500 capitalize">{verification.accountType}</div>
+              <div className="text-xs font-bold text-white truncate max-w-[120px]">{user?.name}</div>
+              <div className="text-[10px] text-green-300 capitalize font-medium">
+                {verification?.accountType === 'company' ? (verification?.companyName || 'Company') : 'Employer'}
+              </div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-red-400 transition"
+            className="p-1.5 rounded-lg text-green-300 hover:bg-red-900/40 hover:text-red-300 transition cursor-pointer"
           >
-            ❌
+            ✕
           </button>
         </div>
 
