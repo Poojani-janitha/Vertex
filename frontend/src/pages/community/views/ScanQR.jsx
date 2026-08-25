@@ -109,28 +109,28 @@ const ScanQR = ({ onClose }) => {
       </div>
 
       {feedback && (
-        <div className={`p-4 rounded-lg border text-xs ${
-          feedback.type === 'success' ? 'bg-green-100 border-green-200 text-green-700' : 'bg-red-100 border-red-200 text-red-700'
+        <div className={`p-5 rounded-2xl border text-xs space-y-2 ${
+          feedback.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
         }`}>
-          <div className="font-bold text-sm mb-1">{feedback.message}</div>
+          <div className="font-bold text-sm">{feedback.message}</div>
           {feedback.details && (
-            <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-200 font-mono text-[10px] text-gray-600">
+            <div className="mt-2 space-y-1.5 bg-white p-4 rounded-xl border border-gray-200 font-mono text-[11px] text-gray-700 shadow-sm">
               {feedback.details.student && (
                 <>
                   <div className="font-bold text-[#06402B] mb-1">🎓 Student Details:</div>
-                  <div className="pl-2">Name: {feedback.details.student.name}</div>
-                  <div className="pl-2 pb-2 text-[9px] text-gray-500">Email: {feedback.details.student.email}</div>
+                  <div className="pl-2">Name: <strong className="text-gray-900">{feedback.details.student.name}</strong></div>
+                  <div className="pl-2 pb-2 text-[10px] text-gray-500">Email: {feedback.details.student.email}</div>
                 </>
               )}
               {feedback.details.job && (
-                <div className="pl-2 pb-2 text-blue-600">Shift: {feedback.details.job.title}</div>
+                <div className="pl-2 pb-2 text-emerald-800 font-semibold">Shift: {feedback.details.job.title}</div>
               )}
-              <div className="font-bold text-[#06402B] mb-1 border-t border-gray-200 pt-1.5 mt-1.5">⏱ Attendance Log:</div>
+              <div className="font-bold text-[#06402B] mb-1 border-t border-gray-100 pt-2 mt-2">⏱ Attendance Log:</div>
               {feedback.details.checkInTime && (
-                <div className="pl-2">Checked In At: {new Date(feedback.details.checkInTime).toLocaleString()}</div>
+                <div className="pl-2 text-gray-700">Checked In At: {new Date(feedback.details.checkInTime).toLocaleString()}</div>
               )}
               {feedback.details.checkOutTime && (
-                <div className="pl-2 text-green-400 font-semibold">Checked Out At: {new Date(feedback.details.checkOutTime).toLocaleString()}</div>
+                <div className="pl-2 text-emerald-700 font-bold">Checked Out At: {new Date(feedback.details.checkOutTime).toLocaleString()}</div>
               )}
             </div>
           )}
@@ -139,27 +139,27 @@ const ScanQR = ({ onClose }) => {
 
       {/* WEBCAM READER CONTAINER */}
       <div className="space-y-3">
-        <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider">Webcam Scanner View</label>
-        <div className="bg-gray-100 border border-gray-200 rounded-xl overflow-hidden p-4 relative z-0 flex justify-center">
-          <div id="reader" className="w-full max-w-md bg-[#0e131f] rounded-lg min-h-[250px]"></div>
+        <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">Webcam Scanner View</label>
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden p-4 relative z-0 flex justify-center">
+          <div id="reader" className="w-full max-w-md bg-[#0e131f] rounded-xl min-h-[250px]"></div>
         </div>
       </div>
 
       {/* MANUAL OVERRIDE FALLBACK */}
       <div className="border-t border-gray-200 pt-6">
-        <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wider">Manual Code Override (Demo / Testing)</label>
+        <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Manual Code Override (Demo / Testing)</label>
         <form onSubmit={handleManualSubmit} className="flex gap-2">
           <input
             type="text"
             placeholder="Paste check-in token text (JWT)..."
-            className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#06402B]"
+            className="flex-grow bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#06402B]"
             value={manualToken}
             onChange={(e) => setManualToken(e.target.value)}
           />
           <button
             type="submit"
             disabled={loading || !manualToken.trim()}
-            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-[#06402B] text-xs font-semibold px-5 py-2 rounded-lg transition"
+            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:opacity-50 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-sm cursor-pointer"
           >
             {loading ? 'Verifying...' : 'Verify Token'}
           </button>

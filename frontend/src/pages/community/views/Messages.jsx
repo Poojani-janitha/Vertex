@@ -218,21 +218,19 @@ const Messages = () => {
             </div>
 
             {/* Input Reply Box */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white/30 flex gap-2 shrink-0">
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white flex gap-2 shrink-0">
               <input
                 type="text"
                 required
                 placeholder="Type your response to the candidate..."
-                className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-4 py-2 text-xs focus:outline-none focus:border-[#06402B]"
-                value={replyText}
-                onChange={(e) => setReverseState(e)} // helper target state hook
+                className="flex-grow bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#06402B]"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
               />
               <button
                 type="submit"
                 disabled={sending || !replyText.trim()}
-                className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-[#06402B] text-xs font-semibold px-5 py-2 rounded-lg transition"
+                className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:opacity-50 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow-sm cursor-pointer"
               >
                 {sending ? 'Sending...' : 'Send'}
               </button>
