@@ -2,7 +2,9 @@ const { User, Review, Checkin, Job, Message } = require('../models');
 
 exports.getAll = async (req, res) => {
   try {
-    const items = await User.findAll();
+    const items = await User.findAll({
+      attributes: { exclude: ['password'] }
+    });
     res.status(200).json(items);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -11,7 +13,9 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const item = await User.findByPk(req.params.id);
+    const item = await User.findByPk(req.params.id, {
+      attributes: { exclude: ['password'] }
+    });
     if (!item) return res.status(404).json({ error: 'User not found' });
     res.status(200).json(item);
   } catch (error) {
@@ -22,7 +26,9 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     const newItem = await User.create(req.body);
-    res.status(201).json(newItem);
+    const userJson = newItem.toJSON();
+    delete userJson.password;
+    res.status(201).json(userJson);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -30,11 +36,22 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const [updated] = await User.update(req.body, {
+    // Only admin or the user themselves can update
+    if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+      return res.status(403).json({ error: 'Not authorized to update this user.' });
+    }
+
+    // Disallow unhashed password injection through this endpoint
+    const updateData = { ...req.body };
+    delete updateData.password;
+
+    const [updated] = await User.update(updateData, {
       where: { id: req.params.id }
     });
     if (updated) {
-      const updatedItem = await User.findByPk(req.params.id);
+      const updatedItem = await User.findByPk(req.params.id, {
+        attributes: { exclude: ['password'] }
+      });
       res.status(200).json(updatedItem);
     } else {
       res.status(404).json({ error: 'User not found' });
@@ -46,6 +63,10 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+      return res.status(403).json({ error: 'Not authorized to delete this user.' });
+    }
+
     const deleted = await User.destroy({
       where: { id: req.params.id }
     });

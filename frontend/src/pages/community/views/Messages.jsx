@@ -145,7 +145,7 @@ const Messages = () => {
           <h3 className="font-bold text-[#06402B] text-sm">Direct Message Threads</h3>
           <p className="text-[10px] text-gray-500 mt-0.5">Approval replies and active inquiries</p>
         </div>
-        <div className="flex-1 overflow-y-auto divide-y divide-gray-850">
+        <div className="flex-1 overflow-y-auto divide-y divide-gray-200">
           {threads.length === 0 ? (
             <div className="p-6 text-center text-xs text-gray-500">
               No messages found. Messages are automatically started when you accept/reject candidate applications.
@@ -188,7 +188,7 @@ const Messages = () => {
                 <h4 className="font-bold text-xs text-[#06402B]">{activeThread.participantName}</h4>
                 <p className="text-[10px] text-gray-500">Subject: <span className="text-blue-600 font-semibold">{activeThread.jobTitle}</span></p>
               </div>
-              <span className="text-[9px] bg-blue-950/40 border border-blue-900/50 text-blue-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+              <span className="text-[9px] bg-blue-100 border border-blue-200 text-blue-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                 Candidate Chat
               </span>
             </div>
@@ -208,7 +208,7 @@ const Messages = () => {
                   >
                     <p className="leading-relaxed break-words">{msg.message}</p>
                     <div className={`text-[8px] mt-1 text-right select-none ${
-                      isMe ? 'text-blue-200' : 'text-gray-450'
+                      isMe ? 'text-blue-200' : 'text-gray-500'
                     }`}>
                       {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
@@ -223,7 +223,7 @@ const Messages = () => {
                 type="text"
                 required
                 placeholder="Type your response to the candidate..."
-                className="flex-grow bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-4 py-2 text-xs focus:outline-none focus:border-[#06402B]"
+                className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-4 py-2 text-xs focus:outline-none focus:border-[#06402B]"
                 value={replyText}
                 onChange={(e) => setReverseState(e)} // helper target state hook
                 value={replyText}

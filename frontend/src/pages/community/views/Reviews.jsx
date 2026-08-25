@@ -53,20 +53,20 @@ const Reviews = ({ user }) => {
       <div className="flex gap-2 border-b border-gray-200 pb-4">
         <button
           onClick={() => setActiveSubTab('received')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+          className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
             activeSubTab === 'received'
-              ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-              : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-200'
+              ? 'bg-[#06402B] border-[#06402B] text-white shadow-md shadow-emerald-950/15'
+              : 'bg-white border-gray-200 text-gray-600 hover:text-[#06402B] hover:border-gray-300'
           }`}
         >
           Received Reviews (from Students)
         </button>
         <button
           onClick={() => setActiveSubTab('sent')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+          className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
             activeSubTab === 'sent'
-              ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-              : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-200'
+              ? 'bg-[#06402B] border-[#06402B] text-white shadow-md shadow-emerald-950/15'
+              : 'bg-white border-gray-200 text-gray-600 hover:text-[#06402B] hover:border-gray-300'
           }`}
         >
           Sent Reviews
@@ -87,7 +87,7 @@ const Reviews = ({ user }) => {
         <div className="text-center py-16 bg-white border border-gray-200 border-dashed rounded-xl">
           <div className="text-gray-600 text-5xl mb-4">💬</div>
           <h3 className="text-lg font-medium text-gray-600">No reviews found</h3>
-          <p className="text-gray-550 text-xs mt-2">
+          <p className="text-gray-500 text-xs mt-2">
             {activeSubTab === 'received' 
               ? "No students have submitted reviews for your jobs yet." 
               : "You haven't submitted any reviews for students yet."}
@@ -109,7 +109,7 @@ const Reviews = ({ user }) => {
                     </h3>
                     
                     {/* Review Partner / Student details */}
-                    <div className="text-[10px] text-gray-500 mt-2 bg-gray-50/60 p-2 rounded border border-gray-850 space-y-1">
+                    <div className="text-[10px] text-gray-500 mt-2 bg-gray-50/60 p-2 rounded border border-gray-200 space-y-1">
                       <div className="uppercase tracking-wider text-[8px] font-bold text-gray-600">
                         {activeSubTab === 'received' ? 'Reviewer Student Details' : 'Recipient Details'}
                       </div>

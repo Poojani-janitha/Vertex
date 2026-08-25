@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+const authRoutes = require('./authRoutes');
+router.use('/auth', authRoutes);
+
 const userRoutes = require('./userRoutes');
 router.use('/users', userRoutes);
 
@@ -39,5 +42,8 @@ router.use('/admin', adminRoutes);
 
 const emergencyRoutes = require('./emergencyRoutes');
 router.use('/emergencies', emergencyRoutes);
+
+const walletRoutes = require('./walletRoutes');
+router.use('/wallet', walletRoutes);
 
 module.exports = router;

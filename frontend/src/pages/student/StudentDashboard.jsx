@@ -9,6 +9,7 @@ import AppliedJobs from './views/AppliedJobs';
 import Messages from './views/Messages';
 import RelatedJobs from './views/RelatedJobs';
 import Reviews from './views/Reviews';
+import Wallet from './views/Wallet';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -18,10 +19,12 @@ const StudentDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [applications, setApplications] = useState([]);
   const [reviewedJobIds, setReviewedJobIds] = useState([]);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Tab State: 'dashboard' | 'profile' | 'jobs' | 'messages'
+  // Tab State: 'dashboard' | 'jobs' | 'related-jobs' | 'wallet' | 'messages' | 'reviews' | 'profile'
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Emergency State
@@ -81,16 +84,21 @@ const StudentDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const [userRes, appsRes, availabilityRes, reviewsRes] = await Promise.all([
+      const [userRes, appsRes, availabilityRes, reviewsRes, walletRes] = await Promise.all([
         api.get('/auth/me'),
         api.get('/applications/my-applications'),
         api.get('/availabilities/my-availability'),
-        api.get('/reviews')
+        api.get('/reviews'),
+        api.get('/wallet/my-wallet')
       ]);
 
       setUser(userRes.data);
       setProfile(userRes.data.profile);
       setApplications(appsRes.data);
+      if (walletRes.data) {
+        setWallet(walletRes.data.wallet);
+        setTransactions(walletRes.data.transactions || []);
+      }
 
       // Filter reviews by this student to know which jobs they already reviewed
       const myReviews = reviewsRes.data.filter(r => r.fromUser === userRes.data.id);
@@ -199,9 +207,17 @@ const StudentDashboard = () => {
     return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'ST';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 22) return 'Good evening';
+    return 'Good night';
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[#0e131f]">
+      <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#06402B]"></div>
       </div>
     );
@@ -210,7 +226,7 @@ const StudentDashboard = () => {
   if (error) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4">
-        <div className="bg-red-900/50 border border-red-500 text-red-200 px-6 py-4 rounded-xl shadow-lg text-center animate-fade-in">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl shadow-lg text-center animate-fade-in">
           <h3 className="font-bold text-lg mb-2">Access Restrict</h3>
           <p>{error}</p>
           <button
@@ -264,9 +280,9 @@ const StudentDashboard = () => {
     : 0;
 
   const sidebarButtonClass = (tabName) => {
-    return `w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition ${activeTab === tabName
-        ? 'bg-white text-[#06402B] shadow-md'
-        : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'
+    return `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition ${activeTab === tabName
+        ? 'bg-white text-[#06402B] shadow-md font-bold'
+        : 'text-green-100 hover:bg-[#0a5c3f] hover:text-white'
       }`;
   };
 
@@ -311,6 +327,13 @@ const StudentDashboard = () => {
                 Related Jobs
               </button>
               <button
+                onClick={() => setActiveTab('wallet')}
+                className={sidebarButtonClass('wallet')}
+              >
+                <span className="text-base">💳</span>
+                Wallet & Payouts
+              </button>
+              <button
                 onClick={() => setActiveTab('messages')}
                 className={sidebarButtonClass('messages')}
               >
@@ -341,12 +364,12 @@ const StudentDashboard = () => {
           </div>
 
           {/* EMERGENCY ALERT */}
-          <div className="mt-8 px-4">
+          <div className="mt-8 px-2">
             <button
               onClick={() => setShowEmergencyModal(true)}
-              className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-500 text-white transition-colors py-3 rounded-xl font-bold text-sm tracking-wide shadow-md shadow-red-900/20"
+              className="w-full flex justify-center items-center gap-2 bg-red-600 hover:bg-red-500 text-white transition-colors py-3 rounded-xl font-bold text-xs tracking-wider shadow-md shadow-red-950/30 cursor-pointer"
             >
-              🚨 EMERGENCY
+              🚨 EMERGENCY SOS
             </button>
           </div>
 
@@ -360,15 +383,15 @@ const StudentDashboard = () => {
             </div>
             <div>
               <div className="text-xs font-bold text-white truncate max-w-[120px]">{user?.name}</div>
-              <div className="text-[10px] text-gray-400 capitalize">Student</div>
+              <div className="text-[10px] text-green-300 capitalize font-medium">Student</div>
             </div>
           </div>
           <button
             onClick={handleLogout}
             title="Log out"
-            className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-red-400 transition"
+            className="p-1.5 rounded-lg text-green-300 hover:bg-red-900/40 hover:text-red-300 transition cursor-pointer"
           >
-            ❌
+            ✕
           </button>
         </div>
 
@@ -378,34 +401,48 @@ const StudentDashboard = () => {
       <main className="flex-grow flex flex-col h-full overflow-hidden">
 
         {/* TOP STATUS BAR */}
-        <header className="h-16 border-b border-[#053020] flex items-center justify-between px-8 bg-white shrink-0">
+        <header className="h-16 border-b border-gray-200 flex items-center justify-between px-8 bg-white shrink-0">
 
           <h2 className="text-sm font-bold text-[#06402B] flex items-center gap-2">
-            Good night, {user?.name.split(' ')[0]} 👋
+            {getGreeting()}, {user?.name.split(' ')[0]} 👋
           </h2>
 
           {/* Top center mock search */}
           <div className="hidden md:flex items-center w-80 relative">
-            <span className="absolute left-3 text-gray-500 text-xs">🔍</span>
+            <span className="absolute left-3 text-gray-400 text-xs">🔍</span>
             <input
               type="text"
               placeholder="Search active applications, stats..."
-              className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-blue-600"
+              className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl pl-8 pr-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B]"
               disabled
             />
           </div>
 
           {/* Top Right Wallet Widget */}
           <div className="flex items-center space-x-6">
-            <div className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs">
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className="bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs transition cursor-pointer shadow-sm"
+              title="Click to open Wallet"
+            >
               <span className="text-gray-500 font-medium">LKR Wallet:</span>
-              <strong className="text-green-700">LKR 0.00</strong>
-              <span className="text-[9px] text-[#06402B] uppercase font-bold px-1.5 py-0.5 rounded bg-green-100 border border-green-300">Active</span>
-            </div>
+              <strong className="text-emerald-700 font-bold">
+                LKR {parseFloat(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </strong>
+              <span className="text-[9px] text-emerald-800 uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 border border-emerald-200">
+                Active
+              </span>
+            </button>
 
             <div className="flex items-center space-x-3 text-gray-500 text-sm">
-              <button title="Notifications" className="hover:text-[#06402B]">🔔</button>
-              <button title="Messages" className="hover:text-[#06402B]">✉</button>
+              <button title="Notifications" className="hover:text-[#06402B] transition-colors">🔔</button>
+              <button 
+                title="Messages" 
+                onClick={() => setIsChatOpen(!isChatOpen)}
+                className="hover:text-[#06402B] transition-colors"
+              >
+                ✉️
+              </button>
             </div>
           </div>
 
@@ -419,6 +456,7 @@ const StudentDashboard = () => {
               profile={profile}
               applications={applications}
               availability={availability}
+              wallet={wallet}
               onNavigateToTab={(tab) => setActiveTab(tab)}
             />
           )}
@@ -451,6 +489,14 @@ const StudentDashboard = () => {
             />
           )}
 
+          {activeTab === 'wallet' && (
+            <Wallet
+              wallet={wallet}
+              transactions={transactions}
+              onRefresh={fetchDashboardData}
+            />
+          )}
+
           {activeTab === 'messages' && (
             <Messages />
           )}
@@ -469,7 +515,7 @@ const StudentDashboard = () => {
           {isChatOpen && (
             <div className="bg-white border border-gray-200 w-80 sm:w-96 h-[480px] rounded-2xl shadow-2xl flex flex-col mb-4 overflow-hidden animate-fade-in text-xs">
               {/* Modal Header */}
-              <div className="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
+              <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                 <div>
                   <h4 className="font-bold text-[#06402B]">Student Message Box</h4>
                   <p className="text-[9px] text-gray-500">Chats with employer representatives</p>
@@ -479,7 +525,7 @@ const StudentDashboard = () => {
                     setIsChatOpen(false);
                     setActiveThreadKey(null);
                   }}
-                  className="text-gray-500 hover:text-[#06402B] font-bold cursor-pointer"
+                  className="text-gray-400 hover:text-[#06402B] font-bold cursor-pointer"
                 >
                   ✕
                 </button>
@@ -497,13 +543,13 @@ const StudentDashboard = () => {
                         <button
                           type="button"
                           onClick={() => setActiveThreadKey(null)}
-                          className="text-blue-600 hover:text-blue-300 font-bold mb-3 flex items-center gap-1 text-[10px] cursor-pointer"
+                          className="text-[#06402B] hover:text-[#0a5c3f] font-bold mb-3 flex items-center gap-1 text-[10px] cursor-pointer"
                         >
                           ← Back to inbox
                         </button>
-                        <div className="bg-gray-100 border border-gray-850 p-2.5 rounded-lg mb-3 shrink-0">
+                        <div className="bg-gray-50 border border-gray-200 p-2.5 rounded-lg mb-3 shrink-0">
                           <div className="font-bold text-[#06402B] text-xs">{thread.otherUserName}</div>
-                          <div className="text-[10px] text-blue-600 font-semibold">{thread.jobTitle}</div>
+                          <div className="text-[10px] text-emerald-700 font-semibold">{thread.jobTitle}</div>
                         </div>
 
                         {/* Chat Bubbles */}
@@ -515,11 +561,11 @@ const StudentDashboard = () => {
                                 key={msg.id}
                                 className={`max-w-[75%] rounded-xl px-3 py-2 text-[11px] leading-relaxed shadow-sm ${isMe
                                     ? 'bg-[#06402B] text-white self-end rounded-tr-none'
-                                    : 'bg-gray-100 text-gray-700 self-start rounded-tl-none border border-gray-200/50'
+                                    : 'bg-gray-100 text-gray-700 self-start rounded-tl-none border border-gray-200'
                                   }`}
                               >
                                 <p className="break-words">{msg.message}</p>
-                                <div className={`text-[7px] text-right mt-1 ${isMe ? 'text-blue-200' : 'text-gray-500'}`}>
+                                <div className={`text-[7px] text-right mt-1 ${isMe ? 'text-green-200' : 'text-gray-400'}`}>
                                   {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                               </div>
@@ -533,14 +579,14 @@ const StudentDashboard = () => {
                             type="text"
                             required
                             placeholder="Type reply to employer..."
-                            className="flex-grow bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B]"
+                            className="flex-grow bg-gray-50 border border-gray-200 text-[#06402B] rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B]"
                             value={chatReplyText}
                             onChange={(e) => setChatReplyText(e.target.value)}
                           />
                           <button
                             type="submit"
                             disabled={sendingChat || !chatReplyText.trim()}
-                            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-blue-800 text-white font-bold px-3 py-1.5 rounded-lg transition text-[10px]"
+                            className="bg-[#06402B] hover:bg-[#0a5c3f] disabled:bg-gray-400 text-white font-bold px-3 py-1.5 rounded-lg transition text-[10px] cursor-pointer"
                           >
                             {sendingChat ? '...' : 'Send'}
                           </button>
@@ -552,7 +598,7 @@ const StudentDashboard = () => {
                   // Thread Inbox list view
                   <div className="space-y-2 flex-grow overflow-y-auto">
                     {threadsList.length === 0 ? (
-                      <div className="text-center text-gray-500 py-16 px-4">
+                      <div className="text-center text-gray-400 py-16 px-4">
                         No message history found. Notification threads open automatically when an employer updates application status.
                       </div>
                     ) : (
@@ -560,15 +606,15 @@ const StudentDashboard = () => {
                         <button
                           key={thread.key}
                           onClick={() => setActiveThreadKey(thread.key)}
-                          className="w-full text-left p-3 rounded-lg bg-gray-100 border border-gray-850 hover:bg-gray-100/50 transition flex flex-col gap-1 cursor-pointer"
+                          className="w-full text-left p-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-emerald-50/50 hover:border-emerald-200 transition flex flex-col gap-1 cursor-pointer"
                         >
                           <div className="flex justify-between items-baseline w-full">
                             <span className="font-bold text-[#06402B] truncate max-w-[150px]">{thread.otherUserName}</span>
-                            <span className="text-[8px] text-gray-500">
+                            <span className="text-[8px] text-gray-400">
                               {thread.latestTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          <div className="text-[10px] text-blue-600 font-semibold truncate max-w-[200px]">{thread.jobTitle}</div>
+                          <div className="text-[10px] text-emerald-700 font-semibold truncate max-w-[200px]">{thread.jobTitle}</div>
                           <p className="text-[10px] text-gray-500 truncate w-full italic mt-1">{thread.latestText}</p>
                         </button>
                       ))
@@ -579,7 +625,7 @@ const StudentDashboard = () => {
             </div>
           )}
 
-          {/* FLOATING BLUE CHAT ENVELOPE BUTTON */}
+          {/* FLOATING GREEN CHAT ENVELOPE BUTTON */}
           <button
             type="button"
             onClick={() => setIsChatOpen(!isChatOpen)}
@@ -587,7 +633,7 @@ const StudentDashboard = () => {
           >
             <span className="text-xl">💬</span>
             {receivedMessagesCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-200">
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
                 {receivedMessagesCount}
               </span>
             )}
@@ -597,19 +643,19 @@ const StudentDashboard = () => {
 
       {/* EMERGENCY MODAL */}
       {showEmergencyModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-[#1a0f14] border border-red-900/50 rounded-2xl max-w-sm w-full shadow-2xl shadow-red-900/20 overflow-hidden transform transition-all scale-100">
-            <div className="p-6 text-center">
-              <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-800">
-                <span className="text-3xl">🚨</span>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white border border-gray-200 rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden transform transition-all scale-100">
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+                <span className="text-3xl animate-bounce">🚨</span>
               </div>
-              <h3 className="text-xl font-bold text-[#06402B] mb-2">Trigger Emergency?</h3>
-              <p className="text-gray-500 text-sm mb-6">
-                This will immediately alert the administration with your details and location. Only use in true emergencies.
+              <h3 className="text-xl font-extrabold text-[#06402B] mb-2">Trigger Emergency Alert?</h3>
+              <p className="text-gray-500 text-xs mb-6 leading-relaxed">
+                This will immediately broadcast a priority SOS alert to WorkOra platform administrators with your profile details and time. Only use in true emergencies.
               </p>
 
               {emergencyStatus && (
-                <div className={`mb-4 p-3 rounded-lg text-sm ${emergencyStatus.type === 'success' ? 'bg-green-900/40 text-green-400 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800'}`}>
+                <div className={`mb-4 p-3 rounded-xl text-xs font-medium ${emergencyStatus.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
                   {emergencyStatus.text}
                 </div>
               )}
@@ -618,19 +664,19 @@ const StudentDashboard = () => {
                 <button
                   onClick={() => setShowEmergencyModal(false)}
                   disabled={triggeringEmergency}
-                  className="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-700 text-[#06402B] rounded-lg font-semibold transition disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition disabled:opacity-50 text-xs border border-gray-200 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleTriggerEmergency}
                   disabled={triggeringEmergency}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold transition shadow-lg shadow-red-600/30 disabled:opacity-50 flex items-center justify-center"
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold transition shadow-lg shadow-red-600/30 disabled:opacity-50 flex items-center justify-center text-xs cursor-pointer"
                 >
                   {triggeringEmergency ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   ) : (
-                    'Confirm Alert'
+                    'Confirm SOS Alert'
                   )}
                 </button>
               </div>

@@ -22,13 +22,13 @@ const Footer = () => {
           <h4 className="text-xs font-bold text-[#06402B] uppercase tracking-wider">Platform</h4>
           <ul className="space-y-2 text-xs">
             <li>
-              <Link to="/" className="hover:text-blue-500 transition-colors">Home</Link>
+              <Link to="/" className="hover:text-[#06402B] transition-colors">Home</Link>
             </li>
             <li>
-              <Link to="/jobs" className="hover:text-blue-500 transition-colors">Jobs Board</Link>
+              <Link to="/jobs" className="hover:text-[#06402B] transition-colors">Jobs Board</Link>
             </li>
             <li>
-              <Link to="/users" className="hover:text-blue-500 transition-colors">Directory</Link>
+              <Link to="/users" className="hover:text-[#06402B] transition-colors">Directory</Link>
             </li>
           </ul>
         </div>
@@ -38,7 +38,7 @@ const Footer = () => {
           <h4 className="text-xs font-bold text-[#06402B] uppercase tracking-wider">Support</h4>
           <ul className="space-y-2 text-xs">
             <li>
-              <Link to="/contact" className="hover:text-blue-500 transition-colors">Contact Us</Link>
+              <Link to="/contact" className="hover:text-[#06402B] transition-colors">Contact Us</Link>
             </li>
             <li>
               <span className="text-gray-600 cursor-not-allowed">Terms of Service</span>

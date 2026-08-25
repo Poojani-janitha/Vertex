@@ -21,7 +21,18 @@ exports.getById = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const newItem = await Report.create(req.body);
+    const { targetId, targetType, reason } = req.body;
+    if (!reason) {
+      return res.status(400).json({ error: 'Please provide reason for the report.' });
+    }
+
+    const newItem = await Report.create({
+      fromUser: req.user ? req.user.id : req.body.fromUser,
+      targetId: targetId || 0,
+      targetType: targetType || 'user',
+      reason,
+      status: 'open'
+    });
     res.status(201).json(newItem);
   } catch (error) {
     res.status(400).json({ error: error.message });

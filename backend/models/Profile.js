@@ -25,6 +25,11 @@ class Profile extends Model {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      resumeUrl: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
+        field: 'resume_url',
+      },
     }, {
       sequelize,
       tableName: 'profiles',

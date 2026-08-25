@@ -101,7 +101,7 @@ const ScanQR = ({ onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="text-xs bg-gray-850 hover:bg-gray-100 text-gray-600 font-semibold px-3 py-1.5 rounded-lg border border-gray-200 transition cursor-pointer"
+            className="text-xs bg-gray-100 hover:bg-gray-100 text-gray-600 font-semibold px-3 py-1.5 rounded-lg border border-gray-200 transition cursor-pointer"
           >
             ✕ Close
           </button>
@@ -110,11 +110,11 @@ const ScanQR = ({ onClose }) => {
 
       {feedback && (
         <div className={`p-4 rounded-lg border text-xs ${
-          feedback.type === 'success' ? 'bg-green-950/40 border-green-500/50 text-green-300' : 'bg-red-950/40 border-red-500/50 text-red-300'
+          feedback.type === 'success' ? 'bg-green-100 border-green-200 text-green-700' : 'bg-red-100 border-red-200 text-red-700'
         }`}>
           <div className="font-bold text-sm mb-1">{feedback.message}</div>
           {feedback.details && (
-            <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-850 font-mono text-[10px] text-gray-600">
+            <div className="mt-2 space-y-1 bg-black/30 p-3 rounded border border-gray-200 font-mono text-[10px] text-gray-600">
               {feedback.details.student && (
                 <>
                   <div className="font-bold text-[#06402B] mb-1">🎓 Student Details:</div>

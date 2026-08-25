@@ -77,9 +77,10 @@ class User extends Model {
     this.hasMany(models.Report, { foreignKey: 'fromUser', as: 'sentReports', onDelete: 'CASCADE' });
     this.hasMany(models.Badge, { foreignKey: 'userId', as: 'badges', onDelete: 'CASCADE' });
     this.hasMany(models.Message, { foreignKey: 'senderId', as: 'sentMessages', onDelete: 'CASCADE' });
-    this.hasMany(models.Message, { foreignKey: 'receiverId', as: 'receivedMessages', onDelete: 'CASCADE' });
     this.hasOne(models.EmployerVerification, { foreignKey: 'userId', as: 'employerVerification', onDelete: 'CASCADE' });
     this.hasMany(models.EmployerVerification, { foreignKey: 'verifiedBy', as: 'verifiedVerifications', onDelete: 'SET NULL' });
+    this.hasOne(models.Wallet, { foreignKey: 'userId', as: 'wallet', onDelete: 'CASCADE' });
+    this.hasMany(models.Transaction, { foreignKey: 'userId', as: 'transactions', onDelete: 'CASCADE' });
   }
 }
 

@@ -11,12 +11,15 @@ import ProfileSettings from './views/ProfileSettings';
 import Reviews from './views/Reviews';
 import ScanQR from './views/ScanQR';
 import JobApplicants from './views/JobApplicants';
+import Wallet from '../student/views/Wallet';
 
 const CommunityDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [verification, setVerification] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,11 +34,19 @@ const CommunityDashboard = () => {
   // Active Job Details state (to view applicants)
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Fetch Employer and Jobs data
+  // Fetch Employer, Jobs, and Wallet data
   const fetchData = async () => {
     try {
-      const meResponse = await api.get('/auth/me');
+      const [meResponse, walletResponse] = await Promise.all([
+        api.get('/auth/me'),
+        api.get('/wallet/my-wallet')
+      ]);
+
       setUser(meResponse.data);
+      if (walletResponse.data) {
+        setWallet(walletResponse.data.wallet);
+        setTransactions(walletResponse.data.transactions || []);
+      }
 
       const verificationData = meResponse.data.employerVerification || null;
       setVerification(verificationData);
@@ -167,6 +178,14 @@ const CommunityDashboard = () => {
     return name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'PJ';
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'Good morning';
+    if (hour >= 12 && hour < 17) return 'Good afternoon';
+    if (hour >= 17 && hour < 22) return 'Good evening';
+    return 'Good night';
+  };
+
   return (
     <div className="flex h-screen bg-gray-50 text-gray-700 overflow-hidden font-sans">
 
@@ -191,6 +210,7 @@ const CommunityDashboard = () => {
                 { id: 'my-jobs', label: 'My Job Posts', icon: '💼' },
                 { id: 'post-job', label: 'Post a Job', icon: '➕' },
                 { id: 'scan-qr', label: 'Scan Check-In', icon: '📷' },
+                { id: 'wallet', label: 'Wallet & Escrow', icon: '💳' },
                 { id: 'messages', label: 'Messages', icon: '💬' },
                 { id: 'reviews', label: 'Reviews Feed', icon: '⭐' },
               ].map((tab) => (
@@ -209,8 +229,6 @@ const CommunityDashboard = () => {
             </nav>
           </div>
 
-
-
           {/* TOOLS */}
           <div>
             <div className="text-[10px] font-bold text-green-200 uppercase tracking-widest px-3 mb-2">Tools</div>
@@ -223,7 +241,7 @@ const CommunityDashboard = () => {
               </button>
               <button
                 onClick={() => setShowReportModal(true)}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-950/20 transition"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-red-400 hover:bg-red-100 transition"
               >
                 <span className="text-base">🚨</span> Report Misconduct
               </button>
@@ -262,7 +280,7 @@ const CommunityDashboard = () => {
 
           {/* Top Welcome Title */}
           <h2 className="text-sm font-bold text-[#06402B] flex items-center gap-2">
-            Good night, {user.name.split(' ')[0]} 👋
+            {getGreeting()}, {user.name.split(' ')[0]} 👋
           </h2>
 
           {/* Top center mock search */}
@@ -276,13 +294,26 @@ const CommunityDashboard = () => {
             />
           </div>
 
-          {/* Top Right Stats Widget */}
+          {/* Top Right Wallet Widget */}
           <div className="flex items-center space-x-6">
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className="bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs transition cursor-pointer shadow-sm"
+              title="Click to view Escrow Wallet"
+            >
+              <span className="text-gray-500 font-medium">Escrow Wallet:</span>
+              <strong className="text-emerald-700 font-bold">
+                LKR {parseFloat(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </strong>
+              <span className="text-[9px] text-emerald-800 uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 border border-emerald-200">
+                Active
+              </span>
+            </button>
 
             {/* Mock Nav controls */}
             <div className="flex items-center space-x-3 text-gray-500 text-sm">
               <button title="Notifications" className="hover:text-[#06402B]">🔔</button>
-              <button title="Messages" className="hover:text-[#06402B]">✉</button>
+              <button title="Messages" onClick={() => setActiveTab('messages')} className="hover:text-[#06402B]">✉</button>
             </div>
           </div>
 
@@ -295,6 +326,7 @@ const CommunityDashboard = () => {
           {activeTab === 'dashboard' && (
             <Overview
               jobs={jobs}
+              wallet={wallet}
               onNavigateToTab={(tab) => {
                 setActiveTab(tab);
                 setSelectedJob(null);
@@ -326,6 +358,14 @@ const CommunityDashboard = () => {
                 setActiveTab('my-jobs');
                 setSelectedJob(null);
               }}
+            />
+          )}
+
+          {activeTab === 'wallet' && (
+            <Wallet
+              wallet={wallet}
+              transactions={transactions}
+              onRefresh={fetchData}
             />
           )}
 
@@ -364,8 +404,8 @@ const CommunityDashboard = () => {
             <form onSubmit={handleFileReport} className="p-6 space-y-4">
               {reportSuccess && (
                 <div className={`p-3 rounded-lg text-xs text-center border ${reportSuccess.includes('success')
-                    ? 'bg-green-950/40 border-green-800 text-green-300'
-                    : 'bg-red-950/40 border-red-800 text-red-300'
+                    ? 'bg-green-100 border-green-200 text-green-700'
+                    : 'bg-red-100 border-red-200 text-red-700'
                   }`}>
                   {reportSuccess}
                 </div>
@@ -377,7 +417,7 @@ const CommunityDashboard = () => {
                   type="email"
                   required
                   placeholder="student@university.edu"
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportEmail}
                   onChange={(e) => setReportEmail(e.target.value)}
                 />
@@ -389,7 +429,7 @@ const CommunityDashboard = () => {
                   type="text"
                   required
                   placeholder="John Doe"
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
                 />
@@ -401,7 +441,7 @@ const CommunityDashboard = () => {
                   required
                   rows="3"
                   placeholder="Detail the issue (e.g. no-show, fake check-in attempt)..."
-                  className="w-full bg-gray-100 border border-gray-850 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
+                  className="w-full bg-gray-100 border border-gray-200 text-[#06402B] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-red-500"
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
                 />
@@ -420,7 +460,7 @@ const CommunityDashboard = () => {
                     setShowReportModal(false);
                     setReportSuccess(null);
                   }}
-                  className="bg-gray-850 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
+                  className="bg-gray-100 hover:bg-gray-100 text-[#06402B] text-xs font-semibold py-2 px-4 rounded-lg transition"
                 >
                   Cancel
                 </button>

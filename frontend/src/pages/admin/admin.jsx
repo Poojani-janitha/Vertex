@@ -23,10 +23,16 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [students, setStudents] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [emergencies, setEmergencies] = useState([]);
+  const [withdrawals, setWithdrawals] = useState([]);
   
   // Selected Student Details for History View
   const [selectedStudentHistory, setSelectedStudentHistory] = useState(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
+  // Search & Filter states
+  const [studentSearch, setStudentSearch] = useState('');
+  const [withdrawalFilter, setWithdrawalFilter] = useState('all');
 
   const [loading, setLoading] = useState(true);
   const [actionFeedback, setActionFeedback] = useState(null);
@@ -45,6 +51,17 @@ const AdminDashboard = () => {
     }
     setCurrentUser(user);
     loadDashboardData();
+
+    // Poll for emergencies every 15 seconds
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get('/admin/emergencies');
+        setEmergencies(res.data);
+      } catch (err) {
+        console.error('Failed to fetch emergencies', err);
+      }
+    }, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const showFeedback = (text, type = 'success') => {
@@ -55,12 +72,15 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // 1. Fetch Pending Employers
+      // 1. Fetch Pending Employers & Emergencies
       const empRes = await api.get('/admin/employers/pending');
       setPendingEmployers(empRes.data);
 
       const appEmpRes = await api.get('/admin/employers/approved');
       setApprovedEmployers(appEmpRes.data);
+
+      const emRes = await api.get('/admin/emergencies');
+      setEmergencies(emRes.data);
 
       // 2. Fetch Reports
       const repRes = await api.get('/admin/reports');
@@ -70,9 +90,12 @@ const AdminDashboard = () => {
       const jobRes = await api.get('/jobs');
       setJobs(jobRes.data);
 
-      // 4. Fetch Students
+      // 4. Fetch Students & Withdrawals
       const stuRes = await api.get('/admin/students');
       setStudents(stuRes.data);
+
+      const withRes = await api.get('/wallet/admin/withdrawals');
+      setWithdrawals(withRes.data);
 
       // 5. Update Quick Stats
       setStats({
@@ -134,14 +157,25 @@ const AdminDashboard = () => {
     }
   };
 
-  // Action: View Student History
-  const handleViewStudentHistory = async (studentId) => {
+  // Action: Resolve Emergency
+  const handleResolveEmergency = async (id) => {
     try {
-      const response = await api.get(`/admin/students/${studentId}/history`);
-      setSelectedStudentHistory(response.data);
-      setIsHistoryModalOpen(true);
+      await api.patch(`/admin/emergencies/${id}/resolve`);
+      setEmergencies(prev => prev.filter(e => e.id !== id));
+      showFeedback('Emergency marked as resolved.', 'success');
     } catch (err) {
-      showFeedback('Failed to load student job history.', 'error');
+      showFeedback('Failed to resolve emergency.', 'error');
+    }
+  };
+
+  // Action: Process Student Bank Withdrawal
+  const handleProcessWithdrawal = async (id, status) => {
+    try {
+      await api.patch(`/wallet/admin/withdrawals/${id}`, { status });
+      showFeedback(`Withdrawal payout request has been ${status.toUpperCase()} successfully.`);
+      loadDashboardData();
+    } catch (err) {
+      showFeedback(err.response?.data?.message || 'Failed to process withdrawal.', 'error');
     }
   };
 
@@ -160,7 +194,7 @@ const AdminDashboard = () => {
           <span className="text-xl font-extrabold text-[#06402B]">
             WorkOra Admin Panel
           </span>
-          <span className="text-[10px] bg-red-950/40 border border-red-900/50 text-red-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+          <span className="text-[10px] bg-red-100 border border-red-200 text-red-700 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
             Superuser Mode
           </span>
         </div>
@@ -240,15 +274,80 @@ const AdminDashboard = () => {
                 <span className="ml-auto bg-yellow-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">{stats.openReports}</span>
               )}
             </button>
+            <button
+              onClick={() => setActiveTab('withdrawals')}
+              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-semibold transition flex items-center gap-2.5 ${
+                activeTab === 'withdrawals' ? 'bg-white text-[#06402B] shadow-md' : 'text-gray-300 hover:bg-[#0a5c3f] hover:text-white'
+              }`}
+            >
+              💳 Bank Payouts
+              {withdrawals.filter(w => w.status === 'pending').length > 0 && (
+                <span className="ml-auto bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">
+                  {withdrawals.filter(w => w.status === 'pending').length}
+                </span>
+              )}
+            </button>
           </nav>
         </aside>
 
         {/* WORKSPACE WORK AREA */}
         <main className="flex-grow p-6 overflow-y-auto space-y-6">
           
+          {/* EMERGENCY BANNER */}
+          {emergencies.length > 0 && (
+            <div className="bg-red-600 px-6 py-5 rounded-3xl border-2 border-red-800 shadow-[0_0_35px_rgba(220,38,38,0.5)] animate-pulse space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <span className="text-3xl animate-bounce">🚨</span> HIGH PRIORITY EMERGENCY ALERT ({emergencies.length})
+                </h2>
+                <span className="text-xs bg-white/20 text-white font-bold px-3 py-1 rounded-full uppercase">
+                  Action Required
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {emergencies.map(em => (
+                  <div key={em.id} className="bg-red-950/80 p-5 rounded-2xl flex flex-col justify-between border border-red-500/60 text-white space-y-3">
+                    <div>
+                      <div className="font-extrabold text-white text-base">Student: {em.student?.name}</div>
+                      <div className="text-red-200 text-xs font-semibold mt-0.5">Phone: {em.student?.phone || 'N/A'} ({em.student?.email})</div>
+                      <div className="text-[10px] text-red-300 mt-1">Broadcast Time: {new Date(em.createdAt).toLocaleString()}</div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-red-800/60">
+                      {em.student?.phone && (
+                        <a
+                          href={`tel:${em.student.phone}`}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-sm"
+                        >
+                          📞 Call Student
+                        </a>
+                      )}
+                      {em.latitude && em.longitude && (
+                        <a
+                          href={`https://www.google.com/maps?q=${em.latitude},${em.longitude}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-sm"
+                        >
+                          📍 Google Maps GPS
+                        </a>
+                      )}
+                      <button 
+                        onClick={() => handleResolveEmergency(em.id)}
+                        className="bg-white text-red-700 hover:bg-gray-100 text-xs font-bold px-3 py-1.5 rounded-xl transition shadow-sm ml-auto cursor-pointer"
+                      >
+                        ✓ Resolve
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {actionFeedback && (
-            <div className={`p-4 rounded-lg border text-sm text-center font-medium ${
-              actionFeedback.type === 'success' ? 'bg-green-50 border-green-200 text-green-300' : 'bg-red-50 border-red-200 text-red-300'
+            <div className={`p-4 rounded-xl border text-sm text-center font-medium ${
+              actionFeedback.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
             }`}>
               {actionFeedback.text}
             </div>
@@ -256,7 +355,7 @@ const AdminDashboard = () => {
 
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#06402B]"></div>
             </div>
           ) : (
             <>
@@ -265,29 +364,36 @@ const AdminDashboard = () => {
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-xl font-bold text-[#06402B]">Platform Overview</h2>
-                    <p className="text-xs text-gray-500">Total volume and actions waiting for review.</p>
+                    <p className="text-xs text-gray-500">Live operational volume, financial queues, and items waiting for administrator action.</p>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-lg">
-                      <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Pending Approvals</div>
-                      <div className="text-3xl font-black text-[#06402B] mt-2">{stats.pendingEmployers}</div>
-                      <p className="text-[10px] text-gray-500 mt-1">Employers waiting to post shifts</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Pending Employers</div>
+                      <div className="text-3xl font-extrabold text-[#06402B] mt-2">{stats.pendingEmployers}</div>
+                      <p className="text-[10px] text-amber-600 font-semibold mt-1">Awaiting verification</p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-lg">
-                      <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Active Job Posts</div>
-                      <div className="text-3xl font-black text-[#06402B] mt-2">{stats.totalJobs}</div>
-                      <p className="text-[10px] text-gray-500 mt-1">Total open freelance shifts</p>
+                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Active Job Posts</div>
+                      <div className="text-3xl font-extrabold text-[#06402B] mt-2">{stats.totalJobs}</div>
+                      <p className="text-[10px] text-emerald-600 font-semibold mt-1">Open freelance shifts</p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-lg">
-                      <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Registered Students</div>
-                      <div className="text-3xl font-black text-[#06402B] mt-2">{stats.totalStudents}</div>
-                      <p className="text-[10px] text-gray-500 mt-1">Active student applicant pool</p>
+                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Registered Students</div>
+                      <div className="text-3xl font-extrabold text-[#06402B] mt-2">{stats.totalStudents}</div>
+                      <p className="text-[10px] text-blue-600 font-semibold mt-1">Total student workforce</p>
                     </div>
-                    <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-lg">
-                      <div className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Pending Reports</div>
-                      <div className="text-3xl font-black text-yellow-500 mt-2">{stats.openReports}</div>
-                      <p className="text-[10px] text-gray-500 mt-1">Issues requiring moderator action</p>
+                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Pending Payouts</div>
+                      <div className="text-3xl font-extrabold text-emerald-700 mt-2">
+                        {withdrawals.filter(w => w.status === 'pending').length}
+                      </div>
+                      <p className="text-[10px] text-emerald-700 font-semibold mt-1">Bank withdrawals to process</p>
+                    </div>
+                    <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Open Reports</div>
+                      <div className="text-3xl font-extrabold text-yellow-600 mt-2">{stats.openReports}</div>
+                      <p className="text-[10px] text-yellow-600 font-semibold mt-1">Disputes requiring review</p>
                     </div>
                   </div>
 
@@ -407,7 +513,7 @@ const AdminDashboard = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg space-y-6">
                   <div>
                     <h3 className="text-sm font-bold text-[#06402B]">Pending Employer Accounts</h3>
-                    <p className="text-xs text-gray-500">Review documents or verify details to grant posting credentials.</p>
+                    <p className="text-xs text-gray-500">Review company credentials, certificates, and ID documents to grant posting authorization.</p>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -416,36 +522,52 @@ const AdminDashboard = () => {
                         <tr className="border-b border-gray-200 text-gray-500">
                           <th className="pb-3 font-semibold">User Details</th>
                           <th className="pb-3 font-semibold">Company Name</th>
-                          <th className="pb-3 font-semibold">Reg. Number</th>
+                          <th className="pb-3 font-semibold">Reg. / ID Number</th>
                           <th className="pb-3 font-semibold">Submitted On</th>
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {pendingEmployers.length === 0 ? (
                           <tr>
-                            <td colSpan="5" className="py-6 text-center text-gray-500">No pending employer accounts waiting.</td>
+                            <td colSpan="5" className="py-8 text-center text-gray-400">No pending employer accounts waiting.</td>
                           </tr>
                         ) : (
                           pendingEmployers.map((emp) => (
                             <tr key={emp.id} className="text-gray-700">
                               <td className="py-4">
-                                <div className="font-bold text-[#06402B]">{emp.user?.name}</div>
-                                <div className="text-[10px] text-gray-500">{emp.user?.email}</div>
+                                <div className="font-bold text-[#06402B]">{emp.user?.name || 'N/A'}</div>
+                                <div className="text-[10px] text-gray-500">{emp.user?.email || 'N/A'}</div>
+                                {emp.user?.phone && <div className="text-[10px] text-gray-400">{emp.user.phone}</div>}
                               </td>
-                              <td className="py-4">{emp.companyName || 'Individual / Contractor'}</td>
-                              <td className="py-4">{emp.registrationNumber || 'N/A'}</td>
-                              <td className="py-4">{new Date(emp.submittedAt || Date.now()).toLocaleDateString()}</td>
+                              <td className="py-4">
+                                <div className="font-semibold text-gray-800">{emp.companyName || emp.user?.name || 'Individual'}</div>
+                                <div className="text-[10px] text-gray-500 capitalize">{emp.accountType}</div>
+                              </td>
+                              <td className="py-4 font-mono text-gray-700">
+                                <div>{emp.companyRegNo || emp.individualIdNo || 'N/A'}</div>
+                                {emp.documentUrl && (
+                                  <a
+                                    href={emp.documentUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[10px] text-blue-600 hover:underline font-semibold block mt-1"
+                                  >
+                                    📄 View Certificate ↗
+                                  </a>
+                                )}
+                              </td>
+                              <td className="py-4">{new Date(emp.createdAt || emp.submittedAt || Date.now()).toLocaleDateString()}</td>
                               <td className="py-4 text-right space-x-2">
                                 <button
                                   onClick={() => handleVerifyEmployer(emp.userId, 'approved')}
-                                  className="bg-green-600 hover:bg-green-500 text-[#06402B] text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shadow-sm"
                                 >
                                   Approve
                                 </button>
                                 <button
                                   onClick={() => handleVerifyEmployer(emp.userId, 'rejected')}
-                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                 >
                                   Reject
                                 </button>
@@ -462,9 +584,20 @@ const AdminDashboard = () => {
               {/* TAB 3: STUDENT MANAGEMENT */}
               {activeTab === 'students' && (
                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg space-y-6">
-                  <div>
-                    <h3 className="text-sm font-bold text-[#06402B]">Student User Management</h3>
-                    <p className="text-xs text-gray-500">View student application/shift logs or delete accounts breaking platform guidelines.</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-bold text-[#06402B]">Student User Management</h3>
+                      <p className="text-xs text-gray-500">Search student profiles, inspect attached resumes, and review shift history.</p>
+                    </div>
+                    <div className="w-full sm:w-64">
+                      <input
+                        type="text"
+                        placeholder="🔍 Search name, email, phone..."
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 text-[#06402B] rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-[#06402B]"
+                      />
+                    </div>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -473,35 +606,55 @@ const AdminDashboard = () => {
                         <tr className="border-b border-gray-200 text-gray-500">
                           <th className="pb-3 font-semibold">Student Name</th>
                           <th className="pb-3 font-semibold">University Email</th>
-                          <th className="pb-3 font-semibold">Contact No.</th>
+                          <th className="pb-3 font-semibold">Contact & Qualifications</th>
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
-                        {students.length === 0 ? (
+                      <tbody className="divide-y divide-gray-200">
+                        {students.filter(s => 
+                          s.name?.toLowerCase().includes(studentSearch.toLowerCase()) ||
+                          s.email?.toLowerCase().includes(studentSearch.toLowerCase()) ||
+                          (s.phone && s.phone.includes(studentSearch))
+                        ).length === 0 ? (
                           <tr>
-                            <td colSpan="4" className="py-6 text-center text-gray-500">No students registered yet.</td>
+                            <td colSpan="4" className="py-8 text-center text-gray-400">No students match the search criteria.</td>
                           </tr>
                         ) : (
-                          students.map((stu) => (
+                          students.filter(s => 
+                            s.name?.toLowerCase().includes(studentSearch.toLowerCase()) ||
+                            s.email?.toLowerCase().includes(studentSearch.toLowerCase()) ||
+                            (s.phone && s.phone.includes(studentSearch))
+                          ).map((stu) => (
                             <tr key={stu.id} className="text-gray-700">
                               <td className="py-4">
                                 <div className="font-bold text-[#06402B]">{stu.name}</div>
                               </td>
                               <td className="py-4">{stu.email}</td>
-                              <td className="py-4">{stu.phone || 'N/A'}</td>
+                              <td className="py-4">
+                                <div>{stu.phone || 'N/A'}</div>
+                                {stu.profile?.resumeUrl && (
+                                  <a
+                                    href={`http://localhost:3000${stu.profile.resumeUrl}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[10px] text-emerald-700 font-bold hover:underline inline-block mt-0.5"
+                                  >
+                                    📄 View Resume PDF ↗
+                                  </a>
+                                )}
+                              </td>
                               <td className="py-4 text-right space-x-2">
                                 <button
                                   onClick={() => handleViewStudentHistory(stu.id)}
-                                  className="bg-[#06402B]/10 hover:bg-[#06402B]/20 text-[#06402B] border border-blue-900/40 text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-emerald-50 hover:bg-emerald-100 text-[#06402B] border border-emerald-200 text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                 >
-                                  View Job History
+                                  Shift History
                                 </button>
                                 <button
                                   onClick={() => handleDeleteStudent(stu.id)}
-                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                 >
-                                  Remove Account
+                                  Remove
                                 </button>
                               </td>
                             </tr>
@@ -518,7 +671,7 @@ const AdminDashboard = () => {
                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg space-y-6">
                   <div>
                     <h3 className="text-sm font-bold text-[#06402B]">Active Freelance Shifts</h3>
-                    <p className="text-xs text-gray-500">View job listings and moderate/delete rule-breaking posts.</p>
+                    <p className="text-xs text-gray-500">Monitor published freelance shifts and delete any rule-breaking or non-compliant posts.</p>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -532,10 +685,10 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {jobs.length === 0 ? (
                           <tr>
-                            <td colSpan="5" className="py-6 text-center text-gray-500">No active job listings found.</td>
+                            <td colSpan="5" className="py-8 text-center text-gray-400">No active job listings found.</td>
                           </tr>
                         ) : (
                           jobs.map((job) => (
@@ -543,11 +696,14 @@ const AdminDashboard = () => {
                               <td className="py-4">
                                 <div className="font-bold text-[#06402B]">{job.title}</div>
                               </td>
-                              <td className="py-4">${job.payAmount}/Hour</td>
+                              <td className="py-4 font-bold text-emerald-800">
+                                LKR {parseFloat(job.payAmount || 0).toFixed(2)}
+                              </td>
                               <td className="py-4 max-w-[200px] truncate">{job.locationName || 'Unmapped'}</td>
                               <td className="py-4">
-                                <span className={`px-2 py-0.5 rounded text-[10px] ${
-                                  job.status === 'open' ? 'bg-green-950 border border-green-900 text-green-300' : 'bg-white text-gray-500'
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                  job.status === 'open' ? 'bg-green-100 border border-green-200 text-green-800' :
+                                  job.status === 'filled' ? 'bg-purple-100 border border-purple-200 text-purple-800' : 'bg-gray-100 text-gray-600'
                                 }`}>
                                   {job.status}
                                 </span>
@@ -555,7 +711,7 @@ const AdminDashboard = () => {
                               <td className="py-4 text-right">
                                 <button
                                   onClick={() => handleDeleteJob(job.id)}
-                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] px-3 py-1.5 rounded transition cursor-pointer"
+                                  className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                 >
                                   Delete Post
                                 </button>
@@ -588,10 +744,10 @@ const AdminDashboard = () => {
                           <th className="pb-3 font-semibold text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-850">
+                      <tbody className="divide-y divide-gray-200">
                         {reports.length === 0 ? (
                           <tr>
-                            <td colSpan="5" className="py-6 text-center text-gray-500">No misconduct reports filed yet.</td>
+                            <td colSpan="5" className="py-8 text-center text-gray-400">No misconduct reports filed yet.</td>
                           </tr>
                         ) : (
                           reports.map((rep) => (
@@ -603,10 +759,10 @@ const AdminDashboard = () => {
                               <td className="py-4 max-w-[250px] break-words">{rep.reason}</td>
                               <td className="py-4">{new Date(rep.createdAt || Date.now()).toLocaleDateString()}</td>
                               <td className="py-4">
-                                <span className={`px-2 py-0.5 rounded text-[10px] ${
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                                   rep.status === 'open' 
-                                    ? 'bg-yellow-950 border border-yellow-900 text-yellow-300' 
-                                    : 'bg-green-950 border border-green-900 text-green-300'
+                                    ? 'bg-yellow-100 border border-yellow-200 text-yellow-800' 
+                                    : 'bg-green-100 border border-green-200 text-green-800'
                                 }`}>
                                   {rep.status}
                                 </span>
@@ -616,24 +772,139 @@ const AdminDashboard = () => {
                                   <>
                                     <button
                                       onClick={() => handleUpdateReportStatus(rep.id, 'reviewed')}
-                                      className="bg-yellow-600 hover:bg-yellow-500 text-[#06402B] text-[10px] px-2.5 py-1.5 rounded transition cursor-pointer"
+                                      className="bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                     >
                                       Review
                                     </button>
                                     <button
                                       onClick={() => handleUpdateReportStatus(rep.id, 'resolved')}
-                                      className="bg-green-600 hover:bg-green-500 text-[#06402B] text-[10px] px-2.5 py-1.5 rounded transition cursor-pointer"
+                                      className="bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
                                     >
                                       Resolve
                                     </button>
                                   </>
                                 )}
                                 {rep.status !== 'open' && (
-                                  <span className="text-gray-500 text-[10px]">Handled</span>
+                                  <span className="text-gray-400 text-[10px] font-semibold">Handled</span>
                                 )}
                               </td>
                             </tr>
                           ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 6: BANK WITHDRAWAL PAYOUTS */}
+              {activeTab === 'withdrawals' && (
+                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-lg space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-bold text-[#06402B]">Student Bank Withdrawal Requests</h3>
+                      <p className="text-xs text-gray-500">Review student payout requests and approve once bank transfer is dispatched.</p>
+                    </div>
+                    <select
+                      value={withdrawalFilter}
+                      onChange={(e) => setWithdrawalFilter(e.target.value)}
+                      className="bg-gray-50 border border-gray-200 text-[#06402B] text-xs font-semibold rounded-xl px-3 py-2 outline-none cursor-pointer"
+                    >
+                      <option value="all">All Payouts</option>
+                      <option value="pending">Pending Processing</option>
+                      <option value="completed">Completed</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-200 text-gray-500">
+                          <th className="pb-3 font-semibold">Student</th>
+                          <th className="pb-3 font-semibold">Amount</th>
+                          <th className="pb-3 font-semibold">Bank Information</th>
+                          <th className="pb-3 font-semibold">Requested Date</th>
+                          <th className="pb-3 font-semibold">Status</th>
+                          <th className="pb-3 font-semibold text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {withdrawals.filter(w => withdrawalFilter === 'all' || w.status === withdrawalFilter).length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="py-8 text-center text-gray-400">
+                              No bank withdrawal requests match this filter.
+                            </td>
+                          </tr>
+                        ) : (
+                          withdrawals
+                            .filter(w => withdrawalFilter === 'all' || w.status === withdrawalFilter)
+                            .map((w) => {
+                              let bank = {};
+                              try {
+                                bank = JSON.parse(w.bankDetails || '{}');
+                              } catch (e) {
+                                bank = {};
+                              }
+
+                              return (
+                                <tr key={w.id} className="text-gray-700">
+                                  <td className="py-4">
+                                    <div className="font-bold text-[#06402B]">{w.user?.name || `User #${w.userId}`}</div>
+                                    <div className="text-[10px] text-gray-500">{w.user?.email}</div>
+                                    {w.user?.phone && <div className="text-[10px] text-gray-400">{w.user.phone}</div>}
+                                  </td>
+                                  <td className="py-4">
+                                    <span className="font-extrabold text-sm text-[#06402B]">
+                                      LKR {parseFloat(w.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                    </span>
+                                  </td>
+                                  <td className="py-4">
+                                    <div className="font-semibold text-gray-800">{bank.bankName || 'N/A'}</div>
+                                    <div className="text-[10px] text-gray-600 font-mono">
+                                      Acc: {bank.accountNumber || 'N/A'} ({bank.accountHolderName || 'N/A'})
+                                    </div>
+                                    <div className="text-[9px] text-gray-400">Branch: {bank.branch || 'N/A'}</div>
+                                  </td>
+                                  <td className="py-4">
+                                    {new Date(w.createdAt).toLocaleDateString()}
+                                  </td>
+                                  <td className="py-4">
+                                    <span
+                                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                        w.status === 'completed'
+                                          ? 'bg-green-100 border border-green-200 text-green-700'
+                                          : w.status === 'pending'
+                                          ? 'bg-yellow-100 border border-yellow-200 text-yellow-700'
+                                          : 'bg-red-100 border border-red-200 text-red-700'
+                                      }`}
+                                    >
+                                      {w.status}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 text-right space-x-2">
+                                    {w.status === 'pending' ? (
+                                      <>
+                                        <button
+                                          onClick={() => handleProcessWithdrawal(w.id, 'completed')}
+                                          className="bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shadow-sm"
+                                        >
+                                          Approve Payout
+                                        </button>
+                                        <button
+                                          onClick={() => handleProcessWithdrawal(w.id, 'rejected')}
+                                          className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded-xl transition cursor-pointer"
+                                        >
+                                          Reject
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-400 text-[10px] font-semibold">Processed</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })
                         )}
                       </tbody>
                     </table>
@@ -698,9 +969,9 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                         <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider ${
-                          app.status === 'accepted' ? 'bg-green-950 border border-green-900 text-green-300' :
-                          app.status === 'rejected' ? 'bg-red-950 border border-red-900 text-red-300' :
-                          'bg-yellow-950 border border-yellow-900 text-yellow-300'
+                          app.status === 'accepted' ? 'bg-green-100 border border-green-200 text-green-700' :
+                          app.status === 'rejected' ? 'bg-red-100 border border-red-200 text-red-700' :
+                          'bg-yellow-100 border border-yellow-200 text-yellow-700'
                         }`}>
                           {app.status}
                         </span>
@@ -712,7 +983,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-gray-200 bg-[#111726]/30 text-right">
+            <div className="p-4 border-t border-gray-200 bg-gray-50 text-right">
               <button
                 onClick={() => {
                   setSelectedStudentHistory(null);

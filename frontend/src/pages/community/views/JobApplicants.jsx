@@ -49,7 +49,7 @@ const JobApplicants = ({ job, onBack }) => {
       </div>
 
       {loading ? (
-        <div className="text-center py-6 text-xs text-gray-450">Loading applicants...</div>
+        <div className="text-center py-6 text-xs text-gray-500">Loading applicants...</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Sidebar applicant names list */}
@@ -65,7 +65,7 @@ const JobApplicants = ({ job, onBack }) => {
                   className={`w-full text-left p-3 rounded-lg border transition ${
                     selectedApplicant?.id === app.id
                       ? 'bg-[#06402B]/20 border-[#06402B]/50'
-                      : 'bg-gray-100/40 border-gray-200 hover:border-gray-750'
+                      : 'bg-gray-100/40 border-gray-200 hover:border-gray-200'
                   }`}
                 >
                   <div className="font-semibold text-[#06402B] text-sm">{app.student?.name || 'Student'}</div>
@@ -114,6 +114,19 @@ const JobApplicants = ({ job, onBack }) => {
                       {selectedApplicant.student.profile.portfolioUrl && (
                         <div className="mt-2"><span className="font-semibold text-gray-500">Portfolio:</span> <a href={selectedApplicant.student.profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{selectedApplicant.student.profile.portfolioUrl}</a></div>
                       )}
+                      {selectedApplicant.student.profile.resumeUrl && (
+                        <div className="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
+                          <span className="font-bold text-[#06402B] text-xs">📄 Student Resume Attached</span>
+                          <a
+                            href={`http://localhost:3000${selectedApplicant.student.profile.resumeUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#06402B] hover:bg-[#0a5c3f] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shadow-sm"
+                          >
+                            Open PDF ↗
+                          </a>
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -125,20 +138,20 @@ const JobApplicants = ({ job, onBack }) => {
                   <button
                     onClick={() => handleUpdateStatus(selectedApplicant.id, 'accepted')}
                     disabled={selectedApplicant.status === 'accepted'}
-                    className={`flex-1 font-semibold py-2 px-4 rounded-lg text-xs text-[#06402B] transition ${
-                      selectedApplicant.status === 'accepted' ? 'bg-green-700/50 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+                    className={`flex-1 font-bold py-2.5 px-4 rounded-xl text-xs text-white transition shadow-sm cursor-pointer ${
+                      selectedApplicant.status === 'accepted' ? 'bg-emerald-800/60 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500'
                     }`}
                   >
-                    Accept Application
+                    {selectedApplicant.status === 'accepted' ? '✓ Accepted' : 'Accept Candidate'}
                   </button>
                   <button
                     onClick={() => handleUpdateStatus(selectedApplicant.id, 'rejected')}
                     disabled={selectedApplicant.status === 'rejected'}
-                    className={`flex-1 font-semibold py-2 px-4 rounded-lg text-xs text-[#06402B] transition ${
-                      selectedApplicant.status === 'rejected' ? 'bg-red-700/50 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
+                    className={`flex-1 font-bold py-2.5 px-4 rounded-xl text-xs text-white transition shadow-sm cursor-pointer ${
+                      selectedApplicant.status === 'rejected' ? 'bg-red-800/60 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
                     }`}
                   >
-                    Reject Application
+                    {selectedApplicant.status === 'rejected' ? '✕ Rejected' : 'Decline Application'}
                   </button>
                 </div>
               </div>
