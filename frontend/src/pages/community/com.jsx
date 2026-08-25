@@ -11,12 +11,15 @@ import ProfileSettings from './views/ProfileSettings';
 import Reviews from './views/Reviews';
 import ScanQR from './views/ScanQR';
 import JobApplicants from './views/JobApplicants';
+import Wallet from '../student/views/Wallet';
 
 const CommunityDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [verification, setVerification] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [wallet, setWallet] = useState(null);
+  const [transactions, setTransactions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,11 +34,19 @@ const CommunityDashboard = () => {
   // Active Job Details state (to view applicants)
   const [selectedJob, setSelectedJob] = useState(null);
 
-  // Fetch Employer and Jobs data
+  // Fetch Employer, Jobs, and Wallet data
   const fetchData = async () => {
     try {
-      const meResponse = await api.get('/auth/me');
+      const [meResponse, walletResponse] = await Promise.all([
+        api.get('/auth/me'),
+        api.get('/wallet/my-wallet')
+      ]);
+
       setUser(meResponse.data);
+      if (walletResponse.data) {
+        setWallet(walletResponse.data.wallet);
+        setTransactions(walletResponse.data.transactions || []);
+      }
 
       const verificationData = meResponse.data.employerVerification || null;
       setVerification(verificationData);
@@ -199,6 +210,7 @@ const CommunityDashboard = () => {
                 { id: 'my-jobs', label: 'My Job Posts', icon: '💼' },
                 { id: 'post-job', label: 'Post a Job', icon: '➕' },
                 { id: 'scan-qr', label: 'Scan Check-In', icon: '📷' },
+                { id: 'wallet', label: 'Wallet & Escrow', icon: '💳' },
                 { id: 'messages', label: 'Messages', icon: '💬' },
                 { id: 'reviews', label: 'Reviews Feed', icon: '⭐' },
               ].map((tab) => (
@@ -216,8 +228,6 @@ const CommunityDashboard = () => {
               ))}
             </nav>
           </div>
-
-
 
           {/* TOOLS */}
           <div>
@@ -284,13 +294,26 @@ const CommunityDashboard = () => {
             />
           </div>
 
-          {/* Top Right Stats Widget */}
+          {/* Top Right Wallet Widget */}
           <div className="flex items-center space-x-6">
+            <button
+              onClick={() => setActiveTab('wallet')}
+              className="bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs transition cursor-pointer shadow-sm"
+              title="Click to view Escrow Wallet"
+            >
+              <span className="text-gray-500 font-medium">Escrow Wallet:</span>
+              <strong className="text-emerald-700 font-bold">
+                LKR {parseFloat(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </strong>
+              <span className="text-[9px] text-emerald-800 uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-100 border border-emerald-200">
+                Active
+              </span>
+            </button>
 
             {/* Mock Nav controls */}
             <div className="flex items-center space-x-3 text-gray-500 text-sm">
               <button title="Notifications" className="hover:text-[#06402B]">🔔</button>
-              <button title="Messages" className="hover:text-[#06402B]">✉</button>
+              <button title="Messages" onClick={() => setActiveTab('messages')} className="hover:text-[#06402B]">✉</button>
             </div>
           </div>
 
@@ -303,6 +326,7 @@ const CommunityDashboard = () => {
           {activeTab === 'dashboard' && (
             <Overview
               jobs={jobs}
+              wallet={wallet}
               onNavigateToTab={(tab) => {
                 setActiveTab(tab);
                 setSelectedJob(null);
@@ -334,6 +358,14 @@ const CommunityDashboard = () => {
                 setActiveTab('my-jobs');
                 setSelectedJob(null);
               }}
+            />
+          )}
+
+          {activeTab === 'wallet' && (
+            <Wallet
+              wallet={wallet}
+              transactions={transactions}
+              onRefresh={fetchData}
             />
           )}
 

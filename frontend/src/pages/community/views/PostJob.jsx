@@ -244,29 +244,62 @@ const PostJob = ({ onJobCreated }) => {
         </div>
 
         {/* REQUIRED SKILLS SELECTABLE BADGES (New) */}
+        {/* Shift Cost Estimator Summary Card */}
+        <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-5 space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <span className="font-semibold text-gray-600">Required Staff:</span>
+            <span className="font-bold text-gray-900">{requiredEmployees || 1} student(s)</span>
+          </div>
+          <div className="flex justify-between items-center text-xs">
+            <span className="font-semibold text-gray-600">Pay Rate per Student:</span>
+            <span className="font-bold text-emerald-800">LKR {parseFloat(payAmount || 0).toFixed(2)}</span>
+          </div>
+          <div className="pt-2 border-t border-emerald-200/80 flex justify-between items-center">
+            <span className="text-xs font-bold text-[#06402B] uppercase tracking-wider">Estimated Total Escrow:</span>
+            <span className="text-lg font-extrabold text-[#06402B]">
+              LKR {(parseFloat(payAmount || 0) * parseInt(requiredEmployees || 1, 10)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+        </div>
+
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-2">Required Skills (Select multiple)</label>
-          <div className="flex flex-wrap gap-2 p-3 bg-gray-100/40 border border-gray-200 rounded-lg">
-            {dbSkills.length === 0 ? (
-              <span className="text-xs text-gray-500 animate-pulse">Loading skills list...</span>
+          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Skills</label>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {['Barista', 'Customer Service', 'Cashier', 'Tutoring', 'Event Coordination', 'Delivery'].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => {
+                  if (!selectedSkills.includes(preset)) {
+                    setSelectedSkills([...selectedSkills, preset]);
+                  }
+                }}
+                className="text-[10px] font-bold bg-white hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 text-gray-700 hover:text-[#06402B] px-2.5 py-1 rounded-full transition cursor-pointer"
+              >
+                + {preset}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl min-h-[50px]">
+            {dbSkills.length === 0 && selectedSkills.length === 0 ? (
+              <span className="text-xs text-gray-400">Click preset tags above to attach required skills...</span>
             ) : (
-              dbSkills.map((skill) => {
-                const isSelected = selectedSkills.includes(skill.name);
-                return (
+              selectedSkills.map((skill) => (
+                <span
+                  key={skill}
+                  className="bg-emerald-100 text-emerald-900 border border-emerald-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"
+                >
+                  {skill}
                   <button
-                    key={skill.id}
                     type="button"
-                    onClick={() => toggleSkill(skill.name)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition cursor-pointer select-none ${
-                      isSelected
-                        ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-                        : 'bg-gray-100 border-gray-200 text-gray-500 hover:border-gray-650'
-                    }`}
+                    onClick={() => setSelectedSkills(selectedSkills.filter(s => s !== skill))}
+                    className="text-emerald-800 hover:text-red-700 font-bold ml-1"
                   >
-                    {skill.name}
+                    ✕
                   </button>
-                );
-              })
+                </span>
+              ))
             )}
           </div>
         </div>
