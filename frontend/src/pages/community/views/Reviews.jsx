@@ -53,20 +53,20 @@ const Reviews = ({ user }) => {
       <div className="flex gap-2 border-b border-gray-200 pb-4">
         <button
           onClick={() => setActiveSubTab('received')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+          className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
             activeSubTab === 'received'
-              ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-              : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-200'
+              ? 'bg-[#06402B] border-[#06402B] text-white shadow-md shadow-emerald-950/15'
+              : 'bg-white border-gray-200 text-gray-600 hover:text-[#06402B] hover:border-gray-300'
           }`}
         >
           Received Reviews (from Students)
         </button>
         <button
           onClick={() => setActiveSubTab('sent')}
-          className={`px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+          className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
             activeSubTab === 'sent'
-              ? 'bg-[#06402B] border-[#06402B] text-[#06402B] shadow-md shadow-blue-500/20'
-              : 'bg-white border-gray-200 text-gray-500 hover:text-[#06402B] hover:border-gray-200'
+              ? 'bg-[#06402B] border-[#06402B] text-white shadow-md shadow-emerald-950/15'
+              : 'bg-white border-gray-200 text-gray-600 hover:text-[#06402B] hover:border-gray-300'
           }`}
         >
           Sent Reviews

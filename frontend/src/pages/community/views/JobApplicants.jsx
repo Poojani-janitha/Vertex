@@ -138,20 +138,20 @@ const JobApplicants = ({ job, onBack }) => {
                   <button
                     onClick={() => handleUpdateStatus(selectedApplicant.id, 'accepted')}
                     disabled={selectedApplicant.status === 'accepted'}
-                    className={`flex-1 font-semibold py-2 px-4 rounded-lg text-xs text-[#06402B] transition ${
-                      selectedApplicant.status === 'accepted' ? 'bg-green-700/50 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500'
+                    className={`flex-1 font-bold py-2.5 px-4 rounded-xl text-xs text-white transition shadow-sm cursor-pointer ${
+                      selectedApplicant.status === 'accepted' ? 'bg-emerald-800/60 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-500'
                     }`}
                   >
-                    Accept Application
+                    {selectedApplicant.status === 'accepted' ? '✓ Accepted' : 'Accept Candidate'}
                   </button>
                   <button
                     onClick={() => handleUpdateStatus(selectedApplicant.id, 'rejected')}
                     disabled={selectedApplicant.status === 'rejected'}
-                    className={`flex-1 font-semibold py-2 px-4 rounded-lg text-xs text-[#06402B] transition ${
-                      selectedApplicant.status === 'rejected' ? 'bg-red-700/50 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
+                    className={`flex-1 font-bold py-2.5 px-4 rounded-xl text-xs text-white transition shadow-sm cursor-pointer ${
+                      selectedApplicant.status === 'rejected' ? 'bg-red-800/60 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'
                     }`}
                   >
-                    Reject Application
+                    {selectedApplicant.status === 'rejected' ? '✕ Rejected' : 'Decline Application'}
                   </button>
                 </div>
               </div>
