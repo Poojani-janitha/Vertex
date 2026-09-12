@@ -45,10 +45,10 @@ const Home = () => {
   ];
 
   const stats = [
-    { value: '1,500+', label: 'Verified Students' },
-    { value: '350+', label: 'Trusted Employers' },
-    { value: 'LKR 4.2M+', label: 'Paid Out to Students' },
-    { value: '4.9 ★', label: 'Student Satisfaction' }
+    { value: 'Verified', label: 'Student profiles' },
+    { value: 'Reviewed', label: 'Employer accounts' },
+    { value: 'Tracked', label: 'QR shift attendance' },
+    { value: 'Secure', label: 'In-app wallet payments' }
   ];
 
   return (
@@ -134,7 +134,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 2. LIVE PLATFORM METRICS */}
+      {/* 2. PLATFORM FEATURES */}
       <section className="max-w-6xl mx-auto px-4">
         <div className="bg-gradient-to-br from-[#06402B] to-[#0a5c3f] rounded-3xl p-8 sm:p-12 text-white shadow-2xl shadow-emerald-950/25 relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
